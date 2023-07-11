@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
   /*DLA関係*/
   const int dla_n = 15000;       // DLAの総粒子数
   const int dla_step = 150;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
-  const double C = 1.0 / 4;      // 分散の大きさ
+  const double C = 1.0 / 16;     // 分散の大きさ
   double alpha = atof(argv[1]);  // RWの電場による異方性の大きさ
 
   int i, j, k;
