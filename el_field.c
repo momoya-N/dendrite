@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <time.h>
 
 #define N 512             // 系の大きさ
@@ -54,6 +55,18 @@ double p(void) {  // 0〜1の乱数発生
   rn = rand() / (double)RAND_MAX;
 
   return rn;
+}
+
+double phi_exact(int i, int j, double MaxPhi) {  // 電位の解析解(2次元)
+  int rmax = CEN - 1;
+  int r0 = CEN * 0.05;
+  double Phi_r;
+  double r;
+
+  r = sqrt(rr(i, j));
+  Phi_r = MaxPhi / (log(rmax) - log(r0)) * (log(r) - log(r0));
+
+  return Phi_r;
 }
 
 void DLA(int **data) {        // DLA形状の形成,用意した配列のポインタを渡す
@@ -141,9 +154,9 @@ void DLA(int **data) {        // DLA形状の形成,用意した配列のポイ�
 }
 
 int main(void) {
-  const double dif = 1.0e-1;  // 収束判定,前回ループとの差
+  const double dif = 1.0e-6;  // 収束判定,前回ループとの差
+  const double MaxPhi = 1.0;  // 最大電位
 
-  double MaxPhi;  // 最大電位
   double MaxErr;  // 最大誤差
   double CurErr;  // 現在の誤差
   double Ex, Ey;  // 電場
@@ -169,7 +182,7 @@ int main(void) {
   }
 
   // phi, rho, Prev_phi, sh_in, sh_out を初期化
-  Initialize_double(phi, 5.0);
+  Initialize_double(phi, MaxPhi);
   Initialize_double(rho, 0);
   Initialize_double(Prev_phi, 0);
   // Initialize_double(errtest, 0);
@@ -217,7 +230,7 @@ int main(void) {
   /*繰り返し計算*/
   loop = 0;
 
-  MaxPhi = 5.0;  // 系内の最大電位、0除算の防止用のため有限値を入れる
+  // MaxPhi = 5.0;  // 系内の最大電位、0除算の防止用のため有限値を入れる
 
 #if DEBUG == 0  // 一方向に値を計算、更新前と更新後の混在データによる電位計算
   double Phi_tmp = 0;
@@ -401,45 +414,55 @@ int main(void) {
   /*経過時間の表示*/
   printf("real_time:%ld\tCPU_time:%lu\n", end_time - start_time, (end_clock - start_clock) / CLOCKS_PER_SEC);
 
-  /*電位の出力*/
-  f = fopen("Phi.dat", "w");
+  /*解析解とのずれの出力*/
+  char dirname[100];
+  char fname[100];
+
+  sprintf(dirname, "./test/errtest");
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./test/errtest/threshold");
+  mkdir(dirname, 0777);
+  sprintf(fname, "./test/errtest/threshold/threshold_dif=%f.dat", dif);  // ディレクトリ作成
+
+  f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
     for (j = 0; j < N; j++) {
-      fprintf(f, "%d %d %e\n", i, j, phi[i][j]);
-    }
-  }
-  fclose(f);
-
-  /*電場出力*/
-  f = fopen("El.dat", "w");
-  for (i = 1; i < N - 1; i++) {
-    for (j = 1; j < N - 1; j++) {
-      Ex = -(phi[i + 1][j] - phi[i - 1][j]) / 2;
-      Ey = -(phi[i][j + 1] - phi[i][j - 1]) / 2;
-
-      fprintf(f, "%d %d %e %e %e\n", i, j, sqrt(Ex * Ex + Ey * Ey), Ex, Ey);
-    }
-  }
-  fclose(f);
-
-  /*極の形状出力*/
-  f = fopen("Shape.dat", "w");
-  for (i = 0; i < N; i++) {
-    for (j = 0; j < N; j++) {
-      fprintf(f, "%d ", sh_in[i][j]);
+      if (phi[i][j] != 0) {
+        fprintf(f, "%f ", phi[i][j] - phi_exact(i, j, MaxPhi));
+      } else {
+        fprintf(f, "0.0 ");
+      }
     }
     fprintf(f, "\n");
   }
   fclose(f);
 
-  // /*対称性とのずれの出力*/
-  // f = fopen("errtest.dat", "w");
-  // double err = 0;
-
+  /*電位の出力*/
+  // f = fopen("Phi.dat", "w");
   // for (i = 0; i < N; i++) {
   //   for (j = 0; j < N; j++) {
-  //     err = fabs(phi[i][j] - phi[N - 1 - i][N - 1 - j]);
-  //     fprintf(f, "%e ", err);
+  //     fprintf(f, "%d %d %e\n", i, j, phi[i][j]);
+  //   }
+  // }
+  // fclose(f);
+
+  // /*電場出力*/
+  // f = fopen("El.dat", "w");
+  // for (i = 1; i < N - 1; i++) {
+  //   for (j = 1; j < N - 1; j++) {
+  //     Ex = -(phi[i + 1][j] - phi[i - 1][j]) / 2;
+  //     Ey = -(phi[i][j + 1] - phi[i][j - 1]) / 2;
+
+  //     fprintf(f, "%d %d %e %e %e\n", i, j, sqrt(Ex * Ex + Ey * Ey), Ex, Ey);
+  //   }
+  // }
+  // fclose(f);
+
+  // /*極の形状出力*/
+  // f = fopen("Shape.dat", "w");
+  // for (i = 0; i < N; i++) {
+  //   for (j = 0; j < N; j++) {
+  //     fprintf(f, "%d ", sh_in[i][j]);
   //   }
   //   fprintf(f, "\n");
   // }
