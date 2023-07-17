@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdio.h>
-#define NAME 64  // ファイル名の長さの上限です。64に特に意味はありません
+#define NAME 100  // ファイル名の長さの上限
 
 #define swap(a, b) \
   do {             \
@@ -13,7 +13,7 @@
 typedef struct complex {  // 複素数を構造体で実現
   double r;
   double i;
-} complex;
+} complex;  // 名付け方良くない,型のタグ名と型名は変えるべき
 
 void cre_w(int N, complex w[]) {  // 1のn乗根を三角関数を用いて生成
   for (int i = 0; i < N; i++) {
@@ -23,14 +23,13 @@ void cre_w(int N, complex w[]) {  // 1のn乗根を三角関数を用いて生�
 }
 
 void cal(complex a, complex b, complex *y) {  // 複素数同士の積の計算
-  y->r = a.r * b.r -
-         a.i * b.i;  // yはポインタで渡して計算結果をmainのに戻るようにする
+  y->r = a.r * b.r - a.i * b.i;               // yはポインタで渡して計算結果をmainに戻るようにする
   y->i = a.r * b.i + a.i * b.r;
 }
 
 int ff(int i) {  // 渡されたiが2の何乗なのかをintで返す
   int r = 0;
-  for (; i > 1;) {
+  for (; i > 1;) {  // Whileと同義,無限ループ処理
     i /= 2;
     r++;
   }
@@ -39,7 +38,9 @@ int ff(int i) {  // 渡されたiが2の何乗なのかをintで返す
 
 int power2(int i) {  // ２のi乗を返す
   int r = 1;
-  for (int l = 0; l < i; l++) r *= 2;
+  for (int l = 0; l < i; l++) {
+    r *= 2;
+  }
   return r;
 }
 
@@ -47,10 +48,11 @@ void change2(int N, int k, int bit[ff(N)]) {  // kを2進数に変換して配�
   for (int j = 0; j < k; j++) {
     for (int l = 0; l < ff(N); l++) {
       bit[l]++;
-      if (bit[l] < 2)  // 筆算の容量で位上げを実装
+      if (bit[l] < 2) {  // 筆算の容量で位上げを実装
         break;
-      else
+      } else {
         bit[l] = 0;
+      }
     }
   }
 }
@@ -63,15 +65,13 @@ int change10(int N, int bit[ff(N)]) {  // 2進数の配列を10進数に戻す
   return r;
 }
 
-void bit_revers(
-    int N,
-    int bit[ff(N)]) {  // 2進数の配列をビットリバースする 配列の長さはff(N)
-
-  for (int i = 0; i < (int)(ff(N) / 2); i++) swap(bit[i], bit[ff(N) - 1 - i]);
+void bit_revers(int N, int bit[ff(N)]) {  // 2進数の配列をビットリバースする 配列の長さはff(N)
+  for (int i = 0; i < (int)(ff(N) / 2); i++) {
+    swap(bit[i], bit[ff(N) - 1 - i]);
+  }
 }
 
-int rev(int N,
-        int k) {  // 10進数の数字を渡すとその数字をビットリバースした数字を返す
+int rev(int N, int k) {  // 10進数の数字を渡すとその数字をビットリバースした数字を返す
   int bit[ff(N)];
 
   for (int i = 0; i < ff(N); i++) bit[i] = 0;
@@ -83,12 +83,12 @@ int rev(int N,
 }
 
 void clear_com(int N, complex a[N]) {  // complexの中身をすべて0にする
-  for (int i = 0; i < N; i++) a[i].r = a[i].i = 0;
+  for (int i = 0; i < N; i++) {
+    a[i].r = a[i].i = 0;
+  }
 }
 
-void FFT(
-    int N, complex x[N],
-    complex X[N]) {  // FFT xには最初は信号を渡す、Xには求める変換が返ってくる
+void FFT(int N, complex x[N], complex X[N]) {  // FFT xには最初は信号を渡す、Xには求める変換が返ってくる
   complex w[N];
   clear_com(N, w);
   cre_w(N, w);  // N個の1のN乗根を生成
@@ -124,6 +124,11 @@ void FFT(
     for (int j = 0; j < N / 2; j++) {  // 返ってきたX1,X2をXに順に格納する
       X[j] = X1[j];
       X[N / 2 + j] = X2[j];
+      // if (X[j].r != 0) {
+      //   printf("%f", X[j].r);
+      // } else if (X[N / 2 + j].r != 0) {
+      //   printf("%f", X[N / 2 + j].r);
+      // }
     }
 
   } else {  // N=2のとき、つまりループの末端の場合
@@ -163,7 +168,7 @@ void WRITE(int N, complex x[N], char fn[NAME]) {  // 書き込み用関数
 }
 
 int main(int argc, const char *argv[]) {
-  int N = 65536;  // ここはフーリエ変換にかける信号長の長さを自分で設定する
+  int N = 512;  // ここはフーリエ変換にかける信号長の長さを自分で設定する
   char fn[NAME];
   complex x[N];    // 信号を格納
   complex X[N];    // 関数FFTで最終的に求める変換を格納する配列
@@ -173,23 +178,23 @@ int main(int argc, const char *argv[]) {
   clear_com(N, X);
   clear_com(N, X_t);
 
-  printf("どのファイルから読み込みますか?");
-  scanf("%s", fn);
-  SCAN(N, x, fn);
+  // printf("どのファイルから読み込みますか?");
+  // scanf("%s", fn);
+  SCAN(N, x, "./test/FFT_test_1d.dat");
 
   FFT(N, x, X);
   printf("hhhh\n");
-  printf("%f %fa\n%f %f\n", X[2].r, X[2].i, X[3].r, X[3].i);
+  // printf("%f %f\n%f %f\n", X[2].r, X[2].i, X[3].r, X[3].i);
   for (int i = 0; i < N; i++) {  // X_tにXの結果を入れる
     X_t[rev(N, i)] = X[i];
   }
   printf("hhhh\n");
-  printf("%f %fa\n%f %f\n", X_t[2].r, X_t[2].i, X_t[3].r, X_t[3].i);
+  // printf("%f %f\n%f %f\n", X_t[2].r, X_t[2].i, X_t[3].r, X_t[3].i);
   printf("FFTが完了しました\n");
 
-  printf("どのファイルに書き込みますか?");
-  scanf("%s", fn);
-  WRITE(N, X_t, fn);
+  // printf("どのファイルに書き込みますか?");
+  // scanf("%s", fn);
+  WRITE(N, X, "./test/FFT_test.dat");
 
   return 0;
 }
