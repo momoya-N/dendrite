@@ -39,18 +39,6 @@ void Initialize_double(double **data, double a) {  // data , initial value
   }
 }
 
-int step(double x) {  // Heviside's step function
-  int r = 0;          // return
-
-  if (x <= 0) {
-    r = 0;
-  } else if (x > 0) {
-    r = 1;
-  }
-
-  return r;
-}
-
 double rr(int i, int j) {  // 中心からの距離の2乗
   double rr;
 
@@ -79,13 +67,84 @@ double p(void) {  // 0〜1の乱数発生
   return rn;
 }
 
-void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int *n_p1, int *n_p2, int *n_p3, int *n_p4,
-         int *n_q) {  // DLA,形状の配列ポインタ(data1),(Particle)粒子分成長後終了,各点での移動確立の異方性(data2),異方性の影響の大きさ(alpha),分散の大きさ(C),各粒子が0-1を超えた回数
+int flag(int x, int y) {  // ある座標が配列内にあるかどうか調べる
+  int flag = 0;
+  if (0 <= x && x < N && 0 <= y && y < N) {
+    flag = 1;
+  }
+
+  return flag;
+}
+
+void cen_of_mass(int **data, double *R_c, int dla_n) {  // 系の重心を求める,DLA形状データ,重心保存用配列、粒子数を入れる
+  double r_x = 0, r_y = 0;
+  int i, j;
+
+  for (i = 0; i < N; i++) {
+    for (j = 0; j < N; j++) {
+      if (data[i][j] == 1) {
+        r_x += i;
+        r_y += j;
+      }
+    }
+  }
+  R_c[0] = r_x / dla_n;
+  R_c[1] = r_y / dla_n;
+}
+
+double r_g(int **data, double r_c[2], int dla_n) {  // 回転半径を求める,DLA形状データ、重心位置、粒子数を入れる
+  int i, j;
+  double tmp = 0.0;
+  double r_g;  // 回転半径
+
+  for (i = 0; i < N; i++) {
+    for (j = 0; j < N; j++) {
+      if (data[i][j] == 1) {
+        tmp += (i - r_c[0]) * (i - r_c[0]) + (j - r_c[1]) * (j - r_c[1]);
+      }
+    }
+  }
+  r_g = sqrt(tmp / dla_n);
+
+  return r_g;
+}
+
+double C_r(int **data, double r, int dla_n) {  // 半径rの時の密度相関関数の計算,密度相関関数法、配列(DLAの配置)と相関距離r,総粒子数Nを入力
+  int n = 1000;                                // dthの分割数
+  int k = 0;
+  int i, j;
+  int r_x, r_y;
+  double c = 0;    // 平均化前の密度相関関数
+  double C_r = 0;  // 平均化後の密度相関関数
+  double rho_sum;
+  double dth = 2 * M_PI / n;  // こっちの方が理論値に近い。定数で割ってるから?(変数rで割るのはやはりまずいか？)
+
+  while ((dth * k) <= (2.0 * M_PI)) {
+    rho_sum = 0;
+    r_x = r * cos(dth * k);
+    r_y = r * sin(dth * k);
+    for (i = 0; i < N; i++) {
+      for (j = 0; j < N; j++) {
+        if (flag(i + r_x, j + r_y) == 1 && (data[i][j] == 1) && (data[i + r_x][j + r_y] == 1)) {
+          rho_sum++;
+        }
+      }
+    }
+    c += rho_sum;
+    k++;
+  }
+  C_r = c / (n * dla_n);
+
+  return C_r;
+}
+
+void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int *n_p1, int *n_p2, int *n_p3, int *n_p4, int *n_q,
+         double P) {  // DLA,形状の配列ポインタ(data1),(Particle)粒子分成長後終了,各点での移動確立の異方性(data2),異方性の影響の大きさ(alpha),分散の大きさ(C),各粒子が0-1を超えた回数,固着確率
   int const D = 30;   // 粒子発生位置のフロントラインからの距離
-  int const R_C = CEN;   // DLAの棄却領域
-  int const RM = CEN;    // DLAの最大成長半径
-  double const P = 1.0;  // 粒子の固着確率
-  // double const C = 3.0 / 16;                                          // variance (constant),2*C
+  int const R_C = CEN;  // DLAの棄却領域
+  int const RM = CEN;   // DLAの最大成長半径
+  // double const P = 1.0;  // 粒子の固着確率
+  //  double const C = 3.0 / 16;                                          // variance (constant),2*C
 
   int x0, y0;  // 粒子の移動後保存用
   int x, y;    // 粒子の位置
@@ -93,7 +152,7 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
   int dr = 0;  // 粒子発生半径調整用、粒子のフロントライン
   int r = 0;   // 粒子発生半径
   int t = 0;   // ステップ数
-  int i, j;    // index for "for"
+  int i, j;
 
   double th;                 // 角度θ
   double tmp;                // 確率保存用
@@ -206,8 +265,8 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 2) {
-    printf("./DLA alpha\n");
+  if (argc != 3) {
+    printf("error\n");
     return 1;
   }
 
@@ -218,15 +277,18 @@ int main(int argc, char *argv[]) {
   start_clock = clock();
 
   /*DLA関係*/
-  const int dla_n = 15000;       // DLAの総粒子数
-  const int dla_step = 150;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
-  const double C = 1.0 / 16;     // 分散の大きさ
-  double alpha = atof(argv[1]);  // RWの電場による異方性の大きさ
+  const int dla_n = 15000;         // DLAの総粒子数
+  const int dla_step = 150;        // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
+  const double C = 3.0 / 16;       // 分散の大きさ
+  const double P = atof(argv[1]);  // 固着確率
+  double alpha = atof(argv[2]);    // RWの電場による異方性の大きさ
 
   int i, j, k;
 
   int n;                                                // DLA粒子数計測用
   int n_p1 = 0, n_p2 = 0, n_p3 = 0, n_p4 = 0, n_q = 0;  // countes for range over probability
+  double R_c[2] = {};                                   // 重心座標
+  double R_g;                                           // 回転半径
 
   /*電場計算関係*/
   const double dif = 1.0e-5;  // 収束判定,前回ループとの差
@@ -297,7 +359,7 @@ int main(int argc, char *argv[]) {
   // MaxPhi = 5.0;  // 系内の最大電位、0除算の防止用のため有限値を入れる
 
   for (k = 0; k < (int)(dla_n / dla_step); k++) {
-    DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q);  // DLAの計算
+    DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q, P);  // DLAの計算
     // printf("%d\t%d\t%d\t%d\t%d\n", n_p1, n_p2, n_p3, n_p4, n_q);
     n = (k + 1) * dla_step;  // DLAの現在の総粒子数
 
@@ -381,9 +443,11 @@ int main(int argc, char *argv[]) {
 
   sprintf(dirname, "./data/C=%f", C);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/Phi_data", C);
+  sprintf(dirname, "./data/C=%f/P=%f", C, P);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/Phi_data/Phi_alpha=%f.dat", C, alpha);  // ディレクトリ、ファイル作成
+  sprintf(dirname, "./data/C=%f/P=%f/Phi_data", C, P);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f/P=%f/Phi_data/Phi_alpha=%f.dat", C, P, alpha);  // ディレクトリ、ファイル作成
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -394,9 +458,11 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*電場出力、最終のEl_field*/
-  sprintf(dirname, "./data/C=%f/El_data", C);
+  sprintf(dirname, "./data/C=%f/P=%f", C, P);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/El_data/El_alpha=%f.dat", C, alpha);  // ディレクトリ作成
+  sprintf(dirname, "./data/C=%f/P=%f/El_data", C, P);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f/P=%f/El_data/El_alpha=%f.dat", C, P, alpha);  // ディレクトリ作成
 
   f = fopen(fname, "w");
   for (i = 1; i < N - 1; i++) {
@@ -409,9 +475,11 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*形状出力*/
-  sprintf(dirname, "./data/C=%f/DLA_data", C);
+  sprintf(dirname, "./data/C=%f/P=%f", C, P);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/DLA_data/DLA_alpha=%f.dat", C, alpha);
+  sprintf(dirname, "./data/C=%f/P=%f/DLA_data", C, P);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f/P=%f/DLA_data/DLA_alpha=%f.dat", C, P, alpha);
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -423,13 +491,37 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*その他データ出力,読み込みはmatplotlib用(コメントアウト文字が#)*/
-  sprintf(dirname, "./data/C=%f/other_data", C);
+  sprintf(dirname, "./data/C=%f/P=%f", C, P);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/other_data/other_alpha=%f.dat", C, alpha);
+  sprintf(dirname, "./data/C=%f/P=%f/other_data", C, P);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f/P=%f/other_data/other_alpha=%f.dat", C, P, alpha);
 
   f = fopen(fname, "w");
   fprintf(f, "#alpha\tn_p1\tn_p2\tn_p3\tn_p4\tn_q\n");
   fprintf(f, "%f\t%d\t%d\t%d\t%d\t%d\n", alpha, n_p1, n_p2, n_p3, n_p4, n_q);
+  fclose(f);
+
+  /*correlation function*/
+  sprintf(dirname, "./data/C=%f/P=%f", C, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f/P=%f/Correlation_function_data", C, P);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f/P=%f/Correlation_function_data/Cor_func_alpha=%f.dat", C, P, alpha);
+
+  f = fopen(fname, "w");
+
+  cen_of_mass(sh_in, R_c, dla_n);
+  R_g = r_g(sh_in, R_c, dla_n);
+  // printf("R_c_x=%f\tR_c_y=%f\tR_g=%f\n", R_c[0], R_c[1], R_g);
+
+  double d = 2.0;      // 回転半径
+  double index = 1.0;  // 回転半径の指数
+
+  fprintf(f, "#R_g\tr\tcor_func\n");
+  for (d = 2.0; pow(d, index) < 0.8 * CEN; index += 0.5) {
+    fprintf(f, "%f\t%f\t%f\n", R_g, pow(d, index), C_r(sh_in, pow(d, index), dla_n));
+  }
   fclose(f);
 
   // printf("final loop:%d\n", loop);
