@@ -277,11 +277,11 @@ int main(int argc, char *argv[]) {
   start_clock = clock();
 
   /*DLA関係*/
-  const int dla_n = 15000;         // DLAの総粒子数
-  const int dla_step = 150;        // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
-  const double C = 3.0 / 16;       // 分散の大きさ
-  const double P = atof(argv[1]);  // 固着確率
-  double alpha = atof(argv[2]);    // RWの電場による異方性の大きさ
+  const int dla_n = 15000;       // DLAの総粒子数
+  const int dla_step = 150;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
+  const double C = 3.0 / 16;     // 分散の大きさ
+  double P = 1.0;                // 固着確率
+  double alpha = atof(argv[2]);  // RWの電場による異方性の大きさ
 
   int i, j, k;
 
@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
   /*電場計算関係*/
   const double dif = 1.0e-5;  // 収束判定,前回ループとの差
 
-  double MaxPhi = 1.0;            // 最大電位
+  double MaxPhi = atof(argv[1]);  // 最大電位
   double MaxErr;                  // 最大誤差
   double CurErr;                  // 現在の誤差
   double Phi_tmp;                 // 電位一時保管用
@@ -443,11 +443,11 @@ int main(int argc, char *argv[]) {
 
   sprintf(dirname, "./data/C=%f", C);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/P=%f", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/P=%f/Phi_data", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f/Phi_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/P=%f/Phi_data/Phi_alpha=%f.dat", C, P, alpha);  // ディレクトリ、ファイル作成
+  sprintf(fname, "./data/C=%f/V=%f/Phi_data/Phi_alpha=%f.dat", C, MaxPhi, alpha);  // ディレクトリ、ファイル作成
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -458,11 +458,11 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*電場出力、最終のEl_field*/
-  sprintf(dirname, "./data/C=%f/P=%f", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/P=%f/El_data", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f/El_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/P=%f/El_data/El_alpha=%f.dat", C, P, alpha);  // ディレクトリ作成
+  sprintf(fname, "./data/C=%f/V=%f/El_data/El_alpha=%f.dat", C, MaxPhi, alpha);  // ディレクトリ作成
 
   f = fopen(fname, "w");
   for (i = 1; i < N - 1; i++) {
@@ -475,11 +475,11 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*形状出力*/
-  sprintf(dirname, "./data/C=%f/P=%f", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/P=%f/DLA_data", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f/DLA_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/P=%f/DLA_data/DLA_alpha=%f.dat", C, P, alpha);
+  sprintf(fname, "./data/C=%f/V=%f/DLA_data/DLA_alpha=%f.dat", C, MaxPhi, alpha);
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -491,11 +491,11 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*その他データ出力,読み込みはmatplotlib用(コメントアウト文字が#)*/
-  sprintf(dirname, "./data/C=%f/P=%f", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/P=%f/other_data", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f/other_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/P=%f/other_data/other_alpha=%f.dat", C, P, alpha);
+  sprintf(fname, "./data/C=%f/V=%f/other_data/other_alpha=%f.dat", C, MaxPhi, alpha);
 
   f = fopen(fname, "w");
   fprintf(f, "#alpha\tn_p1\tn_p2\tn_p3\tn_p4\tn_q\n");
@@ -503,11 +503,11 @@ int main(int argc, char *argv[]) {
   fclose(f);
 
   /*correlation function*/
-  sprintf(dirname, "./data/C=%f/P=%f", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/P=%f/Correlation_function_data", C, P);
+  sprintf(dirname, "./data/C=%f/V=%f/Correlation_function_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/P=%f/Correlation_function_data/Cor_func_alpha=%f.dat", C, P, alpha);
+  sprintf(fname, "./data/C=%f/V=%f/Correlation_function_data/Cor_func_alpha=%f.dat", C, MaxPhi, alpha);
 
   f = fopen(fname, "w");
 
