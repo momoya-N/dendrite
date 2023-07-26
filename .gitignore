@@ -1,5 +1,8 @@
 *.dat
 *.DS_Store
 *.json
-a.out
+*.png
+*.avi
+*.mp4
+a.out 
 DLA
