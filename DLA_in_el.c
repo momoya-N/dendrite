@@ -265,8 +265,8 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
 }
 
 void w_shape(double C, double MaxPhi, double alpha, int **data, int k) {  // DLA形状出力,sh_inのdata
-  char dirname[100];
-  char fname[100];
+  char dirname[200];
+  char fname[200];
   FILE *f;
 
   sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
@@ -291,7 +291,7 @@ void w_shape(double C, double MaxPhi, double alpha, int **data, int k) {  // DLA
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
+  if (argc != 4) {
     printf("error\n");
     return 1;
   }
@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
   const int dla_n = 15000;       // DLAの総粒子数
   const int dla_step = 150;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
   const double C = 3.0 / 16;     // 分散の大きさ
-  double P = 1.0;                // 固着確率
+  double P = atof(argv[1]);      // 固着確率
   double alpha = atof(argv[2]);  // RWの電場による異方性の大きさ
 
   int i, j, k;
@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
   /*電場計算関係*/
   const double dif = 1.0e-5;  // 収束判定,前回ループとの差
 
-  double MaxPhi = atof(argv[1]);  // 最大電位
+  double MaxPhi = 1.0;            // 最大電位
   double MaxErr;                  // 最大誤差
   double CurErr;                  // 現在の誤差
   double Phi_tmp;                 // 電位一時保管用
@@ -367,8 +367,9 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-
-  FILE *f;  // ファイルハンドラ
+  /*計算・ファイル処理関係*/
+  FILE *f;                  // ファイルハンドラ
+  int num = atof(argv[3]);  // 名付け用インデックス
 
   // printf("Initializing...\n");
 
@@ -386,8 +387,8 @@ int main(int argc, char *argv[]) {
 
   for (k = 0; k < (int)(dla_n / dla_step); k++) {
     DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q, P);  // DLAの計算
-    w_shape(C, MaxPhi, alpha, sh_in, k);
-    // printf("%d\t%d\t%d\t%d\t%d\n", n_p1, n_p2, n_p3, n_p4, n_q);
+    // w_shape(C, MaxPhi, alpha, sh_in, k);
+    //  printf("%d\t%d\t%d\t%d\t%d\n", n_p1, n_p2, n_p3, n_p4, n_q);
     n = (k + 1) * dla_step;  // DLAの現在の総粒子数
 
     Initialize_each_step_duble(phi, 0.0, sh_in);  // 極板形状をDLAにして、極板の電位を0にする
@@ -465,8 +466,8 @@ int main(int argc, char *argv[]) {
   // printf("finish calculation\tEmax:%f\n", E_max);
 
   // /*電位の出力*/
-  // char dirname[100];
-  // char fname[100];
+  char dirname[200];
+  char fname[200];
 
   // sprintf(dirname, "./data/C=%f", C);
   // mkdir(dirname, 0777);
@@ -501,21 +502,27 @@ int main(int argc, char *argv[]) {
   // }
   // fclose(f);
 
-  // /*形状出力*/
-  // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f/V=%f/DLA_data", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(fname, "./data/C=%f/V=%f/DLA_data/DLA_alpha=%f.dat", C, MaxPhi, alpha);
+  /*形状出力*/
+  sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f", C, MaxPhi, P, alpha);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, P, alpha, num);
 
-  // f = fopen(fname, "w");
-  // for (i = 0; i < N; i++) {
-  //   for (j = 0; j < N; j++) {
-  //     fprintf(f, "%d ", sh_in[i][j]);
-  //   }
-  //   fprintf(f, "\n");
-  // }
-  // fclose(f);
+  f = fopen(fname, "w");
+  for (i = 0; i < N; i++) {
+    for (j = 0; j < N; j++) {
+      fprintf(f, "%d ", sh_in[i][j]);
+    }
+    fprintf(f, "\n");
+  }
+  fclose(f);
 
   // /*その他データ出力,読み込みはmatplotlib用(コメントアウト文字が#)*/
   // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
@@ -529,27 +536,31 @@ int main(int argc, char *argv[]) {
   // fprintf(f, "%f\t%d\t%d\t%d\t%d\t%d\n", alpha, n_p1, n_p2, n_p3, n_p4, n_q);
   // fclose(f);
 
-  // /*correlation function*/
-  // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f/V=%f/Correlation_function_data", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(fname, "./data/C=%f/V=%f/Correlation_function_data/Cor_func_alpha=%f.dat", C, MaxPhi, alpha);
+  /*correlation function*/
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f", C, MaxPhi, P, alpha);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, P, alpha, num);
 
-  // f = fopen(fname, "w");
+  f = fopen(fname, "w");
 
-  // cen_of_mass(sh_in, R_c, dla_n);
-  // R_g = r_g(sh_in, R_c, dla_n);
-  // // printf("R_c_x=%f\tR_c_y=%f\tR_g=%f\n", R_c[0], R_c[1], R_g);
+  cen_of_mass(sh_in, R_c, dla_n);
+  R_g = r_g(sh_in, R_c, dla_n);
+  // printf("R_c_x=%f\tR_c_y=%f\tR_g=%f\n", R_c[0], R_c[1], R_g);
 
-  // double d = 2.0;      // 回転半径
-  // double index = 1.0;  // 回転半径の指数
+  double d = 2.0;      // 回転半径
+  double index = 1.0;  // 回転半径の指数
 
-  // fprintf(f, "#R_g\tr\tcor_func\n");
-  // for (d = 2.0; pow(d, index) < 0.8 * CEN; index += 0.5) {
-  //   fprintf(f, "%f\t%f\t%f\n", R_g, pow(d, index), C_r(sh_in, pow(d, index), dla_n));
-  // }
-  // fclose(f);
+  fprintf(f, "#R_g\tr\tcor_func\n");
+  for (d = 2.0; pow(d, index) < 0.8 * CEN; index += 0.5) {
+    fprintf(f, "%f\t%f\t%f\n", R_g, pow(d, index), C_r(sh_in, pow(d, index), dla_n));
+  }
+  fclose(f);
 
   // printf("final loop:%d\n", loop);
 
