@@ -8,12 +8,12 @@
 gcc DLA_in_el.c -o DLA #以下MaxPhi,alpha,numの順で記述
 (
 #for i in 1.0 #Voltage
-for i in {0.7,0.4,0.1} #sticking probability
+for i in {1.0,0.7,0.4,0.1} #sticking probability
 do
-  #for j in 0.0
-  for j in {0.0,1.0,2.0,3.0,4.0,5.0} #alpha
+  #for j in 6.0
+  for j in {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0} #alpha
   do
-    for k in {0..10} #data index
+    for k in {0..20} #data index
     do
       echo -e $i $j $k
     done
