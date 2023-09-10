@@ -1,13 +1,14 @@
+#define _USE_MATH_DEFINES // for C
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
 
-#define N 512             // 系の大きさ
-#define CEN (int)(N / 2)  // 中心座標
+#define N 512            // 系の大きさ
+#define CEN (int)(N / 2) // 中心座標
 
-void Initialize_int(int **data, int a) {  // data , initial value
+void Initialize_int(int **data, int a) { // data , initial value
   int i, j;
 
   for (i = 0; i < N; i++) {
@@ -17,7 +18,7 @@ void Initialize_int(int **data, int a) {  // data , initial value
   }
 }
 
-void Initialize_each_step_duble(double **data1, double a, int **data2) {  // data1(Phi) , initial value , data2(Shape)
+void Initialize_each_step_duble(double **data1, double a, int **data2) { // data1(Phi) , initial value , data2(Shape)
   int i, j;
 
   for (i = 0; i < N; i++) {
@@ -29,7 +30,7 @@ void Initialize_each_step_duble(double **data1, double a, int **data2) {  // dat
   }
 }
 
-void Initialize_double(double **data, double a) {  // data , initial value
+void Initialize_double(double **data, double a) { // data , initial value
   int i, j;
 
   for (i = 0; i < N; i++) {
@@ -39,7 +40,7 @@ void Initialize_double(double **data, double a) {  // data , initial value
   }
 }
 
-double rr(int i, int j) {  // 中心からの距離の2乗
+double rr(int i, int j) { // 中心からの距離の2乗
   double rr;
 
   rr = (CEN - i) * (CEN - i) + (CEN - j) * (CEN - j);
@@ -47,7 +48,7 @@ double rr(int i, int j) {  // 中心からの距離の2乗
   return rr;
 }
 
-void circle(int **data, double r) {  // 円形領域の形成,用意した配列のポインタと半径を渡す
+void circle(int **data, double r) { // 円形領域の形成,用意した配列のポインタと半径を渡す
   int i, j;
 
   for (i = 0; i < N; i++) {
@@ -59,7 +60,7 @@ void circle(int **data, double r) {  // 円形領域の形成,用意した配列
   }
 }
 
-double p(void) {  // 0〜1の乱数発生
+double p(void) { // 0〜1の乱数発生
 
   double rn;
   rn = rand() / (double)RAND_MAX;
@@ -67,7 +68,7 @@ double p(void) {  // 0〜1の乱数発生
   return rn;
 }
 
-int flag(int x, int y) {  // ある座標が配列内にあるかどうか調べる
+int flag(int x, int y) { // ある座標が配列内にあるかどうか調べる
   int flag = 0;
   if (0 <= x && x < N && 0 <= y && y < N) {
     flag = 1;
@@ -76,7 +77,7 @@ int flag(int x, int y) {  // ある座標が配列内にあるかどうか調べ
   return flag;
 }
 
-void cen_of_mass(int **data, double *R_c, int dla_n) {  // 系の重心を求める,DLA形状データ,重心保存用配列、粒子数を入れる
+void cen_of_mass(int **data, double *R_c, int dla_n) { // 系の重心を求める,DLA形状データ,重心保存用配列、粒子数を入れる
   double r_x = 0, r_y = 0;
   int i, j;
 
@@ -92,10 +93,10 @@ void cen_of_mass(int **data, double *R_c, int dla_n) {  // 系の重心を求め
   R_c[1] = r_y / dla_n;
 }
 
-double r_g(int **data, double r_c[2], int dla_n) {  // 回転半径を求める,DLA形状データ、重心位置、粒子数を入れる
+double r_g(int **data, double r_c[2], int dla_n) { // 回転半径を求める,DLA形状データ、重心位置、粒子数を入れる
   int i, j;
   double tmp = 0.0;
-  double r_g;  // 回転半径
+  double r_g; // 回転半径
 
   for (i = 0; i < N; i++) {
     for (j = 0; j < N; j++) {
@@ -109,15 +110,15 @@ double r_g(int **data, double r_c[2], int dla_n) {  // 回転半径を求める,
   return r_g;
 }
 
-double C_r(int **data, double r, int dla_n) {  // 半径rの時の密度相関関数の計算,密度相関関数法、配列(DLAの配置)と相関距離r,総粒子数Nを入力
-  int n = 1000;                                // dthの分割数
+double C_r(int **data, double r, int dla_n) { // 半径rの時の密度相関関数の計算,密度相関関数法、配列(DLAの配置)と相関距離r,総粒子数Nを入力
+  int n = 1000;                               // dthの分割数
   int k = 0;
   int i, j;
   int r_x, r_y;
-  double c = 0;    // 平均化前の密度相関関数
-  double C_r = 0;  // 平均化後の密度相関関数
+  double c = 0;   // 平均化前の密度相関関数
+  double C_r = 0; // 平均化後の密度相関関数
   double rho_sum;
-  double dth = 2 * M_PI / n;  // こっちの方が理論値に近い。定数で割ってるから?(変数rで割るのはやはりまずいか？)
+  double dth = 2 * M_PI / n; // こっちの方が理論値に近い。定数で割ってるから?(変数rで割るのはやはりまずいか？)
 
   while ((dth * k) <= (2.0 * M_PI)) {
     rho_sum = 0;
@@ -139,31 +140,31 @@ double C_r(int **data, double r, int dla_n) {  // 半径rの時の密度相関�
 }
 
 void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int *n_p1, int *n_p2, int *n_p3, int *n_p4, int *n_q,
-         double P) {  // DLA,形状の配列ポインタ(data1),(Particle)粒子分成長後終了,各点での移動確立の異方性(data2),異方性の影響の大きさ(alpha),分散の大きさ(C),各粒子が0-1を超えた回数,固着確率
-  int const D = 30;   // 粒子発生位置のフロントラインからの距離
-  int const R_C = CEN;  // DLAの棄却領域
-  int const RM = CEN;   // DLAの最大成長半径
+         double P) { // DLA,形状の配列ポインタ(data1),(Particle)粒子分成長後終了,各点での移動確立の異方性(data2),異方性の影響の大きさ(alpha),分散の大きさ(C),各粒子が0-1を超えた回数,固着確率
+  int const D = 30;  // 粒子発生位置のフロントラインからの距離
+  int const R_C = CEN; // DLAの棄却領域
+  int const RM = CEN;  // DLAの最大成長半径
   // double const P = 1.0;  // 粒子の固着確率
   //  double const C = 3.0 / 16;                                          // variance (constant),2*C
 
-  int x0, y0;  // 粒子の移動後保存用
-  int x, y;    // 粒子の位置
-  int n = 0;   // 粒子No.
-  int dr = 0;  // 粒子発生半径調整用、粒子のフロントライン
-  int r = 0;   // 粒子発生半径
-  int t = 0;   // ステップ数
+  int x0, y0; // 粒子の移動後保存用
+  int x, y;   // 粒子の位置
+  int n = 0;  // 粒子No.
+  int dr = 0; // 粒子発生半径調整用、粒子のフロントライン
+  int r = 0;  // 粒子発生半径
+  int t = 0;  // ステップ数
   int i, j;
 
-  double th;                 // 角度θ
-  double tmp;                // 確率保存用
-  double p1, p2, p3, p4, q;  // step probability
+  double th;                // 角度θ
+  double tmp;               // 確率保存用
+  double p1, p2, p3, p4, q; // step probability
 
   x = 0;
   y = 0;
   x0 = 0;
   y0 = 0;
 
-  for (i = 0; i < N; i++) {  // 粒子のフロントラインの探索(初期値決定)
+  for (i = 0; i < N; i++) { // 粒子のフロントラインの探索(初期値決定)
     for (j = 0; j < N; j++) {
       if (data1[i][j] == 1 && rr(i, j) > (dr * dr)) {
         dr = sqrt(rr(i, j));
@@ -171,9 +172,9 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
     }
   }
 
-  srand((unsigned int)time(NULL));  // 現在時刻の情報でrandの初期化
+  srand((unsigned int)time(NULL)); // 現在時刻の情報でrandの初期化
   // printf("Start DLA\n");
-  while (n < Particle) {  // 粒子No.n
+  while (n < Particle) { // 粒子No.n
     r = D + dr;
     x0 = 0;
     y0 = 0;
@@ -183,8 +184,8 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
     }
 
     /*粒子発生*/
-    th = 2.0 * M_PI * p();         // 角度θ、0から2πの範囲
-    x = (int)(CEN + r * cos(th));  // 粒子の発生位置、半径rの円周上
+    th = 2.0 * M_PI * p();        // 角度θ、0から2πの範囲
+    x = (int)(CEN + r * cos(th)); // 粒子の発生位置、半径rの円周上
     y = (int)(CEN + r * sin(th));
 
     while (1) {
@@ -202,7 +203,7 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
       // //printf("q=%f\n", q);
       // 確率が0,1に入っているかの判定→入ってなかった場合：終了、回数の計測、計算のし直し、アルファとともに分散も変えることで、電場が強くなっても一定範囲内かつ同じ物理状態にできそう。
 
-      if (p1 < 0.0 || 1.0 < p1) {  // 範囲外の確率になった回数を記録
+      if (p1 < 0.0 || 1.0 < p1) { // 範囲外の確率になった回数を記録
         (*n_p1)++;
       }
       if (p2 < 0.0 || 1.0 < p2) {
@@ -218,7 +219,7 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
         (*n_q)++;
       }
 
-      if (p1 > 1.0) {  // alphaが大きく、確率が1を超えている場合(特にp1)、この処理を入れないと、n_p1がどんどん大きくなる→どこにもくっつかない？なぜp1が大きいのか？アルファによっては収束しない？
+      if (p1 > 1.0) { // alphaが大きく、確率が1を超えている場合(特にp1)、この処理を入れないと、n_p1がどんどん大きくなる→どこにもくっつかない？なぜp1が大きいのか？アルファによっては収束しない？
         x++;
       } else if (p2 > 1.0) {
         y--;
@@ -227,35 +228,35 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
       } else if (p4 > 1.0) {
         y++;
       } else {
-        if (tmp < q) {              // その場に留まる
-        } else if (tmp < q + p1) {  // xに+1
+        if (tmp < q) {             // その場に留まる
+        } else if (tmp < q + p1) { // xに+1
           x++;
-        } else if (tmp < q + p1 + p2) {  // yに-1
+        } else if (tmp < q + p1 + p2) { // yに-1
           y--;
-        } else if (tmp < q + p1 + p2 + p3) {  // xに-1
+        } else if (tmp < q + p1 + p2 + p3) { // xに-1
           x--;
-        } else if (tmp < q + p1 + p2 + p3 + p4) {  // yに+1
+        } else if (tmp < q + p1 + p2 + p3 + p4) { // yに+1
           y++;
         }
       }
 
       //  判定//
-      if (rr(x, y) >= R_C * R_C) {  // 動いた後の粒子の位置が棄却領域なら...
+      if (rr(x, y) >= R_C * R_C) { // 動いた後の粒子の位置が棄却領域なら...
         break;
-      } else if (data1[x][y] == 1) {  // 動いた後の位置に粒子がいれば...
-        if (p() <= P) {               // 粒子が固着する場合
-          data1[x0][y0] = 1;          // 補足
+      } else if (data1[x][y] == 1) { // 動いた後の位置に粒子がいれば...
+        if (p() <= P) {              // 粒子が固着する場合
+          data1[x0][y0] = 1;         // 補足
           n++;
-          if (rr(x0, y0) > (dr * dr)) {  // 粒子発生位置のフロントライン調整
+          if (rr(x0, y0) > (dr * dr)) { // 粒子発生位置のフロントライン調整
             dr = sqrt(rr(x0, y0));
           }
           break;
-        } else {   // 粒子が固着しない場合
-          x = x0;  // 固着直前の座標に戻る
+        } else {  // 粒子が固着しない場合
+          x = x0; // 固着直前の座標に戻る
           y = y0;
         }
       } else {
-        x0 = x;  // 移動後の粒子の座標を保存、yも同様
+        x0 = x; // 移動後の粒子の座標を保存、yも同様
         y0 = y;
       }
     }
@@ -264,8 +265,34 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
   // printf("Current r: %d\n", r);
 }
 
+void w_shape(double C, double MaxPhi, double alpha, int **data, int k) { // DLA形状出力,sh_inのdata
+  char dirname[200];
+  char fname[200];
+  FILE *f;
+
+  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f/V=%f/movie", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f/V=%f/movie/data", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f/V=%f/movie/data/data_%d.dat", C, MaxPhi, k);
+  // sprintf(dirname, "./data/C=%f/V=%f/DLA_data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f/V=%f/DLA_data/DLA_alpha=%f.dat", C, MaxPhi, alpha);
+
+  f = fopen(fname, "w");
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      fprintf(f, "%d ", data[i][j]);
+    }
+    fprintf(f, "\n");
+  }
+  fclose(f);
+}
+
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
+  if (argc != 4) {
     printf("error\n");
     return 1;
   }
@@ -277,34 +304,34 @@ int main(int argc, char *argv[]) {
   start_clock = clock();
 
   /*DLA関係*/
-  const int dla_n = 15000;       // DLAの総粒子数
-  const int dla_step = 150;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
-  const double C = 3.0 / 16;     // 分散の大きさ
-  double P = 1.0;                // 固着確率
-  double alpha = atof(argv[2]);  // RWの電場による異方性の大きさ
+  const int dla_n = 15000;      // DLAの総粒子数
+  const int dla_step = 150;     // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
+  const double C = 3.0 / 16;    // 分散の大きさ
+  double P = atof(argv[1]);     // 固着確率
+  double alpha = atof(argv[2]); // RWの電場による異方性の大きさ
 
   int i, j, k;
 
-  int n;                                                // DLA粒子数計測用
-  int n_p1 = 0, n_p2 = 0, n_p3 = 0, n_p4 = 0, n_q = 0;  // countes for range over probability
-  double R_c[2] = {};                                   // 重心座標
-  double R_g;                                           // 回転半径
+  int n;                                               // DLA粒子数計測用
+  int n_p1 = 0, n_p2 = 0, n_p3 = 0, n_p4 = 0, n_q = 0; // countes for range over probability
+  double R_c[2] = {};                                  // 重心座標
+  double R_g;                                          // 回転半径
 
   /*電場計算関係*/
-  const double dif = 1.0e-5;  // 収束判定,前回ループとの差
+  const double dif = 1.0e-5; // 収束判定,前回ループとの差
 
-  double MaxPhi = atof(argv[1]);  // 最大電位
-  double MaxErr;                  // 最大誤差
-  double CurErr;                  // 現在の誤差
-  double Phi_tmp;                 // 電位一時保管用
-  double E_max = 0;               // 電場の最大値
-  double r = 2 / (1 + M_PI / N);  // relaxation parameter
-  double Ex, Ey;                  // 電場
+  double MaxPhi = 1.0;           // 最大電位
+  double MaxErr;                 // 最大誤差
+  double CurErr;                 // 現在の誤差
+  double Phi_tmp;                // 電位一時保管用
+  double E_max = 0;              // 電場の最大値
+  double r = 2 / (1 + M_PI / N); // relaxation parameter
+  double Ex, Ey;                 // 電場
 
-  int loop;  // 計算ループ数
+  int loop; // 計算ループ数
 
   // El_fieldを３次元配列として確保
-  double ***El_field = (double ***)malloc(sizeof(double **) * N);  // 電場配列
+  double ***El_field = (double ***)malloc(sizeof(double **) * N); // 電場配列
   for (i = 0; i < N; i++) {
     El_field[i] = (double **)malloc(sizeof(double *) * N);
     for (j = 0; j < N; j++) {
@@ -313,11 +340,11 @@ int main(int argc, char *argv[]) {
   }
 
   // phi, rho, Prev_phi, sh_in, sh_out を malloc で 2次元配列として確保
-  double **phi = (double **)malloc(sizeof(double *) * N);       // 電位配列
-  double **rho = (double **)malloc(sizeof(double *) * N);       // 電荷密度配列
-  double **Prev_phi = (double **)malloc(sizeof(double *) * N);  // 現在の電位配列
-  int **sh_in = (int **)malloc(sizeof(int *) * N);              // 内側形状
-  int **sh_out = (int **)malloc(sizeof(int *) * N);             // 外側形状
+  double **phi = (double **)malloc(sizeof(double *) * N);      // 電位配列
+  double **rho = (double **)malloc(sizeof(double *) * N);      // 電荷密度配列
+  double **Prev_phi = (double **)malloc(sizeof(double *) * N); // 現在の電位配列
+  int **sh_in = (int **)malloc(sizeof(int *) * N);             // 内側形状
+  int **sh_out = (int **)malloc(sizeof(int *) * N);            // 外側形状
   for (i = 0; i < N; i++) {
     phi[i] = (double *)malloc(sizeof(double) * N);
     rho[i] = (double *)malloc(sizeof(double) * N);
@@ -341,15 +368,16 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+  /*計算・ファイル処理関係*/
+  FILE *f;                 // ファイルハンドラ
+  int num = atof(argv[3]); // 名付け用インデックス
 
-  FILE *f;  // ファイルハンドラ
-
-  ////printf("Initializing...\n");
+  // printf("Initializing...\n");
 
   /*極板の形状決定*/
 
-  sh_in[CEN][CEN] = 1;      // 中央に核を置く
-  circle(sh_out, CEN - 1);  // 陰極(外側)形状,半径はCEN-1にしないとi+1などの計算でセグフォになる。
+  sh_in[CEN][CEN] = 1;     // 中央に核を置く
+  circle(sh_out, CEN - 1); // 陰極(外側)形状,半径はCEN-1にしないとi+1などの計算でセグフォになる。
 
   /*繰り返し計算*/
   loop = 0;
@@ -359,52 +387,53 @@ int main(int argc, char *argv[]) {
   // MaxPhi = 5.0;  // 系内の最大電位、0除算の防止用のため有限値を入れる
 
   for (k = 0; k < (int)(dla_n / dla_step); k++) {
-    DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q, P);  // DLAの計算
-    // printf("%d\t%d\t%d\t%d\t%d\n", n_p1, n_p2, n_p3, n_p4, n_q);
-    n = (k + 1) * dla_step;  // DLAの現在の総粒子数
+    DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q, P); // DLAの計算
+    // w_shape(C, MaxPhi, alpha, sh_in, k);
+    //  printf("%d\t%d\t%d\t%d\t%d\n", n_p1, n_p2, n_p3, n_p4, n_q);
+    n = (k + 1) * dla_step; // DLAの現在の総粒子数
 
-    Initialize_each_step_duble(phi, 0.0, sh_in);  // 極板形状をDLAにして、極板の電位を0にする
+    Initialize_each_step_duble(phi, 0.0, sh_in); // 極板形状をDLAにして、極板の電位を0にする
 
     // printf("current particle:%d\n", n);
     do {
       MaxErr = 0.0;
       CurErr = 0.0;
 
-      if (loop % 2 == 0) {  // 偶数回目のループならば
+      if (loop % 2 == 0) { // 偶数回目のループならば
         for (i = 0; i < N; i++) {
           for (j = 0; j < N; j++) {
-            if (sh_out[i][j] == 1 && sh_in[i][j] == 0) {  // 電極でない場所(計算したい領域)ならば
+            if (sh_out[i][j] == 1 && sh_in[i][j] == 0) { // 電極でない場所(計算したい領域)ならば
 
-              Phi_tmp = phi[i][j];                                                                                             // 前回ループのPhi
-              phi[i][j] = (1 - r) * phi[i][j] + r * (0.25 * (phi[i + 1][j] + phi[i - 1][j] + phi[i][j + 1] + phi[i][j - 1]));  // 電極なので電荷密度rho=0なので省略した。
+              Phi_tmp = phi[i][j];                                                                                            // 前回ループのPhi
+              phi[i][j] = (1 - r) * phi[i][j] + r * (0.25 * (phi[i + 1][j] + phi[i - 1][j] + phi[i][j + 1] + phi[i][j - 1])); // 電極なので電荷密度rho=0なので省略した。
               // if (MaxPhi < fabs(phi[i][j])) {
               //   MaxPhi = phi[i][j];  // 最大電位の更新
               // }
 
-              CurErr = (fabs(phi[i][j] - Phi_tmp)) / MaxPhi;  // 前回ループとの差を電位の最大値で規格化
+              CurErr = (fabs(phi[i][j] - Phi_tmp)) / MaxPhi; // 前回ループとの差を電位の最大値で規格化
 
               if (MaxErr < CurErr) {
-                MaxErr = CurErr;  // 系内の誤差の最大値の更新
+                MaxErr = CurErr; // 系内の誤差の最大値の更新
               }
             }
           }
         }
-      } else {  // 奇数回目のループならば
+      } else { // 奇数回目のループならば
         for (i = N - 1; i > 0; i--) {
           for (j = N - 1; j > 0; j--) {
-            if (sh_out[i][j] == 1 && sh_in[i][j] == 0) {  // 電極でない場所(計算したい領域)ならば
+            if (sh_out[i][j] == 1 && sh_in[i][j] == 0) { // 電極でない場所(計算したい領域)ならば
 
-              Phi_tmp = phi[i][j];                                                                                             // 前回ループのPhi
-              phi[i][j] = (1 - r) * phi[i][j] + r * (0.25 * (phi[i + 1][j] + phi[i - 1][j] + phi[i][j + 1] + phi[i][j - 1]));  // 電極なので電荷密度rho=0なので省略した。
+              Phi_tmp = phi[i][j];                                                                                            // 前回ループのPhi
+              phi[i][j] = (1 - r) * phi[i][j] + r * (0.25 * (phi[i + 1][j] + phi[i - 1][j] + phi[i][j + 1] + phi[i][j - 1])); // 電極なので電荷密度rho=0なので省略した。
 
               // if (MaxPhi < fabs(phi[i][j])) {
               //   MaxPhi = phi[i][j];  // 最大電位の更新
               // }
 
-              CurErr = (fabs(phi[i][j] - Phi_tmp)) / MaxPhi;  // 前回ループとの差を電位の最大値で規格化
+              CurErr = (fabs(phi[i][j] - Phi_tmp)) / MaxPhi; // 前回ループとの差を電位の最大値で規格化
 
               if (MaxErr < CurErr) {
-                MaxErr = CurErr;  // 系内の誤差の最大値の更新
+                MaxErr = CurErr; // 系内の誤差の最大値の更新
               }
             }
           }
@@ -415,7 +444,7 @@ int main(int argc, char *argv[]) {
       if (loop % 1000 == 0) {
         // printf("loop: %d,  MaxErr: %f\n", loop, MaxErr);
       }
-    } while (MaxErr > dif);  // 系内全ての前回ループとの誤差が規定値以下になったら終了
+    } while (MaxErr > dif); // 系内全ての前回ループとの誤差が規定値以下になったら終了
 
     /*電場計算*/
     for (i = 1; i < N - 1; i++) {
@@ -423,7 +452,7 @@ int main(int argc, char *argv[]) {
         Ex = -(phi[i + 1][j] - phi[i - 1][j]) / 2;
         Ey = -(phi[i][j + 1] - phi[i][j - 1]) / 2;
 
-        El_field[i][j][0] = Ex;  // 電場の保存
+        El_field[i][j][0] = Ex; // 電場の保存
         El_field[i][j][1] = Ey;
 
         if (E_max < sqrt(Ex * Ex + Ey * Ey)) {
@@ -437,49 +466,55 @@ int main(int argc, char *argv[]) {
 
   // printf("finish calculation\tEmax:%f\n", E_max);
 
-  /*電位の出力*/
-  char dirname[100];
-  char fname[100];
+  // /*電位の出力*/
+  char dirname[200];
+  char fname[200];
 
-  sprintf(dirname, "./data/C=%f", C);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/Phi_data", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/V=%f/Phi_data/Phi_alpha=%f.dat", C, MaxPhi, alpha);  // ディレクトリ、ファイル作成
+  // sprintf(dirname, "./data/C=%f", C);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f/V=%f/Phi_data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f/V=%f/Phi_data/Phi_alpha=%f.dat", C, MaxPhi, alpha);  // ディレクトリ、ファイル作成
 
-  f = fopen(fname, "w");
-  for (i = 0; i < N; i++) {
-    for (j = 0; j < N; j++) {
-      fprintf(f, "%d %d %e\n", i, j, phi[i][j]);
-    }
-  }
-  fclose(f);
+  // f = fopen(fname, "w");
+  // for (i = 0; i < N; i++) {
+  //   for (j = 0; j < N; j++) {
+  //     fprintf(f, "%d %d %e\n", i, j, phi[i][j]);
+  //   }
+  // }
+  // fclose(f);
 
-  /*電場出力、最終のEl_field*/
-  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/El_data", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/V=%f/El_data/El_alpha=%f.dat", C, MaxPhi, alpha);  // ディレクトリ作成
+  // /*電場出力、最終のEl_field*/
+  // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f/V=%f/El_data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f/V=%f/El_data/El_alpha=%f.dat", C, MaxPhi, alpha);  // ディレクトリ作成
 
-  f = fopen(fname, "w");
-  for (i = 1; i < N - 1; i++) {
-    for (j = 1; j < N - 1; j++) {
-      Ex = El_field[i][j][0];
-      Ey = El_field[i][j][1];
-      fprintf(f, "%d %d %e %e %e\n", i, j, sqrt(Ex * Ex + Ey * Ey), Ex, Ey);
-    }
-  }
-  fclose(f);
+  // f = fopen(fname, "w");
+  // for (i = 1; i < N - 1; i++) {
+  //   for (j = 1; j < N - 1; j++) {
+  //     Ex = El_field[i][j][0];
+  //     Ey = El_field[i][j][1];
+  //     fprintf(f, "%d %d %e %e %e\n", i, j, sqrt(Ex * Ex + Ey * Ey), Ex, Ey);
+  //   }
+  // }
+  // fclose(f);
 
   /*形状出力*/
-  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/DLA_data", C, MaxPhi);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/V=%f/DLA_data/DLA_alpha=%f.dat", C, MaxPhi, alpha);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f", C, MaxPhi, P, alpha);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, P, alpha, num);
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -490,24 +525,28 @@ int main(int argc, char *argv[]) {
   }
   fclose(f);
 
-  /*その他データ出力,読み込みはmatplotlib用(コメントアウト文字が#)*/
-  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/other_data", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/V=%f/other_data/other_alpha=%f.dat", C, MaxPhi, alpha);
+  // /*その他データ出力,読み込みはmatplotlib用(コメントアウト文字が#)*/
+  // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f/V=%f/other_data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f/V=%f/other_data/other_alpha=%f.dat", C, MaxPhi, alpha);
 
-  f = fopen(fname, "w");
-  fprintf(f, "#alpha\tn_p1\tn_p2\tn_p3\tn_p4\tn_q\n");
-  fprintf(f, "%f\t%d\t%d\t%d\t%d\t%d\n", alpha, n_p1, n_p2, n_p3, n_p4, n_q);
-  fclose(f);
+  // f = fopen(fname, "w");
+  // fprintf(f, "#alpha\tn_p1\tn_p2\tn_p3\tn_p4\tn_q\n");
+  // fprintf(f, "%f\t%d\t%d\t%d\t%d\t%d\n", alpha, n_p1, n_p2, n_p3, n_p4, n_q);
+  // fclose(f);
 
   /*correlation function*/
-  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/Correlation_function_data", C, MaxPhi);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
   mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/V=%f/Correlation_function_data/Cor_func_alpha=%f.dat", C, MaxPhi, alpha);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f", C, MaxPhi, P, alpha);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, P, alpha, num);
 
   f = fopen(fname, "w");
 
@@ -515,8 +554,8 @@ int main(int argc, char *argv[]) {
   R_g = r_g(sh_in, R_c, dla_n);
   // printf("R_c_x=%f\tR_c_y=%f\tR_g=%f\n", R_c[0], R_c[1], R_g);
 
-  double d = 2.0;      // 回転半径
-  double index = 1.0;  // 回転半径の指数
+  double d = 2.0;     // 回転半径
+  double index = 1.0; // 回転半径の指数
 
   fprintf(f, "#R_g\tr\tcor_func\n");
   for (d = 2.0; pow(d, index) < 0.8 * CEN; index += 0.5) {
