@@ -1,11 +1,10 @@
-#define _USE_MATH_DEFINES // for C
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
 
-#define N 512            // 系の大きさ
+#define N 128            // 系の大きさ
 #define CEN (int)(N / 2) // 中心座標
 
 void Initialize_int(int **data, int a) { // data , initial value
@@ -466,10 +465,11 @@ int main(int argc, char *argv[]) {
 
   // printf("finish calculation\tEmax:%f\n", E_max);
 
-  // /*電位の出力*/
+  /*ファイル出力*/
   char dirname[200];
   char fname[200];
 
+  /*電位出力*/
   // sprintf(dirname, "./data/C=%f", C);
   // mkdir(dirname, 0777);
   // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
@@ -503,7 +503,7 @@ int main(int argc, char *argv[]) {
   // }
   // fclose(f);
 
-  /*形状出力*/
+  /*形状出力 for Linux*/
   sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
   sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
