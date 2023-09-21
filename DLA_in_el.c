@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#define N 128            // 系の大きさ
+#define N 512            // 系の大きさ
 #define CEN (int)(N / 2) // 中心座標
 
 void Initialize_int(int **data, int a) { // data , initial value
@@ -136,6 +136,36 @@ double C_r(int **data, double r, int dla_n) { // 半径rの時の密度相関関
   C_r = c / (n * dla_n);
 
   return C_r;
+}
+
+double p_curv(int **data, int x, int y) { // 曲率を考慮したsticking prob.
+
+  int i, j;
+  int l = 9; // 探索範囲l=9,11程度がいいらしい。
+  int nl;    // 範囲内の粒子数
+  double A;  // Constant. related with suraface energy.
+  double B;  // probability constant.
+  double C;  // thresold constant.
+
+  A = 0.5;
+  B = 0.5;
+  C = 0.01;
+
+  for (i = 0; i < 9; i++) { // 判定粒子の周囲9マスの粒子数カウント
+    for (j = 0; j < 9; j++) {
+      if (data[x - 4 + i][y - 4 + j] == 1) { // たどり着いた粒子の左上から右方向に、右下に向かって粒子の有無を判定。固着粒子の位置(i,j)は確率判定の段階では0なので影響はない。
+        if ((i + j) % 2 == 1) { // trueなら粒子の上下左右のマス
+          c1++;
+        } else { // faulsなら斜めのマス
+          c2++;
+        }
+      }
+    }
+  }
+
+  pc = c1 * pn + c2 * pd;
+
+  return pc;
 }
 
 void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int *n_p1, int *n_p2, int *n_p3, int *n_p4, int *n_q,
