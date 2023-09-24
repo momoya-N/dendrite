@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#define N 512            // 系の大きさ
+#define N 128            // 系の大きさ
 #define CEN (int)(N / 2) // 中心座標
 
 void Initialize_int(int **data, int a) { // data , initial value
@@ -138,38 +138,42 @@ double C_r(int **data, double r, int dla_n) { // 半径rの時の密度相関関
   return C_r;
 }
 
-double p_curv(int **data, int x, int y) { // 曲率を考慮したsticking prob.
+double p_curv(int **data, int x, int y, double A, double B) { // 曲率を考慮したsticking prob.
 
   int i, j;
-  int l = 9; // 探索範囲l=9,11程度がいいらしい。
-  int nl;    // 範囲内の粒子数
-  double A;  // Constant. related with suraface energy.
-  double B;  // probability constant.
-  double C;  // thresold constant.
+  int l = 9;     // 探索範囲l=9,11程度がいいらしい。
+  int nl;        // 範囲内の粒子数
+  int n0;        // flatな時の範囲内粒子数
+  double p_curv; // 固着確率
+  // double A;      // Constant. related with suraface energy.
+  // double B;      // probability constant.
+  double C; // thresold constant.
 
-  A = 0.5;
-  B = 0.5;
   C = 0.01;
+
+  nl = 0;
+  n0 = (l - 1) / (2 * l);
 
   for (i = 0; i < 9; i++) { // 判定粒子の周囲9マスの粒子数カウント
     for (j = 0; j < 9; j++) {
-      if (data[x - 4 + i][y - 4 + j] == 1) { // たどり着いた粒子の左上から右方向に、右下に向かって粒子の有無を判定。固着粒子の位置(i,j)は確率判定の段階では0なので影響はない。
-        if ((i + j) % 2 == 1) { // trueなら粒子の上下左右のマス
-          c1++;
-        } else { // faulsなら斜めのマス
-          c2++;
-        }
+      if (flag(x - 4 + i, y - 4 + j) == 1 &&
+          data[x - 4 + i][y - 4 + j] == 1) { // たどり着いた粒子の左上から右方向に、右下に向かって粒子の有無を判定。固着粒子の位置(i,j)は確率判定の段階では0なので影響はない。
+        nl++;
       }
     }
   }
 
-  pc = c1 * pn + c2 * pd;
+  p_curv = A * (nl - n0) + B;
 
-  return pc;
+  if (p_curv <= C) {
+    p_curv = C;
+  }
+
+  return p_curv;
 }
 
-void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int *n_p1, int *n_p2, int *n_p3, int *n_p4, int *n_q,
-         double P) { // DLA,形状の配列ポインタ(data1),(Particle)粒子分成長後終了,各点での移動確立の異方性(data2),異方性の影響の大きさ(alpha),分散の大きさ(C),各粒子が0-1を超えた回数,固着確率
+void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int *n_p1, int *n_p2, int *n_p3, int *n_p4, int *n_q, double P, double A,
+         double B) { // DLA,形状の配列ポインタ(data1),(Particle)粒子分成長後終了,各点での移動確立の異方性(data2),異方性の影響の大きさ(alpha),分散の大きさ(C),各粒子が0-1を超えた回数,固着確率
   int const D = 30;  // 粒子発生位置のフロントラインからの距離
   int const R_C = CEN; // DLAの棄却領域
   int const RM = CEN;  // DLAの最大成長半径
@@ -230,23 +234,23 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
       q = 1 - 4 * C - 4 * alpha * alpha * (data2[x][y][0] * data2[x][y][0] + data2[x][y][1] * data2[x][y][1]);
 
       // //printf("q=%f\n", q);
-      // 確率が0,1に入っているかの判定→入ってなかった場合：終了、回数の計測、計算のし直し、アルファとともに分散も変えることで、電場が強くなっても一定範囲内かつ同じ物理状態にできそう。
+      // 確率が0,1に入っているかの判定
 
-      if (p1 < 0.0 || 1.0 < p1) { // 範囲外の確率になった回数を記録
-        (*n_p1)++;
-      }
-      if (p2 < 0.0 || 1.0 < p2) {
-        (*n_p2)++;
-      }
-      if (p3 < 0.0 || 1.0 < p3) {
-        (*n_p3)++;
-      }
-      if (p4 < 0.0 || 1.0 < p4) {
-        (*n_p4)++;
-      }
-      if (q < 0.0 || 1.0 < q) {
-        (*n_q)++;
-      }
+      // if (p1 < 0.0 || 1.0 < p1) { // 範囲外の確率になった回数を記録
+      //   (*n_p1)++;
+      // }
+      // if (p2 < 0.0 || 1.0 < p2) {
+      //   (*n_p2)++;
+      // }
+      // if (p3 < 0.0 || 1.0 < p3) {
+      //   (*n_p3)++;
+      // }
+      // if (p4 < 0.0 || 1.0 < p4) {
+      //   (*n_p4)++;
+      // }
+      // if (q < 0.0 || 1.0 < q) {
+      //   (*n_q)++;
+      // }
 
       if (p1 > 1.0) { // alphaが大きく、確率が1を超えている場合(特にp1)、この処理を入れないと、n_p1がどんどん大きくなる→どこにもくっつかない？なぜp1が大きいのか？アルファによっては収束しない？
         x++;
@@ -272,9 +276,9 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
       //  判定//
       if (rr(x, y) >= R_C * R_C) { // 動いた後の粒子の位置が棄却領域なら...
         break;
-      } else if (data1[x][y] == 1) { // 動いた後の位置に粒子がいれば...
-        if (p() <= P) {              // 粒子が固着する場合
-          data1[x0][y0] = 1;         // 補足
+      } else if (data1[x][y] == 1) {              // 動いた後の位置に粒子がいれば...
+        if (p() <= p_curv(data1, x0, y0, A, B)) { // 粒子が固着する場合
+          data1[x0][y0] = 1;                      // 補足
           n++;
           if (rr(x0, y0) > (dr * dr)) { // 粒子発生位置のフロントライン調整
             dr = sqrt(rr(x0, y0));
@@ -299,13 +303,13 @@ void w_shape(double C, double MaxPhi, double alpha, int **data, int k) { // DLA�
   char fname[200];
   FILE *f;
 
-  sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/movie", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f/V=%f/movie/data", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f/V=%f/movie/data/data_%d.dat", C, MaxPhi, k);
+  // sprintf(dirname, "./data/C=%f/V=%f", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f/V=%f/movie", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f/V=%f/movie/data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f/V=%f/movie/data/data_%d.dat", C, MaxPhi, k);
   // sprintf(dirname, "./data/C=%f/V=%f/DLA_data", C, MaxPhi);
   // mkdir(dirname, 0777);
   // sprintf(fname, "./data/C=%f/V=%f/DLA_data/DLA_alpha=%f.dat", C, MaxPhi, alpha);
@@ -333,10 +337,12 @@ int main(int argc, char *argv[]) {
   start_clock = clock();
 
   /*DLA関係*/
-  const int dla_n = 15000;      // DLAの総粒子数
-  const int dla_step = 150;     // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
+  const int dla_n = 1000;       // DLAの総粒子数
+  const int dla_step = 10;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
   const double C = 3.0 / 16;    // 分散の大きさ
   double P = atof(argv[1]);     // 固着確率
+  double A = 0.8;               // 界面張力に比例する係数
+  double B = 0.5;               // 任意定数
   double alpha = atof(argv[2]); // RWの電場による異方性の大きさ
 
   int i, j, k;
@@ -416,7 +422,7 @@ int main(int argc, char *argv[]) {
   // MaxPhi = 5.0;  // 系内の最大電位、0除算の防止用のため有限値を入れる
 
   for (k = 0; k < (int)(dla_n / dla_step); k++) {
-    DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q, P); // DLAの計算
+    DLA(sh_in, dla_step, El_field, alpha, C, &n_p1, &n_p2, &n_p3, &n_p4, &n_q, P, A, B); // DLAの計算
     // w_shape(C, MaxPhi, alpha, sh_in, k);
     //  printf("%d\t%d\t%d\t%d\t%d\n", n_p1, n_p2, n_p3, n_p4, n_q);
     n = (k + 1) * dla_step; // DLAの現在の総粒子数
@@ -533,18 +539,29 @@ int main(int argc, char *argv[]) {
   // }
   // fclose(f);
 
-  /*形状出力 for Linux*/
-  sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
+  // /*形状出力 */
+  // sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data", C, MaxPhi, P);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f", C, MaxPhi, P, alpha);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, P, alpha, num);
+
+  /*形状出力(test) */
+  sprintf(dirname, "./test/C=%f_V=%f", C, MaxPhi);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01", C, MaxPhi, A, B);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data", C, MaxPhi, A, B);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data", C, MaxPhi, P);
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%f", C, MaxPhi, A, B, alpha);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f", C, MaxPhi, P, alpha);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, P, alpha, num);
+  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, A, B, alpha, num);
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -567,16 +584,23 @@ int main(int argc, char *argv[]) {
   // fprintf(f, "%f\t%d\t%d\t%d\t%d\t%d\n", alpha, n_p1, n_p2, n_p3, n_p4, n_q);
   // fclose(f);
 
-  /*correlation function*/
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  // /*correlation function*/
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data", C, MaxPhi, P);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f", C, MaxPhi, P, alpha);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, P, alpha, num);
+
+  /*correlation function(test)*/
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data", C, MaxPhi, A, B);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%f", C, MaxPhi, A, B, alpha);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data", C, MaxPhi, P);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f", C, MaxPhi, P, alpha);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, P, alpha, num);
+  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, A, B, alpha, num);
 
   f = fopen(fname, "w");
 
