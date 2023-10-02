@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#define N 128            // 系の大きさ
+#define N 512            // 系の大きさ
 #define CEN (int)(N / 2) // 中心座標
 
 void Initialize_int(int **data, int a) { // data , initial value
@@ -142,8 +142,9 @@ double p_curv(int **data, int x, int y, double A, double B) { // 曲率を考慮
 
   int i, j;
   int l = 9;     // 探索範囲l=9,11程度がいいらしい。
-  int nl;        // 範囲内の粒子数
-  int n0;        // flatな時の範囲内粒子数
+  int Nl;        // 範囲内の粒子数
+  double nl;     // 範囲内の粒子の割合
+  double n0;     // flatな時の範囲内粒子割合
   double p_curv; // 固着確率
   // double A;      // Constant. related with suraface energy.
   // double B;      // probability constant.
@@ -151,18 +152,21 @@ double p_curv(int **data, int x, int y, double A, double B) { // 曲率を考慮
 
   C = 0.01;
 
-  nl = 0;
-  n0 = (l - 1) / (2 * l);
+  Nl = 0;
+  nl = 0.0;
+  n0 = (l - 1.0) / (2.0 * l);
+  p_curv = 0.0;
 
   for (i = 0; i < 9; i++) { // 判定粒子の周囲9マスの粒子数カウント
     for (j = 0; j < 9; j++) {
       if (flag(x - 4 + i, y - 4 + j) == 1 &&
           data[x - 4 + i][y - 4 + j] == 1) { // たどり着いた粒子の左上から右方向に、右下に向かって粒子の有無を判定。固着粒子の位置(i,j)は確率判定の段階では0なので影響はない。
-        nl++;
+        Nl++;
       }
     }
   }
 
+  nl = (double)Nl / (l * l);
   p_curv = A * (nl - n0) + B;
 
   if (p_curv <= C) {
@@ -280,6 +284,7 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
         if (p() <= p_curv(data1, x0, y0, A, B)) { // 粒子が固着する場合
           data1[x0][y0] = 1;                      // 補足
           n++;
+          // printf("sticcking probability:%f\n", p_curv(data1, x0, y0, A, B));
           if (rr(x0, y0) > (dr * dr)) { // 粒子発生位置のフロントライン調整
             dr = sqrt(rr(x0, y0));
           }
@@ -337,11 +342,11 @@ int main(int argc, char *argv[]) {
   start_clock = clock();
 
   /*DLA関係*/
-  const int dla_n = 1000;       // DLAの総粒子数
-  const int dla_step = 10;      // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
+  const int dla_n = 15000;      // DLAの総粒子数
+  const int dla_step = 150;     // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
   const double C = 3.0 / 16;    // 分散の大きさ
   double P = atof(argv[1]);     // 固着確率
-  double A = 0.8;               // 界面張力に比例する係数
+  double A = 0.5;               // 界面張力に比例する係数
   double B = 0.5;               // 任意定数
   double alpha = atof(argv[2]); // RWの電場による異方性の大きさ
 
@@ -559,9 +564,9 @@ int main(int argc, char *argv[]) {
   mkdir(dirname, 0777);
   sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data", C, MaxPhi, A, B);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%f", C, MaxPhi, A, B, alpha);
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%.2f", C, MaxPhi, A, B, alpha);
   mkdir(dirname, 0777);
-  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, A, B, alpha, num);
+  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%.2f/DLA_%03d.dat", C, MaxPhi, A, B, alpha, num);
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -598,9 +603,9 @@ int main(int argc, char *argv[]) {
   /*correlation function(test)*/
   sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data", C, MaxPhi, A, B);
   mkdir(dirname, 0777);
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%f", C, MaxPhi, A, B, alpha);
+  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%.2f", C, MaxPhi, A, B, alpha);
   mkdir(dirname, 0777);
-  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, A, B, alpha, num);
+  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%.2f/Cor_func_%03d.dat", C, MaxPhi, A, B, alpha, num);
 
   f = fopen(fname, "w");
 
