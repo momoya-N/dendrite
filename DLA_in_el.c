@@ -191,6 +191,7 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
   int r = 0;  // 粒子発生半径
   int t = 0;  // ステップ数
   int i, j;
+  double p_curv_tmp = 0.0; // sticcking probability
 
   double th;                // 角度θ
   double tmp;               // 確率保存用
@@ -280,11 +281,13 @@ void DLA(int **data1, int Particle, double ***data2, double alpha, double C, int
       //  判定//
       if (rr(x, y) >= R_C * R_C) { // 動いた後の粒子の位置が棄却領域なら...
         break;
-      } else if (data1[x][y] == 1) {              // 動いた後の位置に粒子がいれば...
-        if (p() <= p_curv(data1, x0, y0, A, B)) { // 粒子が固着する場合
-          data1[x0][y0] = 1;                      // 補足
+      } else if (data1[x][y] == 1) { // 動いた後の位置に粒子がいれば...
+        // p_curv_tmp = p_curv(data1, x0, y0, A, B);
+        if (p() <= P) {
+          // if (p() <= p_curv_tmp) { // 粒子が固着する場合
+          data1[x0][y0] = 1; // 補足
           n++;
-          // printf("sticcking probability:%f\n", p_curv(data1, x0, y0, A, B));
+          // printf("sticcking probability:%f\t A=%f\n", p_curv_tmp, A);
           if (rr(x0, y0) > (dr * dr)) { // 粒子発生位置のフロントライン調整
             dr = sqrt(rr(x0, y0));
           }
@@ -346,8 +349,8 @@ int main(int argc, char *argv[]) {
   const int dla_step = 150;     // DLA形状取得のステップ数,(dla_step)粒子ごとにDLA取得、電位計算
   const double C = 3.0 / 16;    // 分散の大きさ
   double P = atof(argv[1]);     // 固着確率
-  double A = 0.5;               // 界面張力に比例する係数
-  double B = 0.5;               // 任意定数
+  double A = -3.0;              // 界面張力に比例する係数
+  double B = 0.1;               // 任意定数
   double alpha = atof(argv[2]); // RWの電場による異方性の大きさ
 
   int i, j, k;
@@ -544,29 +547,29 @@ int main(int argc, char *argv[]) {
   // }
   // fclose(f);
 
-  // /*形状出力 */
-  // sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data", C, MaxPhi, P);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f", C, MaxPhi, P, alpha);
-  // mkdir(dirname, 0777);
-  // sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/DLA_data/alpha=%f/DLA_%03d.dat", C, MaxPhi, P, alpha, num);
+  /*形状出力 */
+  sprintf(dirname, "./data/C=%f_V=%f", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%.2f", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%.2f/DLA_data", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%.2f/DLA_data/alpha=%.2f", C, MaxPhi, P, alpha);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%.2f/DLA_data/alpha=%.2f/DLA_%03d.dat", C, MaxPhi, P, alpha, num);
 
-  /*形状出力(test) */
-  sprintf(dirname, "./test/C=%f_V=%f", C, MaxPhi);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01", C, MaxPhi, A, B);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data", C, MaxPhi, A, B);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%.2f", C, MaxPhi, A, B, alpha);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/DLA_data/alpha=%.2f/DLA_%03d.dat", C, MaxPhi, A, B, alpha, num);
+  // /*形状出力(test) */
+  // sprintf(dirname, "./test/C=%f_V=%f", C, MaxPhi);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01", C, MaxPhi, A, B);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01/DLA_data", C, MaxPhi, A, B);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01/DLA_data/alpha=%.2f", C, MaxPhi, A, B, alpha);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01/DLA_data/alpha=%.2f/DLA_%03d.dat", C, MaxPhi, A, B, alpha, num);
 
   f = fopen(fname, "w");
   for (i = 0; i < N; i++) {
@@ -589,23 +592,23 @@ int main(int argc, char *argv[]) {
   // fprintf(f, "%f\t%d\t%d\t%d\t%d\t%d\n", alpha, n_p1, n_p2, n_p3, n_p4, n_q);
   // fclose(f);
 
-  // /*correlation function*/
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f", C, MaxPhi, P);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data", C, MaxPhi, P);
-  // mkdir(dirname, 0777);
-  // sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f", C, MaxPhi, P, alpha);
-  // mkdir(dirname, 0777);
-  // sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%f/Correlation_function_data/alpha=%f/Cor_func_%03d.dat", C, MaxPhi, P, alpha, num);
+  /*correlation function*/
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data", C, MaxPhi);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%.2f", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%.2f/Correlation_function_data", C, MaxPhi, P);
+  mkdir(dirname, 0777);
+  sprintf(dirname, "./data/C=%f_V=%f/analisis_data/P=%.2f/Correlation_function_data/alpha=%.2f", C, MaxPhi, P, alpha);
+  mkdir(dirname, 0777);
+  sprintf(fname, "./data/C=%f_V=%f/analisis_data/P=%.2f/Correlation_function_data/alpha=%.2f/Cor_func_%03d.dat", C, MaxPhi, P, alpha, num);
 
-  /*correlation function(test)*/
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data", C, MaxPhi, A, B);
-  mkdir(dirname, 0777);
-  sprintf(dirname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%.2f", C, MaxPhi, A, B, alpha);
-  mkdir(dirname, 0777);
-  sprintf(fname, "./test/C=%f_V=%f/A=%.1f_B=%.1f_C=0.01/Correlation_function_data/alpha=%.2f/Cor_func_%03d.dat", C, MaxPhi, A, B, alpha, num);
+  // /*correlation function(test)*/
+  // sprintf(dirname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01/Correlation_function_data", C, MaxPhi, A, B);
+  // mkdir(dirname, 0777);
+  // sprintf(dirname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01/Correlation_function_data/alpha=%.2f", C, MaxPhi, A, B, alpha);
+  // mkdir(dirname, 0777);
+  // sprintf(fname, "./test/C=%f_V=%f/A=%.2f_B=%.2f_C=0.01/Correlation_function_data/alpha=%.2f/Cor_func_%03d.dat", C, MaxPhi, A, B, alpha, num);
 
   f = fopen(fname, "w");
 
