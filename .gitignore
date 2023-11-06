@@ -8,4 +8,9 @@ a.out
 *.pdf
 *.synctex.gz
 *.exe
+*.h
+*.txt
+*.html
+*.csv
+*.js
 DLA
