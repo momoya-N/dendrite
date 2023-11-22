@@ -63,10 +63,15 @@ def n_init():  # ピクセル値を持つfirst frameを計算
 
 
 # main function
-g = "20230223_0.03sur_75.7mN_No.4"  # ここを変えれば読み込みファイルを変えられる。読み込みはedited_movieから。
-filename = "/Volumes/HDPH-UT/dendrite_data/edited_data/edited_movie/" + str(g) + ".avi"  # 黒地に白の画像 ファイル名を入れる
+# g = "20230221_nonsur_76.6mN_No.2"  # ここを変えれば読み込みファイルを変えられる。読み込みはedited_movieから。
+# filename = "D:/dendrite_data/edited_data/edited_movie/" +str(g) + ".avi"  # 黒地に白の画像 ファイル名を入れる
+filename = "D:/dendrite_data/edited_data/edited_movie/20230221_nonsur_76.6mN_No.2.avi"  # 黒地に白の画像 ファイル名を入れる
+print(filename)
+
+# filename = "/Volumes/HDPH-UT/dendrite_data/edited_data/edited_movie/" + str(g) + ".avi"  # 黒地に白の画像 ファイル名を入れる
 cap = cv2.VideoCapture(filename)  # 動画読み込み
-totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)  # get total frame number of movie
+totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+print(totalFrames)  # get total frame number of movie
 dust = 4  # チリの大きさ判定用変数
 cut = 30  # threshold value,輝度値は0が黒色、255が白色。思ったより画像が暗いので、白を取るときは割と大きめで。
 
@@ -143,13 +148,20 @@ mean_D = np.average(D, weights=w)
 print(mean_D)
 
 f = open(
-    "/Volumes/HDPH-UT/dendrite_data/edited_data/housedolf_dim_data/" + str(g) + ".dat",
-    "w",
-)
-f.write("#time" + "\t" + "#Housedolf_dim" + "\n")
-for i in range(len(time)):
-    f.write(str(time[i]) + "\t" + str(dim[i]) + "\n")
+    "C:/Users/PC/Desktop/Master_Thesis/test/fractal_check.dat","w")
+f.write("#scale" + "\t" + "#Box_num" + "\n")
+for i in range(len(scales)):
+    f.write(str(np.log(scales[i])) + "\t" + str(np.log(Ns[i])) + "\n")
 f.close()
+
+# f = open(
+#     "/Volumes/HDPH-UT/dendrite_data/edited_data/housedolf_dim_data/" + str(g) + ".dat",
+#     "w",
+# )
+# f.write("#time" + "\t" + "#Housedolf_dim" + "\n")
+# for i in range(len(time)):
+#     f.write(str(time[i]) + "\t" + str(dim[i]) + "\n")
+# f.close()
 
 
 # 全体的にもっと効率化&可読性を上げることはできる気がするが、なにぶん初めてなので許して下さいなんでも(以下略)
