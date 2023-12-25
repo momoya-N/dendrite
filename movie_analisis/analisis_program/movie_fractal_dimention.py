@@ -1,15 +1,15 @@
 import math
+import sys
 
 import cv2
 import matplotlib.pylab as pl
 import numpy as np
 
-
 def N_FrameImage(frameIndex):  # N番目のフレーム画像を返す
     # インデックスがフレームの範囲内なら…
-    if frameIndex >= 0 and frameIndex < totalFrames:
+    if frameIndex >= 0 and frameIndex < Total_Frames:
         cap.set(cv2.CAP_PROP_POS_FRAMES, frameIndex)
-        ret, image = cap.read()
+        ret, image = cap.read() #ret:bool値(画像が読めれば True) image:画像のnbarray
         return image
     else:
         return None
@@ -61,17 +61,43 @@ def n_init():  # ピクセル値を持つfirst frameを計算
 
     return n
 
+#Main
+#Video Source
+Dir_name="/mnt/d/dendrite_data/edited_data/edited_movie/"
+f_name="20230221_nonsur_76.8mN_No.1.avi"
+delay = 1
+window_name = f_name
+cap = cv2.VideoCapture(Dir_name + f_name)
 
-# main function
-# g = "20230221_nonsur_76.6mN_No.2"  # ここを変えれば読み込みファイルを変えられる。読み込みはedited_movieから。
-# filename = "D:/dendrite_data/edited_data/edited_movie/" +str(g) + ".avi"  # 黒地に白の画像 ファイル名を入れる
-filename = "D:/dendrite_data/edited_data/edited_movie/20230221_nonsur_76.6mN_No.2.avi"  # 黒地に白の画像 ファイル名を入れる
-print(filename)
+Lx=cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+Ly=cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+FPS=cap.get(cv2.CAP_PROP_FPS)
+Total_Frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-# filename = "/Volumes/HDPH-UT/dendrite_data/edited_data/edited_movie/" + str(g) + ".avi"  # 黒地に白の画像 ファイル名を入れる
-cap = cv2.VideoCapture(filename)  # 動画読み込み
-totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-print(totalFrames)  # get total frame number of movie
+print(type(cap)) # <class 'cv2.VideoCapture'>
+print(cap.isOpened()) #True or False
+print("Frame Width : ", Lx)
+print("Frame Hight : ", Ly)
+print("FPS : ", FPS)
+print("Frame Count : ",Total_Frames) # get total frame number of movie
+
+'''
+if not cap.isOpened():
+    sys.exit()
+
+while True:
+    ret, frame = cap.read()
+    if ret:
+        cv2.imshow(window_name, frame)
+        if cv2.waitKey(delay) & 0xFF == ord('q'):
+            break
+    else:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
+cv2.destroyWindow(window_name)
+
+'''
+
 dust = 4  # チリの大きさ判定用変数
 cut = 30  # threshold value,輝度値は0が黒色、255が白色。思ったより画像が暗いので、白を取るときは割と大きめで。
 
@@ -81,7 +107,7 @@ K = 15  # distance of pick up frame,1フレームあたり2秒なので、30秒�
 D = []
 step = []
 
-cutoff = (totalFrames - n0) / 2  # 動画の真ん中のフレーム
+cutoff = (Total_Frames - n0) / 2  # 動画の真ん中のフレーム
 w = []  # 重みづけ関数
 
 # calculate frontline
@@ -90,7 +116,7 @@ r_c = center(n0)
 print(r_c)
 
 while cap.isOpened():
-    if n >= totalFrames:  # ＝がないと、ここは通るのに、N_FrameImageの条件を満たさず、grayの読み込みでエラーが出る。
+    if n >= Total_Frames:  # ＝がないと、ここは通るのに、N_FrameImageの条件を満たさず、grayの読み込みでエラーが出る。
         break
 
     s = 0  # 面積カウント用
@@ -99,23 +125,18 @@ while cap.isOpened():
 
     # making binary array
     gray = cv2.cvtColor(N_FrameImage(n), cv2.COLOR_BGR2GRAY)  # RGBの3次元情報を輝度値のみの1次元情報に変換
-    binary = np.zeros((gray.shape[0], gray.shape[1]), dtype=np.int8)
-    pixels = []
-    for i in range(gray.shape[0]):
-        for j in range(gray.shape[1]):
+    binary = np.zeros((Ly, Lx), dtype=np.int8)
+    for i in range(Ly):
+        for j in range(Lx):
             if gray[i, j] > cut:
                 c_temp = 0
-                for k in range(5):  # 1粒子あたり周囲25マスの探索で単純に時間は25倍になる。しんど。
+                for k in range(5):  # 1粒子あたり周囲25マスの探索で単純に時間は25倍になる
                     for l in range(5):
                         if (2 <= (j - 2 + l) < gray.shape[1] - 2) and (2 <= (i - 2 + k) < gray.shape[0] - 2) and (gray[i - 2 + k, j - 2 + l] > cut):
                             c_temp += 1
 
                 if c_temp > dust:  # 周囲25マスの粒子数が(dust)個より多ければ粒子と判定
-                    pixels.append((i, j))
-
-    Lx = gray.shape[1]
-    Ly = gray.shape[0]
-    pixels = pl.array(pixels)
+                    binary[i,j]=1
 
     # computing the fractal dimension
     # considering only scales in a logarithmic list
@@ -164,79 +185,4 @@ f.close()
 # f.close()
 
 
-# 全体的にもっと効率化&可読性を上げることはできる気がするが、なにぶん初めてなので許して下さいなんでも(以下略)
 
-
-"""
-g = "20230206_0.005sur_76.6mN_No.4"  # ここを変えれば読み込みファイルを変えられる
-filename = "/Volumes/HDPH-UT/dendrite_data/edited_data/edited_movie/" + str(g) + "_edited.avi"  # 黒地に白の画像 ファイル名を入れる
-cap = cv2.VideoCapture(filename)  # 動画読み込み
-totalFrames = cap.get(cv2.CAP_PROP_FRAME_COUNT)  # get total frame number of movie
-
-k = 100  # number of sample,10の倍数の時だけ、D_fの個数とTの分割の個数が合わない？なぜ？→n=0から始めていた影響説or(k*K)noteq(totalframe),数値誤差の影響か？
-K = totalFrames / k  # distance of pick up frame
-n = 3 * K  # frame index,初期値はnon0(ある程度の大きさ)の方がいい。画面が単一色だとgray[i,j]を満たすピクセルが存在しなくなり、histogramのbinの次元と合わなくなりエラーが出る。
-D = []  # fractral dimention strage
-w = []  # weight strage
-m = 2  # cut-off index, cut-off under 1/m frame of movie
-cutoff = k * K / m  # =(totalframs)/m, cut-off frame
-
-# frame_n = cv2.cvtColor(N_FrameImage(n), cv2.COLOR_BGR2GRAY)
-
-while cap.isOpened():
-    if n >= totalFrames:  # ＝がないと、ここは通るのに、N_FrameImageの条件を満たさず、grayの読み込みでエラーが出る。
-        break
-    ret, image = cap.read()
-
-    gray = cv2.cvtColor(N_FrameImage(n), cv2.COLOR_BGR2GRAY)  # RGBの3次元情報を輝度値のみの1次元情報に変換
-
-    # finding all the zero(black) pixels
-    pixels = []
-    for i in range(gray.shape[0]):
-        for j in range(gray.shape[1]):
-            if gray[i, j] > 20:  # 輝度値は0が黒色、255が白色。どっちを探索するかで<>を変える。思ったより画像が暗いので、白を取るときは20以上くらいがいいかも。cv2.thresholdは3次元なのでgrayに再変換すれば==0or255とできる...と思いました。(1敗)
-                pixels.append((i, j))
-
-    Lx = gray.shape[1]
-    Ly = gray.shape[0]
-    pixels = pl.array(pixels)
-
-    # computing the fractal dimension
-    # considering only scales in a logarithmic list
-    scales = np.logspace(1, 6, num=10, endpoint=False, base=2)  # parametaの組み合わせは考慮の余地あり。2^n~L/(6~8)(ボックス6~8個分)ぐらいまでがいい感じ？分割幅は増やせば精度が上がる時もあるし、ない時もある。ワカラン。ただ、(end)-1だとscaleが整数値になって、なぜか精度が落ちた。Sierpinski gasketで調査。
-    Ns = []
-
-    # looping over several scales
-    for scale in scales:
-        H, edges = np.histogramdd(pixels, bins=(np.arange(0, Lx, scale), np.arange(0, Ly, scale)))
-        Ns.append(np.sum(H > 0))
-
-    # linear fit, polynomial of degree 1
-    coeffs = np.polyfit(np.log(scales), np.log(Ns), 1)
-    d_f = -coeffs[0]  # Haussdorff dimension
-    n += K
-    D.append(d_f)
-
-    if n < cutoff:
-        w.append(0)
-    else:
-        w.append(1)
-
-
-T = np.linspace(0, totalFrames, k - 2)  # 始めのframe=0の時の分も加えて k個のHousdolf demention。k≡0(mod10)だとk+1にしないとダメっぽい？
-
-
-fig = pl.figure(figsize=(7, 7))
-pl.plot(T, D, label="")
-pl.xlabel("$t$", fontsize=14)
-pl.ylabel("$D$", fontsize=14)
-mean_D = np.average(D, weights=w)
-
-pl.title("Mean Hausdorff dimension is " + str(mean_D), fontsize=14)
-pl.savefig(str(g) + ".png")
-pl.close()
-
-cap.release()
-cv2.destroyAllWindows()
-
-"""
