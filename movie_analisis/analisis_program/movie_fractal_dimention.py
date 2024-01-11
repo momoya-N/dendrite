@@ -5,7 +5,7 @@ import cv2
 import matplotlib.pylab as pl
 import numpy as np
 
-def N_FrameImage(frameIndex):  # N番目のフレーム画像を返す
+def N_Frame_Image(frameIndex):  # N番目のフレーム画像を返す
     # インデックスがフレームの範囲内なら…
     if frameIndex >= 0 and frameIndex < Total_Frames:
         cap.set(cv2.CAP_PROP_POS_FRAMES, frameIndex)
@@ -15,29 +15,29 @@ def N_FrameImage(frameIndex):  # N番目のフレーム画像を返す
         return None
 
 
-def center(n):  # 重心を返す,n=n0=n_initを入れる
-    center = []
+# def center(n):  # 重心を返す,n=n0=n_initを入れる
+#     center = []
 
-    for k in range(30):  # time=0からxフレーム分計算,x=30なのは経験と勘による。
-        gray = cv2.cvtColor(N_FrameImage(n + k), cv2.COLOR_BGR2GRAY)
-        # finding all the zero(black) pixels
-        pixels = []
-        for i in range(gray.shape[0]):
-            for j in range(gray.shape[1]):
-                if gray[i, j] > cut:
-                    pixels.append((i, j))
-        center.append(pl.mean(pixels, 0))  # 重心(平均値)の中央値なので、外れ値(チリ)の影響はあまりない...はず。
+#     for k in range(30):  # time=0からxフレーム分計算,x=30なのは経験と勘による。
+#         gray = cv2.cvtColor(N_FrameImage(n + k), cv2.COLOR_BGR2GRAY)
+#         # finding all the zero(black) pixels
+#         pixels = []
+#         for i in range(gray.shape[0]):
+#             for j in range(gray.shape[1]):
+#                 if gray[i, j] > cut:
+#                     pixels.append((i, j))
+#         center.append(pl.mean(pixels, 0))  # 重心(平均値)の中央値なので、外れ値(チリ)の影響はあまりない...はず。
 
-    center = np.array(center, dtype=int)
+#     center = np.array(center, dtype=int)
 
-    return np.median(center, axis=0)
+#     return np.median(center, axis=0)
 
 
-def n_init():  # ピクセル値を持つfirst frameを計算
+def First_Frame():  # ピクセル値を持つfirst frameを計算
     n = 0
     while 1:
         # making binary array
-        gray = cv2.cvtColor(N_FrameImage(n), cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(N_Frame_Image(n), cv2.COLOR_BGR2GRAY)
         binary = np.zeros((gray.shape[0], gray.shape[1]), dtype=np.int8)
 
         for i in range(gray.shape[0]):
