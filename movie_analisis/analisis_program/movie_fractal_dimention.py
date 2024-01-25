@@ -5,6 +5,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib_scalebar.scalebar import ScaleBar
+import matplotlib.collections as mc
+import matplotlib.cm as cm
+
 
 def N_Frame_Image(frameIndex):  # N番目のフレーム画像を返す
     # インデックスがフレームの範囲内なら…
@@ -133,42 +136,6 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
 
     return branch_cm,branch_th
 
-# def search_branch_gray(gray,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
-#     dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
-#     t = 0  # 角度のステップ数
-#     th = 0  # 角度
-#     gray_data=[]
-
-#     while th < 2 * math.pi:
-#         th = dth * t
-#         r_x = int(r * math.cos(th) + x_c)
-#         r_y = int(r * math.sin(th) + y_c)
-#         gray_data.append([th,gray[r_y,r_x]])
-        
-#         t += 1
-
-#     theta=[data[0] for data in gray_data]
-#     brightness=[data[1] for data in gray_data]
-#     return theta, brightness
-
-# def search_branch_binary(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
-#     dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
-#     t = 0  # 角度のステップ数
-#     th = 0  # 角度
-#     binary_data=[]
-
-#     while th < 2 * math.pi:
-#         th = dth * t
-#         r_x = int(r * math.cos(th) + x_c)
-#         r_y = int(r * math.sin(th) + y_c)
-#         if binary[r_y,r_x]==255:
-#             binary_data.append(th)
-
-#         t += 1
-
-#     return binary_data
-
-
 #Main
 #constants
 dust = 4  # チリの大きさ判定用変数
@@ -176,16 +143,14 @@ cut = 30  # threshold value,輝度値は0が黒色、255が白色。
 # K = 15  # distance of pick up frame,2 s/frame ->30 s毎に取得
 
 #Video Source
-Dir_name="/mnt/c/Users/PC/Desktop"
-f_name="/20230205_nonsur_77.2mN_No.1.avi"
-f_name2="/20230222_0.05sur_73.2mN_No.3.avi"
-f_name3="/20230221_nonsur_76.8mN_No.1.avi"
-#Dir_name="/mnt/d/dendrite_data/edited_data/edited_movie/"
-#f_name="20230221_nonsur_76.8mN_No.1.avi"
-# f_name2="20230213_0.05sur_71.4mN_No.4.avi"
-#f_name3="20230221_nonsur_76.6mN_No.2.avi"
+Dir_name="/mnt/c/Users/PC/Desktop/"
+f_name="20230205_nonsur_77.2mN_No.1.avi"
+f_name2="20230222_0.05sur_73.2mN_No.3.avi"
+f_name3="20230221_nonsur_76.8mN_No.1.avi"
 
 file_path=Dir_name + f_name2
+name_tag=file_path.replace(Dir_name,"")
+name_tag=name_tag.replace(".avi","")
 window_name = file_path[len(Dir_name):]
 cap = cv2.VideoCapture(file_path)
 print(window_name)
@@ -240,78 +205,148 @@ x,y=CM(n0) #重心計算
 
 img_origin=image #original image
 img_n=N_Frame_Image(n0) #N frames image
-# theta,brightness =search_branch_gray(gray,int(Lx/5),x,y)
 scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
 r_max=min(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最小値
-fig, axes = plt.subplots(2, 2, figsize=(9,9))
+fig, ax = plt.subplots(1,3,figsize=(18,6))
 
 #元画像(gray)
 cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
 cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
-axes[0,0].imshow(img_origin,cmap='gray')
-axes[0,0].set_title('Input Image')
-axes[0,0].add_artist(scalebar)
-
-# 二値化画像
-cv2.line(nongray_binary, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
-cv2.line(nongray_binary, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
-
-for i in range(int(r_max/6),r_max,int(r_max/6)):
-    cv2.circle(nongray_binary,(x,y),i,(0,255,0))
-    branch_cm,branch_th=search_branch(binary,i,x,y)
-    branch_cm_round=np.round(branch_cm)
-    branch_cm_round_int = [list(map(int, row)) for row in branch_cm_round]
-    for j in range(len(branch_cm)):
-        cv2.drawMarker(nongray_binary,branch_cm_round_int[j],(0,0,255),markerSize=5,thickness=2)
-axes[0,1].imshow(nongray_binary,cmap='gray')
-axes[0,1].set_title('nongray_binary')
+ax[0].imshow(img_origin,cmap='gray')
+ax[0].set_title('Input Image')
+ax[0].add_artist(scalebar)
 
 #theta-半径グラフ
-branch_num=[]
-axes[1,0].set_axis_on()
-axes[1,0].set_xticks(
+ax[2].set_axis_on()
+ax[2].set_xticks(
     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4, np.pi*2], 
     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4", "2\u03c0"]
 )
-axes[1,0].set_xlabel(r"$\theta$")
-axes[1,0].set_ylabel(r"Radius $r$ pix")
-for r in range(2,r_max):
+ax[2].set_xlim(-0.1,2*math.pi+0.1)
+ax[2].set_xlabel(r"$\theta$")
+ax[2].set_ylabel(r"Radius $r$ pix")
+search_range=[r for r in range(2,r_max)]
+theta=[[]for i in range(len(search_range))]
+
+for i , r in enumerate(search_range):
     branch_cm,branch_th=search_branch(binary,r,x,y)
-    # theta=search_branch_binary(binary,r,x,y)
     for j in range(len(branch_th)):
-        axes[1,0].scatter(branch_th[j],r,s=1,c="black")
-    
-    branch_num.append([r,len(branch_th)])
-    
-axes[1,0].set_box_aspect(0.5)
+        ax[2].scatter(2*math.pi-branch_th[j],r,s=1,c="black")
+        theta[i].append(2*math.pi-branch_th[j]) #探索の向きの関係上2Piから引くとimput imageと向きが一致
 
-r=[i[0] for i in branch_num]
-number=[i[1] for i in branch_num]
-axes[1,1].plot(r,number)
-axes[1,1].set_xlabel(r"Radius $r$ pix")
-axes[1,1].set_ylabel("Branche Num.")
+ax[2].set_box_aspect(0.5)
 
-plt.savefig("0.05sur.png")
+vector=[]
+for i in reversed(range(1,len(search_range))):
+    rnow=search_range[i]
+    rnext=search_range[i-1]
+    for j in range(len(theta[i])):
+        thnow=theta[i][j]
+        dist_tmp2=pow(r_max,2) #十分大きな数で
+        for k in range(len(theta[i-1])):
+            thnext=theta[i-1][k]
+            dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+            if dist_tmp2>dist2:
+                dist_tmp2=dist2
+                tmp1=rnext
+                tmp2=thnext
+        vector.append([[thnow,rnow],[tmp2,tmp1]])
+
+lc = mc.LineCollection(vector, colors="k", linewidths=1)
+ax[2].add_collection(lc)
+
+ax[1].set_axis_off()
+ax[1]=plt.subplot(132,projection="polar")
+for i , r in enumerate(search_range):
+    branch_cm,branch_th=search_branch(binary,r,x,y)
+    for j in range(len(branch_th)):
+        ax[1].plot(2*math.pi-branch_th[j],r)
+lc = mc.LineCollection(vector, colors="k", linewidths=1)
+ax[1].add_collection(lc)
+
+plt.savefig(str(name_tag)+".png")
 plt.show()
 
-fig, axes = plt.subplots(figsize=(9,9))
-cv2.line(nongray_binary, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
-cv2.line(nongray_binary, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
 
-for i in range(int(r_max/6),r_max,int(r_max/6)):
-    cv2.circle(nongray_binary,(x,y),i,(0,255,0))
-    branch_cm,branch_th=search_branch(binary,i,x,y)
-    branch_cm_round=np.round(branch_cm)
-    branch_cm_round_int = [list(map(int, row)) for row in branch_cm_round]
-    for j in range(len(branch_cm)):
-        cv2.drawMarker(nongray_binary,branch_cm_round_int[j],(0,0,255),markerSize=5,thickness=2)
-axes.imshow(nongray_binary,cmap='gray')
+# # 画像
+# x,y=CM(n0) #重心計算
 
-plt.show()
-axes.set_title('nongray_binary')
-plt.savefig("0.05sur_binary.png")
+# img_origin=image #original image
+# img_n=N_Frame_Image(n0) #N frames image
+# # theta,brightness =search_branch_gray(gray,int(Lx/5),x,y)
+# scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
+
+# # 画像として可視化する
+# r_max=min(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最小値
+# fig, axes = plt.subplots(2, 2, figsize=(9,9))
+
+# #元画像(gray)
+# cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
+# cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
+# axes[0,0].imshow(img_origin,cmap='gray')
+# axes[0,0].set_title('Input Image')
+# axes[0,0].add_artist(scalebar)
+
+# # 二値化画像
+# cv2.line(nongray_binary, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
+# cv2.line(nongray_binary, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
+
+# for i in range(int(r_max/6),r_max,int(r_max/6)):
+#     cv2.circle(nongray_binary,(x,y),i,(0,255,0))
+#     branch_cm,branch_th=search_branch(binary,i,x,y)
+#     branch_cm_round=np.round(branch_cm)
+#     branch_cm_round_int = [list(map(int, row)) for row in branch_cm_round]
+#     for j in range(len(branch_cm)):
+#         cv2.drawMarker(nongray_binary,branch_cm_round_int[j],(0,0,255),markerSize=5,thickness=2)
+# axes[0,1].imshow(nongray_binary,cmap='gray')
+# axes[0,1].set_title('nongray_binary')
+
+# #theta-半径グラフ
+# branch_num=[]
+# axes[1,0].set_axis_on()
+# axes[1,0].set_xticks(
+#     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4, np.pi*2], 
+#     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4", "2\u03c0"]
+# )
+# axes[1,0].set_xlabel(r"$\theta$")
+# axes[1,0].set_ylabel(r"Radius $r$ pix")
+# for r in range(2,r_max):
+#     branch_cm,branch_th=search_branch(binary,r,x,y)
+#     # theta=search_branch_binary(binary,r,x,y)
+#     for j in range(len(branch_th)):
+#         axes[1,0].scatter(branch_th[j],r,s=1,c="black")
+    
+#     branch_num.append([r,len(branch_th)])
+    
+# axes[1,0].set_box_aspect(0.5)
+
+# r=[i[0] for i in branch_num]
+# number=[i[1] for i in branch_num]
+# axes[1,1].plot(r,number)
+# axes[1,1].set_xlabel(r"Radius $r$ pix")
+# axes[1,1].set_ylabel("Branche Num.")
+
+# plt.savefig("0.05sur.png")
+# plt.show()
+
+# fig, axes = plt.subplots(figsize=(9,9))
+# cv2.line(nongray_binary, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
+# cv2.line(nongray_binary, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
+
+# for i in range(int(r_max/6),r_max,int(r_max/6)):
+#     cv2.circle(nongray_binary,(x,y),i,(0,255,0))
+#     branch_cm,branch_th=search_branch(binary,i,x,y)
+#     branch_cm_round=np.round(branch_cm)
+#     branch_cm_round_int = [list(map(int, row)) for row in branch_cm_round]
+#     for j in range(len(branch_cm)):
+#         cv2.drawMarker(nongray_binary,branch_cm_round_int[j],(0,0,255),markerSize=5,thickness=2)
+# axes.imshow(nongray_binary,cmap='gray')
+
+# plt.show()
+# axes.set_title('nongray_binary')
+# plt.savefig("0.05sur_binary.png")
 
 
 # D = []
