@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.collections as mc
 import matplotlib.cm as cm
+import time
 
 def N_Frame_Image(frameIndex):  # N番目のフレーム画像を返す
     # インデックスがフレームの範囲内なら…
@@ -83,7 +84,6 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
     branch_cm=[]
     branch_th=[]
 
-
     r_x = int(r * math.cos(0) + x_c)
     r_y = int(r * math.sin(0) + y_c)
 
@@ -95,17 +95,18 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
         cm_tmp=[]
         th_tmp=[]
 
-        while binary[r_y, r_x] == 255:#枝の重心計測
-            cm_tmp.append([r_x,r_y]) #cv2の描画の関係上ここだけx,yの順番が違う
-            th_tmp.append(th)
-            t += 1
-            th = dth * t
-            
-            if th > 2 * math.pi:
-                break
-            
-            r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
-            r_y = int(r * math.sin(th) + y_c)
+        if (1 <= r_x < Lx-1) and (1 <= r_y < Ly-1):
+            while binary[r_y, r_x] == 255:#枝の重心計測
+                cm_tmp.append([r_x,r_y]) #cv2の描画の関係上ここだけx,yの順番が違う
+                th_tmp.append(th)
+                t += 1
+                th = dth * t
+                
+                if th > 2 * math.pi:
+                    break
+                
+                r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
+                r_y = int(r * math.sin(th) + y_c)
 
         if np.size(cm_tmp)!=0:
             cm=np.average(cm_tmp,axis=0)
@@ -118,6 +119,10 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
     return branch_cm,branch_th
 
 #Main
+
+#time
+start=time.time()
+
 #constants
 dust = 4  # チリの大きさ判定用変数
 cut = 30  # threshold value,輝度値は0が黒色、255が白色。
@@ -128,10 +133,6 @@ Dir_name="/mnt/c/Users/PC/Desktop/"
 f_name="20230205_nonsur_77.2mN_No.1.avi"
 f_name2="20230222_0.05sur_73.2mN_No.3.avi"
 f_name3="20230221_nonsur_76.8mN_No.1.avi"
-#Dir_name="/mnt/d/dendrite_data/edited_data/edited_movie/"
-#f_name="20230221_nonsur_76.8mN_No.1.avi"
-# f_name2="20230213_0.05sur_71.4mN_No.4.avi"
-#f_name3="20230221_nonsur_76.6mN_No.2.avi"
 
 file_path=Dir_name + f_name2
 name_tag=file_path.replace(Dir_name,"")
@@ -164,27 +165,6 @@ threshold,nongray_binary=cv2.threshold(image,cut,255,cv2.THRESH_BINARY)#RGBを�
 
 binary=Remove_Dust(binary)
 
-# # 2 次元高速フーリエ変換で周波数領域の情報を取り出す
-# f_uv = np.fft.fft2(binary)
-# # 画像の中心に低周波数の成分がくるように並べかえる
-# shifted_f_uv = np.fft.fftshift(f_uv)
-# # パワースペクトルに変換する
-# magnitude_spectrum2d = 20 * np.log(np.absolute(shifted_f_uv))
-
-# k=[(min(int(Lx/2),int(Ly/2))/100*(i+1)) for i in range(100)]
-# C_k=[[]for i in range(len(k))]
-# for i in range(len(k)):
-#     C_k[i]=Correlation_Function(k[i],magnitude_spectrum2d)
-    
-# C_k_log=np.log2(C_k)
-# k_log=np.log2(k)
-
-# # 元の並びに直す
-# unshifted_f_uv = np.fft.fftshift(shifted_f_uv)
-
-# # 2 次元逆高速フーリエ変換で空間領域の情報に戻す
-# i_f_xy = np.fft.ifft2(unshifted_f_uv).real  # 実数部だけ使う
-
 # 画像
 x,y=CM(n0) #重心計算
 
@@ -193,7 +173,7 @@ img_n=N_Frame_Image(n0) #N frames image
 scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
-r_max=min(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最小値
+r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
 fig, ax = plt.subplots(1,3,figsize=(18,6))
 
 #元画像(gray)
@@ -204,6 +184,9 @@ ax[0].set_title('Input Image')
 ax[0].add_artist(scalebar)
 
 #theta-半径グラフ
+ax[1].set_axis_off()
+ax[1]=plt.subplot(132,projection="polar")
+
 ax[2].set_axis_on()
 ax[2].set_xticks(
     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4, np.pi*2], 
@@ -212,17 +195,19 @@ ax[2].set_xticks(
 ax[2].set_xlim(-0.1,2*math.pi+0.1)
 ax[2].set_xlabel(r"$\theta$")
 ax[2].set_ylabel(r"Radius $r$ pix")
-search_range=[r for r in range(2,r_max)]
+search_range=[r for r in range(2,r_max,int(r_max/20))]
 theta=[[]for i in range(len(search_range))]
 
 for i , r in enumerate(search_range):
     branch_cm,branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        ax[2].scatter(2*math.pi-branch_th[j],r,s=1,c="black")
+        ax[2].scatter(2*math.pi-branch_th[j],r,s=1,c="k")
+        ax[1].scatter(2*math.pi-branch_th[j],r,s=1,c="k")
         theta[i].append(2*math.pi-branch_th[j]) #探索の向きの関係上2Piから引くとimput imageと向きが一致
 
 ax[2].set_box_aspect(0.5)
 
+#枝のベクトル計算
 vector=[]
 for i in reversed(range(1,len(search_range))):
     rnow=search_range[i]
@@ -233,23 +218,40 @@ for i in reversed(range(1,len(search_range))):
         for k in range(len(theta[i-1])):
             thnext=theta[i-1][k]
             dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-            if dist_tmp2>dist2:
+            if dist_tmp2 > dist2:
                 dist_tmp2=dist2
                 tmp1=rnext
                 tmp2=thnext
         vector.append([[thnow,rnow],[tmp2,tmp1]])
 
-lc = mc.LineCollection(vector, colors="k", linewidths=1)
-ax[2].add_collection(lc)
+node=[]
+vector_pare=[]
+# search node
+for i in range(len(vector)-1):
+    if vector[i][1][0] == vector[i+1][1][0]:
+        node.append(vector[i][1])
+        # vector_pare.append()
 
-ax[1].set_axis_off()
-ax[1]=plt.subplot(132,projection="polar")
-for i , r in enumerate(search_range):
-    branch_cm,branch_th=search_branch(binary,r,x,y)
-    for j in range(len(branch_th)):
-        ax[1].plot(2*math.pi-branch_th[j],r)
-lc = mc.LineCollection(vector, colors="k", linewidths=1)
-ax[1].add_collection(lc)
+for i in range(len(node)):
+    ax[1].scatter(node[i][0],node[i][1],s=10,c="r")
 
-plt.savefig(str(name_tag)+".png")
+lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
+lc2 = mc.LineCollection(vector, colors="k", linewidths=1)
+
+ax[1].add_collection(lc1)
+ax[2].add_collection(lc2)
+
+# plt.savefig(str(name_tag)+".png")
+finish=time.time()
 plt.show()
+total_time=finish-start
+print("total time:",total_time)
+print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
+
+#時間計測メモ file3で計測
+# 系サイズ最大、1ステップ毎：75.58797311782837 sec ->20倍になっても時間は10倍ほど
+# 系サイズ最大、r_max/20毎：7.566540241241455 sec
+# 重心から系の端まで、1ステップ毎：77.58949756622314 sec ->こっちの方がむしろ長い？
+# 重心から系の端まで、1ステップ毎、探索関数にif文をかませない：83.54880547523499 sec ->ifをかませない方が長い？
+# 重心から系の端まで、r_max/20毎：6.782961368560791 sec
+# 点数が増えるとplot関数により時間がかかる印象,cpuの使用状況に多少よるかも
