@@ -26,6 +26,7 @@ def bezie_curve(Q):
         py += np.dot(B[i], Q[i][1])
     return px, py
 
+#液滴の底面算出
 def bottom_line(q1,q4,px):
     delta=q4-q1
     alpha=delta[1]/delta[0]
@@ -34,6 +35,7 @@ def bottom_line(q1,q4,px):
 
     return y_botom
 
+#ベジエ曲線の面積の厳密解
 def bezie_area_exact(Q):
     S_bottom=0.5*(Q[3][0]-Q[0][0])*(Q[0][1]+Q[3][1])
     S_bezie=0.05*(-Q[3][1]*(Q[0][0]+3*Q[1][0]+6*Q[2][0]-10*Q[3][0])-3*Q[2][1]*(Q[0][0]+Q[1][0]-2*Q[3][0])+3*Q[1][1]*(-2*Q[0][0]+Q[2][0]+Q[3][0])+Q[0][1]*(-10*Q[0][0]+6*Q[1][0]+3*Q[2][0]+Q[3][0]))
@@ -42,11 +44,26 @@ def bezie_area_exact(Q):
 
     return S_exact
 
+#色のヒストグラム作成
 def color_hist(filename):
     img = np.asarray(Image.open(filename).convert("L")).reshape(-1,1)
     plt.hist(img, bins=128)
     plt.show()
 
+#hypabolic tangent での境界表現
+def surface(epsilnon,R): #epsilon:境界の幅(2*epsilon),R:円の半径
+    step=100
+    dth=2*math.pi()/step
+    dr=2*R/step
+
+    theta=[dth*i for i in range(step)]
+    r=[dr*i for i in range(step)]
+    
+    f=0.5*(1+math.tanh((R-r)/epsilnon))
+
+    return 
+
+#main
 #Video Source
 Dir_name="/mnt/c/Users/PC/Desktop/data_for_contact_angle/"
 fname_list=[]

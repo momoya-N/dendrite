@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.collections as mc
 import matplotlib.cm as cm
-
+import time
 
 def N_Frame_Image(frameIndex):  # N番目のフレーム画像を返す
     # インデックスがフレームの範囲内なら…
@@ -84,7 +84,6 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
     branch_cm=[]
     branch_th=[]
 
-
     r_x = int(r * math.cos(0) + x_c)
     r_y = int(r * math.sin(0) + y_c)
 
@@ -93,38 +92,21 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
         r_x = int(r * math.cos(th) + x_c)
         r_y = int(r * math.sin(th) + y_c)
 
-        thick_d = 0
-        d_temp = []
         cm_tmp=[]
         th_tmp=[]
 
-        while binary[r_y, r_x] == 255:  # 太さの計算。粒子を中心として円で探査し、その最大半径から太さを求める
-            d = 1
-            dphi = math.pi / 30  # 1/dだと、d=1の時、粒子の上下の探索ができないため、こう与える。arg=6度刻み
-            phi = 0
-            
-            while phi < 2 * math.pi:  # 粒子のある点の周りの半径dでの粒子配置の探索
-                rx_tmp = int(r_x + d * math.cos(phi))
-                ry_tmp = int(r_y + d * math.sin(phi))
-
-                if binary[ry_tmp, rx_tmp] != 255:  # 粒子がなければその時の半径はその点から枝の表面までの最短距離になる
-                    d_temp.append(d)
+        if (1 <= r_x < Lx-1) and (1 <= r_y < Ly-1):
+            while binary[r_y, r_x] == 255:#枝の重心計測
+                cm_tmp.append([r_x,r_y]) #cv2の描画の関係上ここだけx,yの順番が違う
+                th_tmp.append(th)
+                t += 1
+                th = dth * t
+                
+                if th > 2 * math.pi:
                     break
-                else:
-                    if phi+dphi < 2 * math.pi:
-                        phi += dphi
-                    else:
-                        phi = 0
-                        d += 1
-
-            cm_tmp.append([r_x,r_y]) #cv2の描画の関係上ここだけx,yの順番が違う
-            th_tmp.append(th)
-
-            t += 1
-            th = dth * t
-            
-            r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
-            r_y = int(r * math.sin(th) + y_c)
+                
+                r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
+                r_y = int(r * math.sin(th) + y_c)
 
         if np.size(cm_tmp)!=0:
             cm=np.average(cm_tmp,axis=0)
@@ -137,6 +119,10 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
     return branch_cm,branch_th
 
 #Main
+
+#time
+start=time.time()
+
 #constants
 dust = 4  # チリの大きさ判定用変数
 cut = 30  # threshold value,輝度値は0が黒色、255が白色。
@@ -148,7 +134,7 @@ f_name="20230205_nonsur_77.2mN_No.1.avi"
 f_name2="20230222_0.05sur_73.2mN_No.3.avi"
 f_name3="20230221_nonsur_76.8mN_No.1.avi"
 
-file_path=Dir_name + f_name2
+file_path=Dir_name + f_name3
 name_tag=file_path.replace(Dir_name,"")
 name_tag=name_tag.replace(".avi","")
 window_name = file_path[len(Dir_name):]
@@ -179,27 +165,6 @@ threshold,nongray_binary=cv2.threshold(image,cut,255,cv2.THRESH_BINARY)#RGBを�
 
 binary=Remove_Dust(binary)
 
-# 2 次元高速フーリエ変換で周波数領域の情報を取り出す
-f_uv = np.fft.fft2(binary)
-# 画像の中心に低周波数の成分がくるように並べかえる
-shifted_f_uv = np.fft.fftshift(f_uv)
-# パワースペクトルに変換する
-magnitude_spectrum2d = 20 * np.log(np.absolute(shifted_f_uv))
-
-k=[(min(int(Lx/2),int(Ly/2))/100*(i+1)) for i in range(100)]
-C_k=[[]for i in range(len(k))]
-for i in range(len(k)):
-    C_k[i]=Correlation_Function(k[i],magnitude_spectrum2d)
-    
-C_k_log=np.log2(C_k)
-k_log=np.log2(k)
-
-# 元の並びに直す
-unshifted_f_uv = np.fft.fftshift(shifted_f_uv)
-
-# 2 次元逆高速フーリエ変換で空間領域の情報に戻す
-i_f_xy = np.fft.ifft2(unshifted_f_uv).real  # 実数部だけ使う
-
 # 画像
 x,y=CM(n0) #重心計算
 
@@ -208,36 +173,45 @@ img_n=N_Frame_Image(n0) #N frames image
 scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
-r_max=min(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最小値
-fig, ax = plt.subplots(1,3,figsize=(18,6))
+r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
+fig = plt.figure(figsize=(9,9))
+# ax1=fig.add_subplot(2,2,1)
+ax2=fig.add_subplot(1,1,1,projection="polar")
+# ax3=fig.add_subplot(2,2,4)
+## fig, ax = plt.subplots(1,3,figsize=(18,6))
 
-#元画像(gray)
+# #元画像(gray)
 cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
 cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
-ax[0].imshow(img_origin,cmap='gray')
-ax[0].set_title('Input Image')
-ax[0].add_artist(scalebar)
+# ax1.imshow(img_origin,cmap='gray')
+# ax1.set_title('Input Image')
+# ax1.add_artist(scalebar)
 
 #theta-半径グラフ
-ax[2].set_axis_on()
-ax[2].set_xticks(
-    [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4, np.pi*2], 
-    ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4", "2\u03c0"]
+ax2.set_axis_off()
+##ax2=plt.subplot(132,projection="polar")
+
+ax2.set_axis_on()
+ax2.set_xticks(
+    [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
+    ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
 )
-ax[2].set_xlim(-0.1,2*math.pi+0.1)
-ax[2].set_xlabel(r"$\theta$")
-ax[2].set_ylabel(r"Radius $r$ pix")
-search_range=[r for r in range(2,r_max)]
+# ax3.set_xlim(-0.1,2*math.pi+0.1)
+# ax3.set_xlabel(r"$\theta$")
+# ax3.set_ylabel(r"Radius $r$ pix")
+search_range=[r for r in range(2,r_max,int(r_max/20))]
 theta=[[]for i in range(len(search_range))]
 
 for i , r in enumerate(search_range):
     branch_cm,branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        ax[2].scatter(2*math.pi-branch_th[j],r,s=1,c="black")
+        # ax3.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
+        ax2.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
         theta[i].append(2*math.pi-branch_th[j]) #探索の向きの関係上2Piから引くとimput imageと向きが一致
 
-ax[2].set_box_aspect(0.5)
+# ax3.set_box_aspect(0.8)
 
+#枝のベクトル計算
 vector=[]
 for i in reversed(range(1,len(search_range))):
     rnow=search_range[i]
@@ -248,23 +222,43 @@ for i in reversed(range(1,len(search_range))):
         for k in range(len(theta[i-1])):
             thnext=theta[i-1][k]
             dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-            if dist_tmp2>dist2:
+            if dist_tmp2 > dist2:
                 dist_tmp2=dist2
                 tmp1=rnext
                 tmp2=thnext
         vector.append([[thnow,rnow],[tmp2,tmp1]])
 
-lc = mc.LineCollection(vector, colors="k", linewidths=1)
-ax[2].add_collection(lc)
+print(vector)
+node=[]
+vector_pare=[]
+# search node
+for i in range(len(vector)-1):
+    if vector[i][1][0] == vector[i+1][1][0]:
+        node.append(vector[i][1])
+        # vector_pare.append()
 
-ax[1].set_axis_off()
-ax[1]=plt.subplot(132,projection="polar")
-for i , r in enumerate(search_range):
-    branch_cm,branch_th=search_branch(binary,r,x,y)
-    for j in range(len(branch_th)):
-        ax[1].plot(2*math.pi-branch_th[j],r)
-lc = mc.LineCollection(vector, colors="k", linewidths=1)
-ax[1].add_collection(lc)
+for i in range(len(node)):
+    ax2.scatter(node[i][0],node[i][1],s=10,c="r")
+
+lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
+# lc2 = mc.LineCollection(vector, colors="k", linewidths=1)
+
+##r,theta,対応する枝の番号の分の情報をつけて再帰的に探索
+ax2.add_collection(lc1)
+# ax3.add_collection(lc2)
 
 # plt.savefig(str(name_tag)+".png")
-# plt.show()
+# plt.savefig(str(name_tag)+"_lareg.png")
+finish=time.time()
+plt.show()
+total_time=finish-start
+print("total time:",total_time)
+print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
+
+#時間計測メモ file3で計測
+# 系サイズ最大、1ステップ毎：75.58797311782837 sec ->20倍になっても時間は10倍ほど
+# 系サイズ最大、r_max/20毎：7.566540241241455 sec
+# 重心から系の端まで、1ステップ毎：77.58949756622314 sec ->こっちの方がむしろ長い？
+# 重心から系の端まで、1ステップ毎、探索関数にif文をかませない：83.54880547523499 sec ->ifをかませない方が長い？
+# 重心から系の端まで、r_max/20毎：6.782961368560791 sec
+# 点数が増えるとplot関数により時間がかかる印象,cpuの使用状況に多少よるかも

@@ -1,3 +1,61 @@
+# import numpy as np
+# import math
+# from matplotlib import pyplot as plt
+# import cv2
+# from PIL import Image
+
+# # Bernstein多項式を計算する関数
+# def bernstein(n, t):
+#     B = []
+#     for k in range(n + 1):
+#         # 二項係数を計算してからBernstein多項式を計算
+#         nCk = math.factorial(n) / (math.factorial(k) * math.factorial(n - k))
+#         B.append(nCk * t ** k * (1 - t) ** (n - k))
+#     return B
+
+# # ベジェ曲線を描く関数
+# def bezie_curve(Q):
+#     n = len(Q) - 1
+#     dt = 0.001
+#     t = np.arange(0, 1 + dt, dt)
+#     B = bernstein(n, t)
+#     px = 0
+#     py = 0
+#     for i in range(len(Q)):
+#         px += np.dot(B[i], Q[i][0])
+#         py += np.dot(B[i], Q[i][1])
+#     return px, py
+
+# #液滴の底面算出
+# def bottom_line(q1,q4,px):
+#     delta=q4-q1
+#     alpha=delta[1]/delta[0]
+
+#     y_botom=alpha*(px-q1[0])+q1[1]
+
+#     return y_botom
+
+# #ベジエ曲線の面積の厳密解
+# def bezie_area_exact(Q):
+#     S_bottom=0.5*(Q[3][0]-Q[0][0])*(Q[0][1]+Q[3][1])
+#     S_bezie=0.05*(-Q[3][1]*(Q[0][0]+3*Q[1][0]+6*Q[2][0]-10*Q[3][0])-3*Q[2][1]*(Q[0][0]+Q[1][0]-2*Q[3][0])+3*Q[1][1]*(-2*Q[0][0]+Q[2][0]+Q[3][0])+Q[0][1]*(-10*Q[0][0]+6*Q[1][0]+3*Q[2][0]+Q[3][0]))
+
+#     S_exact=S_bottom-S_bezie
+
+#     return S_exact
+
+# #色のヒストグラム作成
+# def color_hist(filename):
+#     img = np.asarray(Image.open(filename).convert("L")).reshape(-1,1)
+#     plt.hist(img, bins=128)
+#     plt.show()
+
+# #hyperbolic tangent での境界表現
+# def surface(epsilnon,R,r): #epsilon:境界の幅(2*epsilon),R:境界の半径,r:動径半径
+#     f=0.5*(1+math.tanh((R-r)/epsilnon))
+    
+#     return f
+
 import math
 import sys
 
@@ -77,11 +135,7 @@ def Remove_Dust(Matrix):#remove dust funvtion
 def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
     dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
     t = 0  # 角度のステップ数
-    k = 0  # 角度のステップ数その2
     th = 0  # 角度
-    phi = 0  # 太さ探索用角度
-    # thick_d_array = []
-    branch_cm=[]
     branch_th=[]
 
     r_x = int(r * math.cos(0) + x_c)
@@ -92,12 +146,10 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
         r_x = int(r * math.cos(th) + x_c)
         r_y = int(r * math.sin(th) + y_c)
 
-        cm_tmp=[]
         th_tmp=[]
 
         if (1 <= r_x < Lx-1) and (1 <= r_y < Ly-1):
             while binary[r_y, r_x] == 255:#枝の重心計測
-                cm_tmp.append([r_x,r_y]) #cv2の描画の関係上ここだけx,yの順番が違う
                 th_tmp.append(th)
                 t += 1
                 th = dth * t
@@ -108,15 +160,13 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
                 r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
                 r_y = int(r * math.sin(th) + y_c)
 
-        if np.size(cm_tmp)!=0:
-            cm=np.average(cm_tmp,axis=0)
+        if np.size(th_tmp)!=0:
             th=np.average(th_tmp)
-            branch_cm.append(cm)
             branch_th.append(th)
 
         t += 1
 
-    return branch_cm,branch_th
+    return branch_th
 
 #Main
 
@@ -174,53 +224,67 @@ scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
 r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
-fig = plt.figure(figsize=(9,9))
-# ax1=fig.add_subplot(2,2,1)
-ax2=fig.add_subplot(1,1,1,projection="polar")
-# ax3=fig.add_subplot(2,2,4)
-## fig, ax = plt.subplots(1,3,figsize=(18,6))
+fig = plt.figure(figsize=(18,9))
+ax1=fig.add_subplot(1,2,1)
+ax2=fig.add_subplot(1,2,2,projection="polar")
 
 # #元画像(gray)
 cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
 cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
-# ax1.imshow(img_origin,cmap='gray')
-# ax1.set_title('Input Image')
-# ax1.add_artist(scalebar)
+ax1.imshow(img_origin,cmap='gray')
+ax1.set_title('Input Image')
+ax1.add_artist(scalebar)
 
 #theta-半径グラフ
 ax2.set_axis_off()
-##ax2=plt.subplot(132,projection="polar")
-
 ax2.set_axis_on()
 ax2.set_xticks(
     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
 )
-# ax3.set_xlim(-0.1,2*math.pi+0.1)
-# ax3.set_xlabel(r"$\theta$")
-# ax3.set_ylabel(r"Radius $r$ pix")
-search_range=[r for r in range(2,r_max,int(r_max/20))]
-theta=[[]for i in range(len(search_range))]
+search_range=[r for r in reversed(range(2,r_max,int(r_max/20)))]
+position=[[]for i in range(len(search_range))]
+position_id=1
 
+#位置データの作成
 for i , r in enumerate(search_range):
-    branch_cm,branch_th=search_branch(binary,r,x,y)
+    branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        # ax3.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
         ax2.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
-        theta[i].append(2*math.pi-branch_th[j]) #探索の向きの関係上2Piから引くとimput imageと向きが一致
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0])#data=[radius,theta,position_id,in,out]
+        position_id+=1
 
-# ax3.set_box_aspect(0.8)
+#接続の計算
+for i in range(search_range):
+    for j in range(len(position[i])):
+        if position[i][j][4]==0:
+            position[i][j][4]=-1
+
+def next_point(position_now,position_next_tuple):#position[i][j],position[i+1]
+    rnow=position_now[0]
+    thnow=position_now[1]
+    rnext=position_next_tuple[0][0]
+    dist_tmp2=pow(r_max,2) #十分大きな数で
+    for i in range(len(position_next_tuple)):
+        thnext=position_next_tuple[i][1]
+        dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+        if dist_tmp2 > dist2:
+            dist_tmp2=dist2
+            index=i
+
+    return index
 
 #枝のベクトル計算
 vector=[]
-for i in reversed(range(1,len(search_range))):
+for i in range(0,len(search_range)-1):
     rnow=search_range[i]
-    rnext=search_range[i-1]
-    for j in range(len(theta[i])):
-        thnow=theta[i][j]
+    rnext=search_range[i+1]
+    print(rnow,rnext)
+    for j in range(len(position[i])):
+        thnow=position[i][j][1]
         dist_tmp2=pow(r_max,2) #十分大きな数で
-        for k in range(len(theta[i-1])):
-            thnext=theta[i-1][k]
+        for k in range(len(position[i+1])):
+            thnext=position[i+1][k][1]
             dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
             if dist_tmp2 > dist2:
                 dist_tmp2=dist2
@@ -228,7 +292,6 @@ for i in reversed(range(1,len(search_range))):
                 tmp2=thnext
         vector.append([[thnow,rnow],[tmp2,tmp1]])
 
-print(vector)
 node=[]
 vector_pare=[]
 # search node
@@ -241,12 +304,9 @@ for i in range(len(node)):
     ax2.scatter(node[i][0],node[i][1],s=10,c="r")
 
 lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
-# lc2 = mc.LineCollection(vector, colors="k", linewidths=1)
 
-##r,theta,対応する枝の番号の分の情報をつけて再帰的に探索
+#r,theta,対応する枝の番号の分の情報をつけて再帰的に探索
 ax2.add_collection(lc1)
-# ax3.add_collection(lc2)
-
 # plt.savefig(str(name_tag)+".png")
 # plt.savefig(str(name_tag)+"_lareg.png")
 finish=time.time()
@@ -262,3 +322,152 @@ print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
 # 重心から系の端まで、1ステップ毎、探索関数にif文をかませない：83.54880547523499 sec ->ifをかませない方が長い？
 # 重心から系の端まで、r_max/20毎：6.782961368560791 sec
 # 点数が増えるとplot関数により時間がかかる印象,cpuの使用状況に多少よるかも
+
+
+
+# step=100
+# R=50
+# epsilon=20
+# dth=2*math.pi/step
+# dr=2*R/step
+# theta=[dth*i for i in range(step)]
+# r=[dr*i for i in range(step)]
+# f=[[surface(epsilon,R,r[i]) for j in range(step)] for i in range(step)]
+# # fig , ax=plt.subplots( )
+# fig , ax = plt.subplots(figsize=(9,9),subplot_kw={'projection': 'polar'})
+# map=ax.pcolor(theta,r,f)
+# plt.colorbar(map, ax=ax)
+# plt.show()
+
+# #main
+# #Video Source
+# Dir_name="/mnt/c/Users/PC/Desktop/data_for_contact_angle/"
+# fname_list=[]
+# for i in range(4):
+#     fname="contact_angle_H2O_Plronic_TWEEN_00"+str(i+1)+".tif"
+#     fname_list.append(fname)
+
+# file_path=Dir_name + fname_list[0]
+# name_tag=file_path.replace(Dir_name,"")
+# name_tag=name_tag.replace(".tif","")
+# window_name = file_path[len(Dir_name):]
+# img=cv2.imread(file_path,1)
+# img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+# print(window_name)
+# print(type(img))
+
+# hight, width, channels=img.shape
+# print("File Name : ",window_name)
+# print("Frame Width : ", width)
+# print("Frame Hight : ", hight)
+
+# # # 大津の二値化
+# ret,th = cv2.threshold(img_gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+
+# # スレッショルドを切る
+# # ret,th = cv2.threshold(img_gray,40,255,cv2.THRESH_BINARY)
+
+
+# # カーネルの設定
+# kernel = np.ones((5,5),np.uint8)
+
+# # モルフォロジー変換（膨張）
+# th_dilation = cv2.dilate(th,kernel,iterations = 1)
+
+# # モルフォロジー変換（収縮）
+# th_elosion = cv2.erode(th,kernel,iterations = 1)
+
+# #オープニング処理(収縮->膨張),極板の除去
+# th_opening=cv2.morphologyEx(th,cv2.MORPH_OPEN,kernel)
+
+# #クロージング処理(膨張->収縮),黒い穴の除去
+# kernel=np.ones((20,20),np.uint8) #カーネルの変更
+# th_closing=cv2.morphologyEx(th_opening,cv2.MORPH_CLOSE,kernel)
+
+# # 輪郭抽出
+# contours, hierarchy = cv2.findContours(th_closing,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE) #RETR_LISTは白領域をCCWで探索
+
+# # 輪郭を元画像に描画
+# img_contour = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
+
+# # # 重心と両端の点の取得,探索は黒領域のCCWなのでcontersには右->左->中の順番で格納
+# color=["r","b","g"]
+# Q=[]
+# Area=[]
+# px=[]
+# py=[]
+# for i , c in enumerate(contours):
+#     area=cv2.contourArea(c)
+    
+#     index_L=np.where(c[...,0]==np.min(c[...,0]))
+#     left=c[index_L[0][len(index_L[0])-1]][0] #各液滴の一番左下の検出(RETR_LISTで白領域をCCWで探索の場合)
+
+#     index_R=np.where(c[...,0]==np.max(c[...,0]))
+#     right=c[index_R[0][0]][0] #各液滴の一番右下の検出(RETR_LISTで白領域をCCWで探索の場合)
+
+#     q1 = left
+#     q2=np.round(left+(right-left)/3.0).astype(int)
+#     q3=np.round(left+(right-left)*2.0/3.0).astype(int)
+#     q4 = right
+#     q2+=[0,-50]
+#     q3+=[0,-50]
+
+#     Q.append([q1,q2,q3,q4])
+#     Area.append(area)
+#     px.append(bezie_curve(Q[i])[0])
+#     py.append(bezie_curve(Q[i])[1])
+
+# y_bottom=bottom_line(q1,q4,px)
+# print(Area)
+# print(Q)
+# print(bezie_area_exact(Q[0]),bezie_area_exact(Q[1]),bezie_area_exact(Q[2]))
+# bezie_area=[]
+
+# for i in range(len(contours)):
+#     area_temp=0
+#     for j in range(len(py[i])-1):
+#         dx=px[i][j+1]-px[i][j]
+#         area_temp+=(bottom_line(Q[i][0],Q[i][3],px[i][j])-py[i][j])*dx
+#     print(area_temp)
+
+# fig= plt.figure(figsize=(18,9))
+# ax1=fig.add_subplot(1,2,1)
+# ax2=fig.add_subplot(1,2,2)
+# # ax3=fig.add_subplot(2,2,3)
+
+# #元画像(gray)
+# ax1.imshow(img_contour,cmap='gray')
+# ax1.set_title('Input Image')
+
+# #二値化画像(binary)
+# ax2.imshow(th_closing,cmap='gray')
+# ax2.set_title('Binary Image')
+
+# #各液滴の重心を描画、探索は黒領域のCCWなので右->左->中の順番で格納
+# color=["r","b","g"]
+# for i , c in enumerate(contours):
+#     M = cv2.moments(c)
+#     x = int(M["m10"] / M["m00"])
+#     y = int(M["m01"] / M["m00"])
+    
+#     ax2.plot(x,y,marker='.',c=color[i])
+#     for j in range(len(Q[i])):
+#         ax2.plot(Q[i][j][0],Q[i][j][1],marker="o",c=color[i])
+#         ax2.plot(px[i],py[i],c=color[i])
+#         ax2.plot(px[i],y_bottom[i],c=color[i])
+
+#     for j in range(len(py[i])):
+#         x1=[px[i][j],px[i][j]]
+#         y1=[y_bottom[i][j],py[i][j]]
+#         ax2.plot(x1,y1,c=color[i])
+
+# # レイアウト設定
+# fig.tight_layout()
+
+# # グラフを表示する。
+# # plt.savefig(str(name_tag)+".png")
+# plt.show()
+
+
+# # ---------------------------------------------------
