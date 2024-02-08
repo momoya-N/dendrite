@@ -16,7 +16,7 @@ def bernstein(n, t):
 # ベジェ曲線を描く関数
 def bezie_curve(Q):
     n = len(Q) - 1
-    dt = 0.01
+    dt = 0.001
     t = np.arange(0, 1 + dt, dt)
     B = bernstein(n, t)
     px = 0
@@ -25,6 +25,22 @@ def bezie_curve(Q):
         px += np.dot(B[i], Q[i][0])
         py += np.dot(B[i], Q[i][1])
     return px, py
+
+def bottom_line(q1,q4,px):
+    delta=q4-q1
+    alpha=delta[1]/delta[0]
+
+    y_botom=alpha*(px-q1[0])+q1[1]
+
+    return y_botom
+
+def bezie_area_exact(Q):
+    S_bottom=0.5*(Q[3][0]-Q[0][0])*(Q[0][1]+Q[3][1])
+    S_bezie=0.05*(-Q[3][1]*(Q[0][0]+3*Q[1][0]+6*Q[2][0]-10*Q[3][0])-3*Q[2][1]*(Q[0][0]+Q[1][0]-2*Q[3][0])+3*Q[1][1]*(-2*Q[0][0]+Q[2][0]+Q[3][0])+Q[0][1]*(-10*Q[0][0]+6*Q[1][0]+3*Q[2][0]+Q[3][0]))
+
+    S_exact=S_bottom-S_bezie
+
+    return S_exact
 
 def color_hist(filename):
     img = np.asarray(Image.open(filename).convert("L")).reshape(-1,1)
@@ -36,7 +52,6 @@ Dir_name="/mnt/c/Users/PC/Desktop/data_for_contact_angle/"
 fname_list=[]
 for i in range(4):
     fname="contact_angle_H2O_Plronic_TWEEN_00"+str(i+1)+".tif"
-    print(fname)
     fname_list.append(fname)
 
 file_path=Dir_name + fname_list[0]
@@ -78,78 +93,88 @@ kernel=np.ones((20,20),np.uint8) #カーネルの変更
 th_closing=cv2.morphologyEx(th_opening,cv2.MORPH_CLOSE,kernel)
 
 # 輪郭抽出
-contours, hierarchy = cv2.findContours(th_dilation,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE)
+contours, hierarchy = cv2.findContours(th_closing,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE) #RETR_LISTは白領域をCCWで探索
 
 # 輪郭を元画像に描画
 img_contour = cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
 
+# # 重心と両端の点の取得,探索は黒領域のCCWなのでcontersには右->左->中の順番で格納
+color=["r","b","g"]
+Q=[]
+Area=[]
+px=[]
+py=[]
+for i , c in enumerate(contours):
+    area=cv2.contourArea(c)
+    
+    index_L=np.where(c[...,0]==np.min(c[...,0]))
+    left=c[index_L[0][len(index_L[0])-1]][0] #各液滴の一番左下の検出(RETR_LISTで白領域をCCWで探索の場合)
 
-# color_hist(file_path)
+    index_R=np.where(c[...,0]==np.max(c[...,0]))
+    right=c[index_R[0][0]][0] #各液滴の一番右下の検出(RETR_LISTで白領域をCCWで探索の場合)
 
-# 点座標を準備
-# q1 = [0., 0.]
-# q2 = [0.5, 1.]
-# q3 = [1., 0.]and
-# Q = [q1, q2, q3]
+    q1 = left
+    q2=np.round(left+(right-left)/3.0).astype(int)
+    q3=np.round(left+(right-left)*2.0/3.0).astype(int)
+    q4 = right
+    q2+=[0,-50]
+    q3+=[0,-50]
 
-q1 = [0., 0.]
-q2 = [0.5, 0.]
-q3 = [0.5, 1.]
-q4 = [1., 1.]
-Q = [q1, q2, q3, q4]
+    Q.append([q1,q2,q3,q4])
+    Area.append(area)
+    px.append(bezie_curve(Q[i])[0])
+    py.append(bezie_curve(Q[i])[1])
 
-# ベジェ曲線を描く関数を実行
-px, py = bezie_curve(Q)
-print(px,py)
-# ここからグラフ描画-------------------------------------
-fig, ax = plt.subplots(1,3,figsize=(18,6))
+y_bottom=bottom_line(q1,q4,px)
+print(Area)
+print(Q)
+print(bezie_area_exact(Q[0]),bezie_area_exact(Q[1]),bezie_area_exact(Q[2]))
+bezie_area=[]
+
+for i in range(len(contours)):
+    area_temp=0
+    for j in range(len(py[i])-1):
+        dx=px[i][j+1]-px[i][j]
+        area_temp+=(bottom_line(Q[i][0],Q[i][3],px[i][j])-py[i][j])*dx
+    print(area_temp)
+
+fig= plt.figure(figsize=(18,9))
+ax1=fig.add_subplot(1,2,1)
+ax2=fig.add_subplot(1,2,2)
+# ax3=fig.add_subplot(2,2,3)
 
 #元画像(gray)
-ax[0].imshow(img_contour,cmap='gray')
-ax[0].set_title('Input Image')
+ax1.imshow(img_contour,cmap='gray')
+ax1.set_title('Input Image')
 
 #二値化画像(binary)
-ax[1].imshow(th_closing,cmap='gray')
-ax[1].set_title('Binary Image')
+ax2.imshow(th_closing,cmap='gray')
+ax2.set_title('Binary Image')
 
-# # フォントのサイズを設定する。
-# plt.rcParams['font.size'] = 14
+#各液滴の重心を描画、探索は黒領域のCCWなので右->左->中の順番で格納
+color=["r","b","g"]
+for i , c in enumerate(contours):
+    M = cv2.moments(c)
+    x = int(M["m10"] / M["m00"])
+    y = int(M["m01"] / M["m00"])
+    
+    ax2.plot(x,y,marker='.',c=color[i])
+    for j in range(len(Q[i])):
+        ax2.plot(Q[i][j][0],Q[i][j][1],marker="o",c=color[i])
+        ax2.plot(px[i],py[i],c=color[i])
+        ax2.plot(px[i],y_bottom[i],c=color[i])
 
-# # 目盛を内側にする。
-# ax[2].rcParams['xtick.direction'] = 'in'
-# ax[2].rcParams['ytick.direction'] = 'in'
-
-# グラフの上下左右に目盛線を付ける。
-# fig = plt.figure()
-# ax[2] = fig.add_subplot(133)
-ax[2].yaxis.set_ticks_position('both')
-ax[2].xaxis.set_ticks_position('both')
-
-# 軸のラベルを設定する。
-ax[2].set_xlabel('x')
-ax[2].set_ylabel('y')
-
-# スケールの設定をする。
-ax[2].set_xlim(-0.1, 1.1)
-ax[2].set_ylim(-0.1, 1.1)
-
-# ベジェ曲線をプロット
-ax[2].plot(px, py, color='red', label='Bezie curve')
-
-# 制御点をプロット
-qx = []
-qy = []
-for i in range(len(Q)):
-    qx.append(Q[i][0])
-    qy.append(Q[i][1])
-ax[2].plot(qx, qy, color='blue', marker='o', linestyle='--', label='Control point')
-ax[2].legend()
-#ax1.axis('off')
+    for j in range(len(py[i])):
+        x1=[px[i][j],px[i][j]]
+        y1=[y_bottom[i][j],py[i][j]]
+        ax2.plot(x1,y1,c=color[i])
 
 # レイアウト設定
 fig.tight_layout()
 
 # グラフを表示する。
+# plt.savefig(str(name_tag)+".png")
 plt.show()
-plt.close()
+
+
 # ---------------------------------------------------

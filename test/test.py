@@ -134,7 +134,7 @@ f_name="20230205_nonsur_77.2mN_No.1.avi"
 f_name2="20230222_0.05sur_73.2mN_No.3.avi"
 f_name3="20230221_nonsur_76.8mN_No.1.avi"
 
-file_path=Dir_name + f_name2
+file_path=Dir_name + f_name3
 name_tag=file_path.replace(Dir_name,"")
 name_tag=name_tag.replace(".avi","")
 window_name = file_path[len(Dir_name):]
@@ -174,38 +174,42 @@ scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
 r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
-fig, ax = plt.subplots(1,3,figsize=(18,6))
+fig = plt.figure(figsize=(9,9))
+# ax1=fig.add_subplot(2,2,1)
+ax2=fig.add_subplot(1,1,1,projection="polar")
+# ax3=fig.add_subplot(2,2,4)
+## fig, ax = plt.subplots(1,3,figsize=(18,6))
 
-#元画像(gray)
+# #元画像(gray)
 cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
 cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
-ax[0].imshow(img_origin,cmap='gray')
-ax[0].set_title('Input Image')
-ax[0].add_artist(scalebar)
+# ax1.imshow(img_origin,cmap='gray')
+# ax1.set_title('Input Image')
+# ax1.add_artist(scalebar)
 
 #theta-半径グラフ
-ax[1].set_axis_off()
-ax[1]=plt.subplot(132,projection="polar")
+ax2.set_axis_off()
+##ax2=plt.subplot(132,projection="polar")
 
-ax[2].set_axis_on()
-ax[2].set_xticks(
-    [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4, np.pi*2], 
-    ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4", "2\u03c0"]
+ax2.set_axis_on()
+ax2.set_xticks(
+    [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
+    ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
 )
-ax[2].set_xlim(-0.1,2*math.pi+0.1)
-ax[2].set_xlabel(r"$\theta$")
-ax[2].set_ylabel(r"Radius $r$ pix")
+# ax3.set_xlim(-0.1,2*math.pi+0.1)
+# ax3.set_xlabel(r"$\theta$")
+# ax3.set_ylabel(r"Radius $r$ pix")
 search_range=[r for r in range(2,r_max,int(r_max/20))]
 theta=[[]for i in range(len(search_range))]
 
 for i , r in enumerate(search_range):
     branch_cm,branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        ax[2].scatter(2*math.pi-branch_th[j],r,s=1,c="k")
-        ax[1].scatter(2*math.pi-branch_th[j],r,s=1,c="k")
+        # ax3.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
+        ax2.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
         theta[i].append(2*math.pi-branch_th[j]) #探索の向きの関係上2Piから引くとimput imageと向きが一致
 
-ax[2].set_box_aspect(0.5)
+# ax3.set_box_aspect(0.8)
 
 #枝のベクトル計算
 vector=[]
@@ -224,6 +228,7 @@ for i in reversed(range(1,len(search_range))):
                 tmp2=thnext
         vector.append([[thnow,rnow],[tmp2,tmp1]])
 
+print(vector)
 node=[]
 vector_pare=[]
 # search node
@@ -233,15 +238,17 @@ for i in range(len(vector)-1):
         # vector_pare.append()
 
 for i in range(len(node)):
-    ax[1].scatter(node[i][0],node[i][1],s=10,c="r")
+    ax2.scatter(node[i][0],node[i][1],s=10,c="r")
 
 lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
-lc2 = mc.LineCollection(vector, colors="k", linewidths=1)
+# lc2 = mc.LineCollection(vector, colors="k", linewidths=1)
 
-ax[1].add_collection(lc1)
-ax[2].add_collection(lc2)
+##r,theta,対応する枝の番号の分の情報をつけて再帰的に探索
+ax2.add_collection(lc1)
+# ax3.add_collection(lc2)
 
 # plt.savefig(str(name_tag)+".png")
+# plt.savefig(str(name_tag)+"_lareg.png")
 finish=time.time()
 plt.show()
 total_time=finish-start
