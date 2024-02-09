@@ -245,20 +245,15 @@ ax2.set_xticks(
 search_range=[r for r in reversed(range(2,r_max,int(r_max/20)))]
 position=[[]for i in range(len(search_range))]
 position_id=1
+brance_id=0
 
 #位置データの作成
 for i , r in enumerate(search_range):
     branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
         ax2.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
-        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0])#data=[radius,theta,position_id,in,out]
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,branch_id1,branch_id2,branch_id3]
         position_id+=1
-
-#接続の計算
-for i in range(search_range):
-    for j in range(len(position[i])):
-        if position[i][j][4]==0:
-            position[i][j][4]=-1
 
 def next_point(position_now,position_next_tuple):#position[i][j],position[i+1]
     rnow=position_now[0]
@@ -273,6 +268,31 @@ def next_point(position_now,position_next_tuple):#position[i][j],position[i+1]
             index=i
 
     return index
+
+def tree_serch(position,i,j):
+    if position[i][j][4]==0: #最外端の判定
+        position[i][j][4]=-1
+
+    if position[i][j][5]==0:
+        position[i][j][5]=brance_id
+    elif position[i][j][6]==0:
+        position[i][j][6]=brance_id
+    else:
+        position[i][j][7]=brance_id
+
+    j_tmp=next_point(position[i][j],position[i+1])
+    position[i][j][3]=position[i+1][j_tmp][2]
+    i+=1
+    j=j_tmp
+    tree_serch(position,i,j)
+    
+#接続の計算
+for i in range(search_range):
+    for j in range(len(position[i])):
+        if position[i][j][4]==0: #最外端の判定
+            position[i][j][4]=-1
+        position[i][j].append(brance_id)
+        next_point(position[i][j],position[i+1])
 
 #枝のベクトル計算
 vector=[]
