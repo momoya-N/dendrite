@@ -168,6 +168,36 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
 
     return branch_th
 
+def next_point(position_now,position_next_list):#position[i][j],position[i+1]
+    rnow=position_now[0]
+    thnow=position_now[1]
+    rnext=position_next_list[0][0]
+    dist_tmp2=pow(r_max,2) #十分大きな数で
+    for i in range(len(position_next_list)):
+        thnext=position_next_list[i][1]
+        dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+        if dist_tmp2 > dist2:
+            dist_tmp2=dist2
+            index=i
+
+    return index
+
+def tree_serch(i,j,branch_id):
+    if i < len(search_range)-1:
+        branch_id_tmp=branch_id
+        i_tmp=i+1
+        j_tmp=next_point(position[i][j],position[i_tmp])
+        position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j]in <- [i_tmp][j_tmp]position_id
+        position[i_tmp][j_tmp][4]=position[i][j][2] #[i_tmp][j_tmp]out <- [i][j]position_id
+        if position[i][j][5]==position[i_tmp][j_tmp][5]:
+            position[i][j][5]=branch_id_tmp
+        elif position[i][j][5]!=position[i_tmp][j_tmp][5]:
+            position[i][j][5]=branch_id_tmp
+            position[i_tmp][j_tmp].append(branch_id_tmp)
+            branch_id_tmp+=1
+        tree_serch(i_tmp,j_tmp,branch_id_tmp)
+        return branch_id_tmp
+
 #Main
 
 #time
@@ -215,15 +245,55 @@ threshold,nongray_binary=cv2.threshold(image,cut,255,cv2.THRESH_BINARY)#RGBを�
 
 binary=Remove_Dust(binary)
 
-# 画像
+#位置データの作成
 x,y=CM(n0) #重心計算
+r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
+search_range=[r for r in reversed(range(2,r_max,int(r_max/30)))]
+position=[[]for i in range(len(search_range))]
+position_id=1
+branch_id=1
 
+for i , r in enumerate(search_range):
+    branch_th=search_branch(binary,r,x,y)
+    for j in range(len(branch_th)):
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,branch_id1,branch_id2,branch_id3]
+        position_id+=1
+
+#接続の計算
+for i in range(len(search_range)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==0: #最外端の判定
+            position[i][j][4]=-1
+            tmp=tree_serch(i,j,branch_id)
+            branch_id=tmp+1
+
+print(branch_id)
+
+#枝のベクトル計算
+vector=[]
+for i in range(0,len(position)-1):
+    for j in range(len(position[i])):
+        thnow=position[i][j][1]
+        rnow=position[i][0][0]
+        thnext=position[i+1][next_point(position[i][j],position[i+1])][1]
+        rnext=position[i+1][0][0]
+        vector.append([[thnow,rnow],[thnext,rnext]])
+
+vector_tmp=[]
+
+node=[]
+edge=[]
+
+
+# color=np.linspace(0,brance_id)
+# print(position,brance_id)
+
+# 画像
 img_origin=image #original image
 img_n=N_Frame_Image(n0) #N frames image
 scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
-r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
 fig = plt.figure(figsize=(18,9))
 ax1=fig.add_subplot(1,2,1)
 ax2=fig.add_subplot(1,2,2,projection="polar")
@@ -242,86 +312,27 @@ ax2.set_xticks(
     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
 )
-search_range=[r for r in reversed(range(2,r_max,int(r_max/20)))]
-position=[[]for i in range(len(search_range))]
-position_id=1
-brance_id=0
 
-#位置データの作成
+# search node & edge
+for i in range(len(position)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==-1:
+            edge.append([position[i][j][1],position[i][j][0]]) #theta,rの順に格納
+        elif len(position[i][j])!=6:
+            node.append([position[i][j][1],position[i][j][0]])
+            if len(position[i][j])-5 > 4:
+                ax2.scatter(position[i][j][1],position[i][j][0],s=40,c="y")
+                # print(position[i][j])
+
 for i , r in enumerate(search_range):
-    branch_th=search_branch(binary,r,x,y)
-    for j in range(len(branch_th)):
-        ax2.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
-        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,branch_id1,branch_id2,branch_id3]
-        position_id+=1
-
-def next_point(position_now,position_next_tuple):#position[i][j],position[i+1]
-    rnow=position_now[0]
-    thnow=position_now[1]
-    rnext=position_next_tuple[0][0]
-    dist_tmp2=pow(r_max,2) #十分大きな数で
-    for i in range(len(position_next_tuple)):
-        thnext=position_next_tuple[i][1]
-        dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-        if dist_tmp2 > dist2:
-            dist_tmp2=dist2
-            index=i
-
-    return index
-
-def tree_serch(position,i,j):
-    if position[i][j][4]==0: #最外端の判定
-        position[i][j][4]=-1
-
-    if position[i][j][5]==0:
-        position[i][j][5]=brance_id
-    elif position[i][j][6]==0:
-        position[i][j][6]=brance_id
-    else:
-        position[i][j][7]=brance_id
-
-    j_tmp=next_point(position[i][j],position[i+1])
-    position[i][j][3]=position[i+1][j_tmp][2]
-    i+=1
-    j=j_tmp
-    tree_serch(position,i,j)
-    
-#接続の計算
-for i in range(search_range):
     for j in range(len(position[i])):
-        if position[i][j][4]==0: #最外端の判定
-            position[i][j][4]=-1
-        position[i][j].append(brance_id)
-        next_point(position[i][j],position[i+1])
-
-#枝のベクトル計算
-vector=[]
-for i in range(0,len(search_range)-1):
-    rnow=search_range[i]
-    rnext=search_range[i+1]
-    print(rnow,rnext)
-    for j in range(len(position[i])):
-        thnow=position[i][j][1]
-        dist_tmp2=pow(r_max,2) #十分大きな数で
-        for k in range(len(position[i+1])):
-            thnext=position[i+1][k][1]
-            dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-            if dist_tmp2 > dist2:
-                dist_tmp2=dist2
-                tmp1=rnext
-                tmp2=thnext
-        vector.append([[thnow,rnow],[tmp2,tmp1]])
-
-node=[]
-vector_pare=[]
-# search node
-for i in range(len(vector)-1):
-    if vector[i][1][0] == vector[i+1][1][0]:
-        node.append(vector[i][1])
-        # vector_pare.append()
+        ax2.scatter(position[i][j][1],r,s=1,c="k")
 
 for i in range(len(node)):
     ax2.scatter(node[i][0],node[i][1],s=10,c="r")
+
+for i in range(len(edge)):
+    ax2.scatter(edge[i][0],edge[i][1],s=10,c="b")
 
 lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
 
