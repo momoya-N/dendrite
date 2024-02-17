@@ -182,21 +182,35 @@ def next_point(position_now,position_next_list):#position[i][j],position[i+1]
 
     return index
 
-def tree_serch(i,j,branch_id):
+def tree_search(i,j):
     if i < len(search_range)-1:
-        branch_id_tmp=branch_id
         i_tmp=i+1
         j_tmp=next_point(position[i][j],position[i_tmp])
-        position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j]in <- [i_tmp][j_tmp]position_id
-        position[i_tmp][j_tmp][4]=position[i][j][2] #[i_tmp][j_tmp]out <- [i][j]position_id
-        if position[i][j][5]==position[i_tmp][j_tmp][5]:
-            position[i][j][5]=branch_id_tmp
-        elif position[i][j][5]!=position[i_tmp][j_tmp][5]:
-            position[i][j][5]=branch_id_tmp
-            position[i_tmp][j_tmp].append(branch_id_tmp)
-            branch_id_tmp+=1
-        tree_serch(i_tmp,j_tmp,branch_id_tmp)
-        return branch_id_tmp
+        position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j] in <- [i_tmp][j_tmp] position_id
+        if position[i_tmp][j_tmp][4]!=0:
+            position[i_tmp][j_tmp][5]=1 #node_flag=True
+            return
+        else:
+            position[i_tmp][j_tmp][4]=position[i][j][2] #[i_tmp][j_tmp] out <- [i][j] position_id
+        
+        tree_search(i_tmp,j_tmp)
+        
+#data[i][j]=[radius,theta,position_id,in,out,node_flag,branch_id1,branch_id2,branch_id3]
+def branch_search(i,j):
+    if i < len(search_range)-1:
+        i_tmp=i+1
+        j_tmp=next_point(position[i][j],position[i_tmp])
+        position[i][j][8]=branch_id[0]
+        if position[i][j][5] == 1:
+            # print("OK",branch_id[0])
+            # position[i][j][6]=branch_id[0]
+            del position[i][j][6]
+            branch_id[0]+=1
+            position[i][j].append(branch_id[0]) #node_flag=True
+            
+        # print(branch_id[0])
+        branch_search(i_tmp,j_tmp)
+        
 
 #Main
 
@@ -248,15 +262,15 @@ binary=Remove_Dust(binary)
 #位置データの作成
 x,y=CM(n0) #重心計算
 r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
-search_range=[r for r in reversed(range(2,r_max,int(r_max/30)))]
+search_range=[r for r in reversed(range(2,r_max,int(r_max/40)))]
 position=[[]for i in range(len(search_range))]
 position_id=1
-branch_id=1
+branch_id=[2] #Pythonには参照渡しは存在しない(objectのaddressを値渡しする)ため、関数内ではコピーして渡されたaddressにアクセスしてobjectを書き換えることで参照渡しのような挙動を実現するらしい。
 
 for i , r in enumerate(search_range):
     branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,branch_id1,branch_id2,branch_id3]
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,node_flag,branch_id1,branch_id2,branch_id3]
         position_id+=1
 
 #接続の計算
@@ -264,10 +278,14 @@ for i in range(len(search_range)):
     for j in range(len(position[i])):
         if position[i][j][4]==0: #最外端の判定
             position[i][j][4]=-1
-            tmp=tree_serch(i,j,branch_id)
-            branch_id=tmp+1
+            tree_search(i,j)
 
-print(branch_id)
+for i in range(len(search_range)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==-1: #最外端の判定
+            branch_search(i,j)
+
+print(position)
 
 #枝のベクトル計算
 vector=[]
@@ -283,7 +301,6 @@ vector_tmp=[]
 
 node=[]
 edge=[]
-
 
 # color=np.linspace(0,brance_id)
 # print(position,brance_id)
@@ -318,11 +335,8 @@ for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==-1:
             edge.append([position[i][j][1],position[i][j][0]]) #theta,rの順に格納
-        elif len(position[i][j])!=6:
+        elif position[i][j][5]==1:
             node.append([position[i][j][1],position[i][j][0]])
-            if len(position[i][j])-5 > 4:
-                ax2.scatter(position[i][j][1],position[i][j][0],s=40,c="y")
-                # print(position[i][j])
 
 for i , r in enumerate(search_range):
     for j in range(len(position[i])):
