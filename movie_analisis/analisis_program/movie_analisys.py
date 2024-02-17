@@ -77,11 +77,7 @@ def Remove_Dust(Matrix):#remove dust funvtion
 def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
     dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
     t = 0  # 角度のステップ数
-    k = 0  # 角度のステップ数その2
     th = 0  # 角度
-    phi = 0  # 太さ探索用角度
-    # thick_d_array = []
-    branch_cm=[]
     branch_th=[]
 
     r_x = int(r * math.cos(0) + x_c)
@@ -92,12 +88,10 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
         r_x = int(r * math.cos(th) + x_c)
         r_y = int(r * math.sin(th) + y_c)
 
-        cm_tmp=[]
         th_tmp=[]
 
         if (1 <= r_x < Lx-1) and (1 <= r_y < Ly-1):
             while binary[r_y, r_x] == 255:#枝の重心計測
-                cm_tmp.append([r_x,r_y]) #cv2の描画の関係上ここだけx,yの順番が違う
                 th_tmp.append(th)
                 t += 1
                 th = dth * t
@@ -108,15 +102,52 @@ def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
                 r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
                 r_y = int(r * math.sin(th) + y_c)
 
-        if np.size(cm_tmp)!=0:
-            cm=np.average(cm_tmp,axis=0)
+        if np.size(th_tmp)!=0:
             th=np.average(th_tmp)
-            branch_cm.append(cm)
             branch_th.append(th)
 
         t += 1
 
-    return branch_cm,branch_th
+    return branch_th
+
+def next_point(position_now,position_next_list):#position[i][j],position[i+1]
+    rnow=position_now[0]
+    thnow=position_now[1]
+    rnext=position_next_list[0][0]
+    dist_tmp2=pow(r_max,2) #十分大きな数で
+    for i in range(len(position_next_list)):
+        thnext=position_next_list[i][1]
+        dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+        if dist_tmp2 > dist2:
+            dist_tmp2=dist2
+            index=i
+
+    return index
+
+def tree_search(i,j):
+    if i < len(search_range)-1:
+        i_tmp=i+1
+        j_tmp=next_point(position[i][j],position[i_tmp])
+        position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j] in <- [i_tmp][j_tmp] position_id
+        if position[i_tmp][j_tmp][4]!=0:
+            position[i_tmp][j_tmp][5]=1 #node_flag=True
+            return
+        else:
+            position[i_tmp][j_tmp][4]=position[i][j][2] #[i_tmp][j_tmp] out <- [i][j] position_id
+        
+        tree_search(i_tmp,j_tmp)
+
+def branch_search(i,j):
+    if i < len(search_range)-1:
+        i_tmp=i+1
+        j_tmp=next_point(position[i][j],position[i_tmp])
+        position[i][j][9]=branch_id[0]
+        if position[i][j][5] == 1:
+            del position[i][j][6]
+            branch_id[0]+=1
+            position[i][j].append(branch_id[0]) #node_flag=True
+            
+        branch_search(i_tmp,j_tmp)
 
 #Main
 
@@ -134,7 +165,7 @@ f_name="20230205_nonsur_77.2mN_No.1.avi"
 f_name2="20230222_0.05sur_73.2mN_No.3.avi"
 f_name3="20230221_nonsur_76.8mN_No.1.avi"
 
-file_path=Dir_name + f_name3
+file_path=Dir_name + f_name2
 name_tag=file_path.replace(Dir_name,"")
 name_tag=name_tag.replace(".avi","")
 window_name = file_path[len(Dir_name):]
@@ -165,92 +196,148 @@ threshold,nongray_binary=cv2.threshold(image,cut,255,cv2.THRESH_BINARY)#RGBを�
 
 binary=Remove_Dust(binary)
 
-# 画像
+#位置データの作成
+print("Start Calculation")
 x,y=CM(n0) #重心計算
+r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
+search_range=[r*0.5 for r in reversed(range(1,r_max*2))]
+position=[[]for i in range(len(search_range))]
+position_id=1
+branch_id=[1] #Pythonには参照渡しは存在しない(objectのaddressを値渡しする)ため、関数内ではコピーして渡されたaddressにアクセスしてobjectを書き換えることで参照渡しのような挙動を実現するらしい。
 
+for i , r in enumerate(search_range):
+    branch_th=search_branch(binary,r,x,y)
+    for j in range(len(branch_th)):
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0,0,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,node_flag,branch_id1,branch_id2,branch_id3,branch_id4]
+        position_id+=1
+
+#接続の計算
+for i in range(len(search_range)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==0: #最外端の判定
+            position[i][j][4]=-1
+            tree_search(i,j)
+
+for i in range(len(search_range)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==-1: #最外端の判定
+            branch_search(i,j)
+
+#枝のベクトル計算
+vector=[]
+for i in range(0,len(position)-1):
+    for j in range(len(position[i])):
+        thnow=position[i][j][1]
+        rnow=position[i][0][0]
+        thnext=position[i+1][next_point(position[i][j],position[i+1])][1]
+        rnext=position[i+1][0][0]
+        vector.append([[thnow,rnow],[thnext,rnext]])
+
+vector_tmp=[]
+
+node=[]
+edge=[]
+
+# search node & edge
+branch_vector_edge=[]
+for i in range(len(position)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==-1:
+            edge.append([position[i][j][1],position[i][j][0]]) #theta,rの順に格納
+            branch_vector_edge.append(position[i][j])
+        elif position[i][j][5]==1:
+            node.append([position[i][j][1],position[i][j][0]])
+            branch_vector_edge.append(position[i][j])
+
+# make branch vector
+branch_vector=[]
+for i in range(len(branch_vector_edge)):
+    for j in range(i+1,len(branch_vector_edge)):
+        tmp1=[branch_vector_edge[i][6:10][k] for k , ID in enumerate(branch_vector_edge[i][6:10]) if ID > 0]
+        tmp2=[branch_vector_edge[j][6:10][k] for k , ID in enumerate(branch_vector_edge[j][6:10]) if ID > 0]
+        if not set(tmp1).isdisjoint(set(tmp2)):
+            rev1=list(reversed(branch_vector_edge[i][0:2]))
+            rev2=list(reversed(branch_vector_edge[j][0:2]))
+            branch_vector.append([rev1,rev2])
+            # print([rev1,rev2])
+            # print(branch_vector_edge[i],branch_vector_edge[j],tmp1,tmp2)
+
+print("Finish Calculation")
+print("Start Making Figure")
+# 画像
 img_origin=image #original image
 img_n=N_Frame_Image(n0) #N frames image
 scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # 画像として可視化する
-r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
-fig = plt.figure(figsize=(9,9))
-# ax1=fig.add_subplot(2,2,1)
-ax2=fig.add_subplot(1,1,1,projection="polar")
-# ax3=fig.add_subplot(2,2,4)
-## fig, ax = plt.subplots(1,3,figsize=(18,6))
+fig = plt.figure(figsize=(18,9))
+ax1=fig.add_subplot(1,2,1)
+ax2=fig.add_subplot(1,2,2,projection="polar")
 
-# #元画像(gray)
+#元画像(gray)
 cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
 cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
-# ax1.imshow(img_origin,cmap='gray')
-# ax1.set_title('Input Image')
-# ax1.add_artist(scalebar)
+ax1.imshow(img_origin,cmap='gray')
+ax1.set_title('Input Image')
+ax1.add_artist(scalebar)
 
 #theta-半径グラフ
 ax2.set_axis_off()
-##ax2=plt.subplot(132,projection="polar")
-
 ax2.set_axis_on()
 ax2.set_xticks(
     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
 )
-# ax3.set_xlim(-0.1,2*math.pi+0.1)
-# ax3.set_xlabel(r"$\theta$")
-# ax3.set_ylabel(r"Radius $r$ pix")
-search_range=[r for r in range(2,r_max,int(r_max/20))]
-theta=[[]for i in range(len(search_range))]
 
 for i , r in enumerate(search_range):
-    branch_cm,branch_th=search_branch(binary,r,x,y)
-    for j in range(len(branch_th)):
-        # ax3.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
-        ax2.scatter(2*math.pi-branch_th[j],r,s=1,c="k")
-        theta[i].append(2*math.pi-branch_th[j]) #探索の向きの関係上2Piから引くとimput imageと向きが一致
-
-# ax3.set_box_aspect(0.8)
-
-#枝のベクトル計算
-vector=[]
-for i in reversed(range(1,len(search_range))):
-    rnow=search_range[i]
-    rnext=search_range[i-1]
-    for j in range(len(theta[i])):
-        thnow=theta[i][j]
-        dist_tmp2=pow(r_max,2) #十分大きな数で
-        for k in range(len(theta[i-1])):
-            thnext=theta[i-1][k]
-            dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-            if dist_tmp2 > dist2:
-                dist_tmp2=dist2
-                tmp1=rnext
-                tmp2=thnext
-        vector.append([[thnow,rnow],[tmp2,tmp1]])
-
-print(vector)
-node=[]
-vector_pare=[]
-# search node
-for i in range(len(vector)-1):
-    if vector[i][1][0] == vector[i+1][1][0]:
-        node.append(vector[i][1])
-        # vector_pare.append()
+    for j in range(len(position[i])):
+        ax2.scatter(position[i][j][1],r,s=1,c="k")
 
 for i in range(len(node)):
     ax2.scatter(node[i][0],node[i][1],s=10,c="r")
 
-lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
-# lc2 = mc.LineCollection(vector, colors="k", linewidths=1)
+for i in range(len(edge)):
+    ax2.scatter(edge[i][0],edge[i][1],s=10,c="b")
 
-##r,theta,対応する枝の番号の分の情報をつけて再帰的に探索
+lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
+lc2 = mc.LineCollection(branch_vector,colors="green",linewidth=1)
+
 ax2.add_collection(lc1)
+ax2.add_collection(lc2)
+
+plt.savefig(str(name_tag)+".png")
+
+# # 画像として可視化する
+# fig2, ax3 = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(9,9))
+
+# #theta-半径グラフ
+# ax3.set_axis_off()
+# ax3.set_axis_on()
+# ax3.set_xticks(
+#     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
+#     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
+# )
+
+# for i , r in enumerate(search_range):
+#     for j in range(len(position[i])):
+#         ax3.scatter(position[i][j][1],r,s=1,c="k")
+
+# for i in range(len(node)):
+#     ax3.scatter(node[i][0],node[i][1],s=10,c="r")
+
+# for i in range(len(edge)):
+#     ax3.scatter(edge[i][0],edge[i][1],s=10,c="b")
+
+# lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
+# lc2 = mc.LineCollection(branch_vector,colors="green",linewidth=2)
+
+# ax3.add_collection(lc1)
 # ax3.add_collection(lc2)
 
-# plt.savefig(str(name_tag)+".png")
 # plt.savefig(str(name_tag)+"_lareg.png")
 finish=time.time()
 plt.show()
+print("Finish Making Figure")
 total_time=finish-start
 print("total time:",total_time)
 print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
