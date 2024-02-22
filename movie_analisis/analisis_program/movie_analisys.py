@@ -355,7 +355,7 @@ for i in range(len(branch_vector_angle_tmp)):
         len3=len(branch_vector_angle_tmp[j][0])
         len4=len(branch_vector_angle_tmp[j][1])
         tmp1=[branch_vector_angle_tmp[i][1][6:len2][k] for k , ID in enumerate(branch_vector_angle_tmp[i][1][6:len2]) if ID > 0]
-        tmp2=[branch_vector_angle_tmp[j][0][6:len3][k] for k , ID in enumerate(branch_vector_angle_tmp[j][0][6:len3]) if ID > 0]
+        tmp2=[branch_vector_angle_tmp[j][1][6:len3][k] for k , ID in enumerate(branch_vector_angle_tmp[j][1][6:len3]) if ID > 0]
         if not set(tmp1).isdisjoint(set(tmp2)) :
             rev1=list(reversed(branch_vector_angle_tmp[i][0][0:2]))
             rev2=list(reversed(branch_vector_angle_tmp[i][1][0:2]))
@@ -369,7 +369,7 @@ for i in range(len(branch_vector_angle_tmp)):
             ax3.add_collection(lc_tmp2)
 
 # # plt.savefig(str(name_tag)+"_lareg.png")
-plt.savefig(str(name_tag)+"_teat_lareg.png")
+plt.savefig(str(name_tag)+"_teat1_lareg.png")
 
 # path=str(name_tag)+".dat"
 
