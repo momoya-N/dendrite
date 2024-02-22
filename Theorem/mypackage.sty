@@ -1,0 +1,38 @@
+%配置関係
+\usepackage[top=30truemm,bottom=30truemm,left=20truemm,right=20truemm]{geometry}
+
+%画像描画関係
+%\usepackage{xparse} %なくてもいけるか？physics packageに関係ありそう
+\usepackage{graphicx}
+\usepackage[hang,small,bf]{caption}
+\usepackage[subrefformat=parens]{subcaption}
+\usepackage{here}
+
+%数式関係
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{physics}
+\usepackage[version=4]{mhchem}
+
+%テキスト関係
+\usepackage{url}
+\usepackage{enumerate} %細かい設定ができるenumerate
+
+% hyper link関係
+\usepackage{hyperref}
+\usepackage{xcolor}
+% \usepackage{pxjahyper} % (u)pLaTeXのときのみかく
+\hypersetup{%
+  setpagesize=false,%
+  %bookmarks=true,%
+  bookmarksdepth=tocdepth,%
+  bookmarksnumbered=true,%
+  colorlinks=true,%
+  linkcolor=darkgray,%
+  citecolor=blue,%
+  urlcolor=cyan,%
+  pdftitle={},%
+  pdfsubject={},%
+  pdfauthor={},%
+  pdfkeywords={}}

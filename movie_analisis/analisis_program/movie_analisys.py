@@ -1,0 +1,393 @@
+import math
+import sys
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib_scalebar.scalebar import ScaleBar
+import matplotlib.collections as mc
+import matplotlib.cm as cm
+import time
+
+def N_Frame_Image(frameIndex):  # N番目のフレーム画像を返す
+    # インデックスがフレームの範囲内なら…
+    if 0<= frameIndex < Total_Frames:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frameIndex)
+        ret, image = cap.read() #ret:bool値(画像が読めれば True) image:画像のnbarray
+        return image
+    else:
+        return None
+
+def CM(n): #n:n_0,calculate the center of mass
+    cap.set(cv2.CAP_PROP_POS_FRAMES,n)
+    ret,image_cm=cap.read()
+    gray_cm=cv2.cvtColor(image_cm,cv2.COLOR_BGR2GRAY)
+    threshold,binary_cm=cv2.threshold(gray_cm,cut,255,cv2.THRESH_BINARY)
+
+    binary_cm=Remove_Dust(binary_cm)
+    
+    m=cv2.moments(binary_cm,True) #bool値はbinary画像かどうか
+    #重心の計算、四捨五入
+    x,y=round(m['m10']/m['m00']) , round(m['m01']/m['m00'])
+    
+    return x,y
+
+def First_Frame():  # ピクセル値を持つfirst frameを計算
+    n = 0
+    while 1:
+        # making binary array
+        gray = cv2.cvtColor(N_Frame_Image(n), cv2.COLOR_BGR2GRAY)
+        threshold,binary=cv2.threshold(gray,cut,255,cv2.THRESH_BINARY)#完全に二値化
+        binary=Remove_Dust(binary)
+        
+        if np.count_nonzero(binary) > 0:
+            break
+        n += 1
+    return n
+
+def Correlation_Function(k,power_specturm): #波数空間での相関関数
+    d_theta=2*math.asin(0.5/k)
+    theta=0
+    rho_k=0
+    
+    if k>=max(Lx/2,Ly/2):
+        return 
+
+    while theta<2*math.pi:
+        k_x=k*math.cos(theta)
+        k_y=k*math.sin(theta)
+        rho_k += power_specturm[int(Ly/2+k_y),int(Lx/2+k_x)]
+        theta += d_theta
+        
+    return rho_k/(2*math.pi)
+
+def Remove_Dust(Matrix):#remove dust funvtion
+    for i in range(Ly):
+        for j in range(Lx):
+            if Matrix[i,j]==255:
+                c_temp = 0
+                for k in range(5):  # 1粒子あたり周囲25マスの探索
+                    for l in range(5):
+                        if (2 <= (j - 2 + l) < Lx - 2) and (2 <= (i - 2 + k) < Ly - 2)and (Matrix[i - 2 + k, j - 2 + l]==255) :
+                            c_temp += 1
+                if c_temp <= dust:  # 周囲25マスの粒子数が(dust)個より少なければゴミと判定
+                    Matrix[i,j]=0
+    return Matrix
+
+def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
+    dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
+    t = 0  # 角度のステップ数
+    th = 0  # 角度
+    branch_th=[]
+
+    r_x = int(r * math.cos(0) + x_c)
+    r_y = int(r * math.sin(0) + y_c)
+
+    while th < 2 * math.pi:
+        th = dth * t
+        r_x = int(r * math.cos(th) + x_c)
+        r_y = int(r * math.sin(th) + y_c)
+
+        th_tmp=[]
+
+        if (1 <= r_x < Lx-1) and (1 <= r_y < Ly-1):
+            while binary[r_y, r_x] == 255:#枝の重心計測
+                th_tmp.append(th)
+                t += 1
+                th = dth * t
+                
+                if th > 2 * math.pi:
+                    break
+                
+                r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
+                r_y = int(r * math.sin(th) + y_c)
+
+        if np.size(th_tmp)!=0:
+            th=np.average(th_tmp)
+            branch_th.append(th)
+
+        t += 1
+
+    return branch_th
+
+def next_point(position_now,position_next_list):#position[i][j],position[i+1]
+    rnow=position_now[0]
+    thnow=position_now[1]
+    rnext=position_next_list[0][0]
+    dist_tmp2=pow(r_max,2) #十分大きな数で
+    for i in range(len(position_next_list)):
+        thnext=position_next_list[i][1]
+        dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+        if dist_tmp2 > dist2:
+            dist_tmp2=dist2
+            index=i
+
+    return index
+
+def tree_search(i,j):
+    if i < len(search_range)-1:
+        i_tmp=i+1
+        j_tmp=next_point(position[i][j],position[i_tmp])
+        position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j] in <- [i_tmp][j_tmp] position_id
+        if position[i_tmp][j_tmp][4]!=0:
+            position[i_tmp][j_tmp][5]=1 #node_flag=True
+            return
+        else:
+            position[i_tmp][j_tmp][4]=position[i][j][2] #[i_tmp][j_tmp] out <- [i][j] position_id
+        
+        tree_search(i_tmp,j_tmp)
+
+def branch_search(i,j):
+    if i < len(search_range)-1:
+        i_tmp=i+1
+        j_tmp=next_point(position[i][j],position[i_tmp])
+        position[i][j].append(branch_id[0])
+        if position[i][j][5] == 1:
+            # del position[i][j][6]
+            branch_id[0]+=1
+            position[i][j].append(branch_id[0])
+            
+        branch_search(i_tmp,j_tmp)
+
+#Main
+
+#time
+start=time.time()
+
+#constants
+dust = 4  # チリの大きさ判定用変数
+cut = 30  # threshold value,輝度値は0が黒色、255が白色。
+# K = 15  # distance of pick up frame,2 s/frame ->30 s毎に取得
+
+#Video Source
+Dir_name="/mnt/c/Users/PC/Desktop/"
+f_name="20230205_nonsur_77.2mN_No.1.avi"
+f_name2="20230222_0.05sur_73.2mN_No.3.avi"
+f_name3="20230221_nonsur_76.8mN_No.1.avi"
+
+file_path=Dir_name + f_name3
+name_tag=file_path.replace(Dir_name,"")
+name_tag=name_tag.replace(".avi","")
+window_name = file_path[len(Dir_name):]
+cap = cv2.VideoCapture(file_path)
+print(window_name)
+print(type(cap))
+
+Lx=int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+Ly=int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+FPS=cap.get(cv2.CAP_PROP_FPS)
+print(cap.isOpened())
+Total_Frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+print("File Name : ",window_name)
+print("Frame Width : ", Lx)
+print("Frame Hight : ", Ly)
+print("FPS : ", FPS)
+print("Frame Count : ", Total_Frames)
+
+n0 = First_Frame()  # origin frame number, time=0
+
+#Last Frame
+cap.set(cv2.CAP_PROP_POS_FRAMES,Total_Frames-1)
+ret,image=cap.read()
+
+gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)#輝度値情報のみの画像
+threshold,binary=cv2.threshold(gray,cut,255,cv2.THRESH_BINARY)#完全に二値化(RGB -> 輝度値算出 ->二値化)
+threshold,nongray_binary=cv2.threshold(image,cut,255,cv2.THRESH_BINARY)#RGBを残したまま二値化
+
+binary=Remove_Dust(binary)
+
+#位置データの作成
+print("Start Calculation")
+x,y=CM(n0) #重心計算
+r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
+search_range=[r for r in reversed(range(1,r_max))]
+position=[[]for i in range(len(search_range))]
+position_id=1
+branch_id=[1] #Pythonには参照渡しは存在しない(objectのaddressを値渡しする)ため、関数内ではコピーして渡されたaddressにアクセスしてobjectを書き換えることで参照渡しのような挙動を実現するらしい。
+
+for i , r in enumerate(search_range):
+    branch_th=search_branch(binary,r,x,y)
+    for j in range(len(branch_th)):
+        # position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0,0,0,0,0,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,node_flag,branch_id_n],branch_idが少ないと内側の何度も探索するnodeでbranch_IDが押し出されて消えてしまう?
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0])
+        position_id+=1
+
+#接続の計算
+for i in range(len(search_range)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==0: #最外端の判定
+            position[i][j][4]=-1
+            tree_search(i,j)
+
+for i in range(len(search_range)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==-1: #最外端の判定
+            branch_search(i,j)
+            branch_id[0]+=1
+
+#枝のベクトル計算
+vector=[]
+for i in range(0,len(position)-1):
+    for j in range(len(position[i])):
+        thnow=position[i][j][1]
+        rnow=position[i][0][0]
+        thnext=position[i+1][next_point(position[i][j],position[i+1])][1]
+        rnext=position[i+1][0][0]
+        vector.append([[thnow,rnow],[thnext,rnext]])
+
+vector_tmp=[]
+
+node=[]
+edge=[]
+
+# search node & edge
+branch_vector_edge=[]
+for i in range(len(position)):
+    for j in range(len(position[i])):
+        if position[i][j][4]==-1:
+            edge.append([position[i][j][1],position[i][j][0]]) #theta,rの順に格納
+            branch_vector_edge.append(position[i][j])
+        elif position[i][j][5]==1:
+            node.append([position[i][j][1],position[i][j][0]])
+            branch_vector_edge.append(position[i][j])
+
+# print(branch_vector_edge)
+# make branch vector
+branch_vector=[]
+branch_vector_angle_tmp=[]
+branch_vector_length=[]
+for i in range(len(branch_vector_edge)):
+    for j in range(i+1,len(branch_vector_edge)):
+        len1=len(branch_vector_edge[i])
+        len2=len(branch_vector_edge[j])
+        # r_i=branch_vector_edge[i][0]
+        # r_j=branch_vector_edge[j][0]
+        tmp1=[branch_vector_edge[i][6:len1][k] for k , ID in enumerate(branch_vector_edge[i][6:len1]) if ID > 0]
+        tmp2=[branch_vector_edge[j][6:len2][k] for k , ID in enumerate(branch_vector_edge[j][6:len2]) if ID > 0]
+        if not set(tmp1).isdisjoint(set(tmp2)) :
+            rev1=list(reversed(branch_vector_edge[i][0:2]))
+            rev2=list(reversed(branch_vector_edge[j][0:2]))
+            branch_vector.append([rev1,rev2])
+            # dist=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
+            # branch_vector_length.append(dist)
+            branch_vector_angle_tmp.append([branch_vector_edge[i],branch_vector_edge[j]])
+
+print("Finish Calculation")
+print("Start Making Figure")
+# # 画像
+# img_origin=image #original image
+# img_n=N_Frame_Image(n0) #N frames image
+# scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
+
+# # 画像として可視化する
+# fig = plt.figure(figsize=(18,9))
+# ax1=fig.add_subplot(1,2,1)
+# ax2=fig.add_subplot(1,2,2,projection="polar")
+
+# #元画像(gray)
+# cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
+# cv2.line(img_origin, (x+5,y-5), (x-5,y+5), (255, 0, 0), 2)
+# ax1.imshow(img_origin,cmap='gray')
+# ax1.set_title('Input Image')
+# ax1.add_artist(scalebar)
+
+# #theta-半径グラフ
+# ax2.set_axis_off()
+# ax2.set_axis_on()
+# ax2.set_xticks(
+#     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
+#     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
+# )
+
+# for i , r in enumerate(search_range):
+#     for j in range(len(position[i])):
+#         ax2.scatter(position[i][j][1],r,s=1,c="k")
+
+# for i in range(len(node)):
+#     ax2.scatter(node[i][0],node[i][1],s=10,c="r")
+
+# for i in range(len(edge)):
+#     ax2.scatter(edge[i][0],edge[i][1],s=10,c="b")
+
+# lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
+# lc2 = mc.LineCollection(branch_vector,colors="green",linewidth=1)
+
+# ax2.add_collection(lc1)
+# ax2.add_collection(lc2)
+
+# plt.savefig(str(name_tag)+".png")
+
+# 画像として可視化する
+fig2, ax3 = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(9,9))
+
+#theta-半径グラフ
+ax3.set_axis_off()
+ax3.set_axis_on()
+ax3.set_xticks(
+    [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
+    ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
+)
+
+for i , r in enumerate(search_range):
+    for j in range(len(position[i])):
+        ax3.scatter(position[i][j][1],r,s=1,c="k")
+
+for i in range(len(node)):
+    ax3.scatter(node[i][0],node[i][1],s=10,c="r")
+
+for i in range(len(edge)):
+    ax3.scatter(edge[i][0],edge[i][1],s=10,c="b")
+
+lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
+lc2 = mc.LineCollection(branch_vector,colors="green",linewidth=2)
+
+ax3.add_collection(lc1)
+ax3.add_collection(lc2)
+
+# make branch vector angle
+# color_map=plt.get_cmap("")
+color_list = ["r", "b", "g", "y", "m", "c"]
+branch_vector_angle=[]
+for i in range(len(branch_vector_angle_tmp)):
+    for j in range(i+1,len(branch_vector_angle_tmp)):
+        len1=len(branch_vector_angle_tmp[i][0])
+        len2=len(branch_vector_angle_tmp[i][1])
+        len3=len(branch_vector_angle_tmp[j][0])
+        len4=len(branch_vector_angle_tmp[j][1])
+        tmp1=[branch_vector_angle_tmp[i][1][6:len2][k] for k , ID in enumerate(branch_vector_angle_tmp[i][1][6:len2]) if ID > 0]
+        tmp2=[branch_vector_angle_tmp[j][1][6:len3][k] for k , ID in enumerate(branch_vector_angle_tmp[j][1][6:len3]) if ID > 0]
+        if not set(tmp1).isdisjoint(set(tmp2)) :
+            rev1=list(reversed(branch_vector_angle_tmp[i][0][0:2]))
+            rev2=list(reversed(branch_vector_angle_tmp[i][1][0:2]))
+            rev3=list(reversed(branch_vector_angle_tmp[j][0][0:2]))
+            rev4=list(reversed(branch_vector_angle_tmp[j][1][0:2]))
+            # print(rev1,rev2,tmp1,tmp2)
+            branch_vector_angle.append([[rev1,rev2],[rev3,rev4]])
+            lc_tmp1 = mc.LineCollection([[rev1,rev2]], colors=color_list[i%6], linewidths=1)
+            lc_tmp2 = mc.LineCollection([[rev3,rev4]], colors=color_list[i%6], linewidths=1)
+            ax3.add_collection(lc_tmp1)
+            ax3.add_collection(lc_tmp2)
+
+# # plt.savefig(str(name_tag)+"_lareg.png")
+plt.savefig(str(name_tag)+"_teat1_lareg.png")
+
+# path=str(name_tag)+".dat"
+
+# with open(path,mode="w") as f:
+#     for i in range(len(branch_vector_length)):
+#         f.write(str(branch_vector_length[i])+"\n")
+
+finish=time.time()
+print("Finish Making Figure")
+plt.show()
+total_time=finish-start
+print("total time:",total_time)
+print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
+
+#時間計測メモ file3で計測
+# 系サイズ最大、1ステップ毎：75.58797311782837 sec ->20倍になっても時間は10倍ほど
+# 系サイズ最大、r_max/20毎：7.566540241241455 sec
+# 重心から系の端まで、1ステップ毎：77.58949756622314 sec ->こっちの方がむしろ長い？
+# 重心から系の端まで、1ステップ毎、探索関数にif文をかませない：83.54880547523499 sec ->ifをかませない方が長い？
+# 重心から系の端まで、r_max/20毎：6.782961368560791 sec
+# 点数が増えるとplot関数により時間がかかる印象,cpuの使用状況に多少よるかも
