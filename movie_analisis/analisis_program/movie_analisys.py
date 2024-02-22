@@ -143,21 +143,34 @@ def branch_search(i,j):
         j_tmp=next_point(position[i][j],position[i_tmp])
         position[i][j].append(branch_id[0])
         if position[i][j][5] == 1:
-            # del position[i][j][6]
             branch_id[0]+=1
             position[i][j].append(branch_id[0])
             
         branch_search(i_tmp,j_tmp)
 
-#Main
+def branch_angle(node:list,branch1:list,branch2:list): #各点の極座標(theta,r)をわたす
+    r0=node[1]
+    r1=branch1[1]
+    r2=branch2[1]
+    th0=node[0]
+    th1=branch1[0]
+    th2=branch2[0]
 
+    r01_2=r0*r0+r1*r1-2*r0*r1*math.cos(th0-th1)
+    r12_2=r1*r1+r2*r2-2*r1*r2*math.cos(th1-th2)
+    r20_2=r2*r2+r0*r0-2*r2*r0*math.cos(th2-th0)
+
+    angle=math.acos((-r12_2+r01_2+r20_2)/(2*math.sqrt(r01_2*r20_2)))
+
+    return angle
+
+#Main
 #time
 start=time.time()
 
 #constants
 dust = 4  # チリの大きさ判定用変数
 cut = 30  # threshold value,輝度値は0が黒色、255が白色。
-# K = 15  # distance of pick up frame,2 s/frame ->30 s毎に取得
 
 #Video Source
 Dir_name="/mnt/c/Users/PC/Desktop/"
@@ -208,40 +221,39 @@ branch_id=[1] #Pythonには参照渡しは存在しない(objectのaddressを値
 for i , r in enumerate(search_range):
     branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        # position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0,0,0,0,0,0,0,0])#data[i][j]=[radius,theta,position_id,in,out,node_flag,branch_id_n],branch_idが少ないと内側の何度も探索するnodeでbranch_IDが押し出されて消えてしまう?
         position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0])
         position_id+=1
 
-#接続の計算
+#枝のトラッキング&諸量の計算
+#Making position data
 for i in range(len(search_range)):
     for j in range(len(position[i])):
         if position[i][j][4]==0: #最外端の判定
             position[i][j][4]=-1
             tree_search(i,j)
 
+#Add branch ID
 for i in range(len(search_range)):
     for j in range(len(position[i])):
-        if position[i][j][4]==-1: #最外端の判定
+        if position[i][j][4]==-1: 
             branch_search(i,j)
             branch_id[0]+=1
 
-#枝のベクトル計算
-vector=[]
+#Traking branch
+branch=[]
 for i in range(0,len(position)-1):
     for j in range(len(position[i])):
         thnow=position[i][j][1]
         rnow=position[i][0][0]
         thnext=position[i+1][next_point(position[i][j],position[i+1])][1]
         rnext=position[i+1][0][0]
-        vector.append([[thnow,rnow],[thnext,rnext]])
+        branch.append([[thnow,rnow],[thnext,rnext]])
 
-vector_tmp=[]
-
+# Search node & edge
 node=[]
 edge=[]
-
-# search node & edge
 branch_vector_edge=[]
+
 for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==-1:
@@ -251,26 +263,24 @@ for i in range(len(position)):
             node.append([position[i][j][1],position[i][j][0]])
             branch_vector_edge.append(position[i][j])
 
-# print(branch_vector_edge)
 # make branch vector
 branch_vector=[]
-branch_vector_angle_tmp=[]
+branch_vector_origin=[]
 branch_vector_length=[]
+
 for i in range(len(branch_vector_edge)):
     for j in range(i+1,len(branch_vector_edge)):
         len1=len(branch_vector_edge[i])
         len2=len(branch_vector_edge[j])
-        # r_i=branch_vector_edge[i][0]
-        # r_j=branch_vector_edge[j][0]
-        tmp1=[branch_vector_edge[i][6:len1][k] for k , ID in enumerate(branch_vector_edge[i][6:len1]) if ID > 0]
-        tmp2=[branch_vector_edge[j][6:len2][k] for k , ID in enumerate(branch_vector_edge[j][6:len2]) if ID > 0]
+        tmp1=[branch_vector_edge[i][6:len1][k] for k in range(len(branch_vector_edge[i][6:len1]))]
+        tmp2=[branch_vector_edge[j][6:len2][k] for k in range(len(branch_vector_edge[j][6:len2]))]
         if not set(tmp1).isdisjoint(set(tmp2)) :
             rev1=list(reversed(branch_vector_edge[i][0:2]))
             rev2=list(reversed(branch_vector_edge[j][0:2]))
             branch_vector.append([rev1,rev2])
-            # dist=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
-            # branch_vector_length.append(dist)
-            branch_vector_angle_tmp.append([branch_vector_edge[i],branch_vector_edge[j]])
+            dist=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
+            branch_vector_length.append(dist)
+            branch_vector_origin.append([branch_vector_edge[i],branch_vector_edge[j]])
 
 print("Finish Calculation")
 print("Start Making Figure")
@@ -338,48 +348,44 @@ for i in range(len(node)):
 for i in range(len(edge)):
     ax3.scatter(edge[i][0],edge[i][1],s=10,c="b")
 
-lc1 = mc.LineCollection(vector, colors="k", linewidths=1)
-lc2 = mc.LineCollection(branch_vector,colors="green",linewidth=2)
+lc1 = mc.LineCollection(branch, colors="k", linewidths=1)
+# lc2 = mc.LineCollection(branch_vector,colors="g",linewidth=2)
 
 ax3.add_collection(lc1)
-ax3.add_collection(lc2)
+# ax3.add_collection(lc2)
 
 # make branch vector angle
-# color_map=plt.get_cmap("")
-color_list = ["r", "b", "g", "y", "m", "c"]
+color_list = ["r", "b", "g", "y", "m", "c" , "coral" , "orange" , "gold" , "olive" , "greenyellow" , "turquoise" , "lightseagreen" , "navy" , "plum" , "crimson"]
+branch_vector_pair=[]
 branch_vector_angle=[]
-for i in range(len(branch_vector_angle_tmp)):
-    for j in range(i+1,len(branch_vector_angle_tmp)):
-        len1=len(branch_vector_angle_tmp[i][0])
-        len2=len(branch_vector_angle_tmp[i][1])
-        len3=len(branch_vector_angle_tmp[j][0])
-        len4=len(branch_vector_angle_tmp[j][1])
-        tmp1=[branch_vector_angle_tmp[i][1][6:len2][k] for k , ID in enumerate(branch_vector_angle_tmp[i][1][6:len2]) if ID > 0]
-        tmp2=[branch_vector_angle_tmp[j][1][6:len3][k] for k , ID in enumerate(branch_vector_angle_tmp[j][1][6:len3]) if ID > 0]
-        if not set(tmp1).isdisjoint(set(tmp2)) :
-            rev1=list(reversed(branch_vector_angle_tmp[i][0][0:2]))
-            rev2=list(reversed(branch_vector_angle_tmp[i][1][0:2]))
-            rev3=list(reversed(branch_vector_angle_tmp[j][0][0:2]))
-            rev4=list(reversed(branch_vector_angle_tmp[j][1][0:2]))
-            # print(rev1,rev2,tmp1,tmp2)
-            branch_vector_angle.append([[rev1,rev2],[rev3,rev4]])
-            lc_tmp1 = mc.LineCollection([[rev1,rev2]], colors=color_list[i%6], linewidths=1)
-            lc_tmp2 = mc.LineCollection([[rev3,rev4]], colors=color_list[i%6], linewidths=1)
+for i in range(len(branch_vector)):
+    for j in range(i+1,len(branch_vector)):
+        if branch_vector[i][1]==branch_vector[j][1]:
+            branch_vector_pair.append([branch_vector[i],branch_vector[j]])
+            lc_tmp1 = mc.LineCollection([branch_vector[i],branch_vector[j]], colors=color_list[i%len(color_list)], linewidths=1)
             ax3.add_collection(lc_tmp1)
-            ax3.add_collection(lc_tmp2)
+            angle=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
+            branch_vector_angle.append(angle)
 
-# # plt.savefig(str(name_tag)+"_lareg.png")
-plt.savefig(str(name_tag)+"_teat1_lareg.png")
+plt.savefig(str(name_tag)+"_lareg.png")
+# plt.savefig(str(name_tag)+"_teat_lareg.png")
 
-# path=str(name_tag)+".dat"
+path=str(name_tag)+".dat"
+unit=11/681 #cm/pix
 
-# with open(path,mode="w") as f:
-#     for i in range(len(branch_vector_length)):
-#         f.write(str(branch_vector_length[i])+"\n")
-
+with open(path,mode="w") as f:
+    f.write("#length (cm)"+ "\t" + "#angle (radian)" + "\n")
+    for i in range(max(len(branch_vector_length),len(branch_vector_angle))):
+        if i >= len(branch_vector_length):
+            f.write("\t"+str(branch_vector_angle[i])+"\n")
+        elif i >= len(branch_vector_angle):
+            f.write(str(branch_vector_length[i]*unit)+"\n")
+        else:
+            f.write(str(branch_vector_length[i]*unit)+"\t"+str(branch_vector_angle[i])+"\n")
+            
 finish=time.time()
 print("Finish Making Figure")
-plt.show()
+# plt.show()
 total_time=finish-start
 print("total time:",total_time)
 print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
