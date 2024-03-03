@@ -443,7 +443,7 @@ for i in reversed(range(len(branch_vector))):
     if angle>= 2*math.pi/3:
         lc_tmp2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
         ax2.add_collection(lc_tmp2)
-            
+
 
 plt.savefig(str(name_tag)+"_lareg.pdf")
 # plt.savefig(str(name_tag)+"_lareg.eps")
