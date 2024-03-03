@@ -74,7 +74,7 @@ def Remove_Dust(Matrix):#remove dust funvtion
                     Matrix[i,j]=0
     return Matrix
 
-def search_branch(binary,r,x_c,y_c):  # binsry data,radius r, cm_x,cm_y
+def search_branch(binary,r,x_c,y_c):  # binary data,radius r, cm_x,cm_y
     dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
     t = 0  # 角度のステップ数
     th = 0  # 角度
@@ -124,10 +124,34 @@ def next_point(position_now,position_next_list):#position[i][j],position[i+1]
 
     return index
 
+# def next_point(i:int,j:int):#position[i][j]
+#     rnow=position[i][j][0]
+#     thnow=position[i][j][1]
+#     dist_tmp2=pow(r_max,2) #十分大きな数で
+#     if len(position[i-1])!=0:
+#         itr_start=i-1
+#     else:
+#         itr_start=i
+    
+#     for k in range(max(0,itr_start),min(i+2,len(position))):
+#         rnext=position[k][0][0]
+#         for l in range(len(position[k])):
+#             if (k!=i) and (l!=j):
+#                 thnext=position[k][l][1]
+#                 dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+#                 if dist_tmp2 > dist2:
+#                     dist_tmp2=dist2
+#                     index_i=k
+#                     index_j=l
+
+#     return index_i , index_j
+
 def tree_search(i,j):
-    if i < len(search_range)-1:
+    if i < len(position)-1:
         i_tmp=i+1
         j_tmp=next_point(position[i][j],position[i_tmp])
+        # i_tmp , j_tmp = next_point(i,j)
+        # print([i,j],[i_tmp,j_tmp])
         position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j] in <- [i_tmp][j_tmp] position_id
         if position[i_tmp][j_tmp][4]!=0:
             position[i_tmp][j_tmp][5]=1 #node_flag=True
@@ -138,13 +162,16 @@ def tree_search(i,j):
         tree_search(i_tmp,j_tmp)
 
 def branch_search(i,j):
-    if i < len(search_range)-1:
+    if i < len(position)-1:
         i_tmp=i+1
         j_tmp=next_point(position[i][j],position[i_tmp])
         position[i][j].append(branch_id[0])
         if position[i][j][5] == 1:
             branch_id[0]+=1
             position[i][j].append(branch_id[0])
+
+        if i_tmp==len(position)-1: #中心の例外処理
+            position[i_tmp][0].append(branch_id[0])
             
         branch_search(i_tmp,j_tmp)
 
@@ -156,9 +183,9 @@ def branch_angle(node:list,branch1:list,branch2:list): #各点の極座標(theta
     th1=branch1[0]
     th2=branch2[0]
 
-    r01_2=r0*r0+r1*r1-2*r0*r1*math.cos(th0-th1)
-    r12_2=r1*r1+r2*r2-2*r1*r2*math.cos(th1-th2)
-    r20_2=r2*r2+r0*r0-2*r2*r0*math.cos(th2-th0)
+    r01_2=pow(r0,2)+pow(r1,2)-2*r0*r1*math.cos(th0-th1)
+    r12_2=pow(r1,2)+pow(r2,2)-2*r1*r2*math.cos(th1-th2)
+    r20_2=pow(r2,2)+pow(r0,2)-2*r2*r0*math.cos(th2-th0)
 
     angle=math.acos((-r12_2+r01_2+r20_2)/(2*math.sqrt(r01_2*r20_2)))
 
@@ -178,7 +205,7 @@ f_name="20230205_nonsur_77.2mN_No.1.avi"
 f_name2="20230222_0.05sur_73.2mN_No.3.avi"
 f_name3="20230221_nonsur_76.8mN_No.1.avi"
 
-file_path=Dir_name + f_name3
+file_path=Dir_name + f_name2
 name_tag=file_path.replace(Dir_name,"")
 name_tag=name_tag.replace(".avi","")
 window_name = file_path[len(Dir_name):]
@@ -197,7 +224,7 @@ print("Frame Hight : ", Ly)
 print("FPS : ", FPS)
 print("Frame Count : ", Total_Frames)
 
-n0 = First_Frame()  # origin frame number, time=0
+n0 = First_Frame() # origin frame number, time=0
 
 #Last Frame
 cap.set(cv2.CAP_PROP_POS_FRAMES,Total_Frames-1)
@@ -221,19 +248,23 @@ branch_id=[1] #Pythonには参照渡しは存在しない(objectのaddressを値
 for i , r in enumerate(search_range):
     branch_th=search_branch(binary,r,x,y)
     for j in range(len(branch_th)):
-        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0])
+        position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0]) #radius ,theta,position,in,out,node
         position_id+=1
+
+#中心軸の追加
+position_id+=1
+position.append([[0,0,position_id,0,0,0]]) #radius ,theta,position,in,out,node
 
 #枝のトラッキング&諸量の計算
 #Making position data
-for i in range(len(search_range)):
+for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==0: #最外端の判定
             position[i][j][4]=-1
             tree_search(i,j)
 
 #Add branch ID
-for i in range(len(search_range)):
+for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==-1: 
             branch_search(i,j)
@@ -257,10 +288,10 @@ branch_vector_edge=[]
 for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==-1:
-            edge.append([position[i][j][1],position[i][j][0]]) #theta,rの順に格納
+            edge.append([position[i][j][1],position[i][j][0]]) #theta,rの順に格納,枝の端
             branch_vector_edge.append(position[i][j])
         elif position[i][j][5]==1:
-            node.append([position[i][j][1],position[i][j][0]])
+            node.append([position[i][j][1],position[i][j][0]]) #枝の節
             branch_vector_edge.append(position[i][j])
 
 # make branch vector
@@ -278,21 +309,26 @@ for i in range(len(branch_vector_edge)):
             rev1=list(reversed(branch_vector_edge[i][0:2]))
             rev2=list(reversed(branch_vector_edge[j][0:2]))
             branch_vector.append([rev1,rev2])
-            dist=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
-            branch_vector_length.append(dist)
+            length=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
+            branch_vector_length.append(length)
             branch_vector_origin.append([branch_vector_edge[i],branch_vector_edge[j]])
 
 print("Finish Calculation")
+print(branch_vector)
+# print("Branch ID:" + str(branch_id)+" ,Branch Nomber:" +str(len(branch_vector)))
 print("Start Making Figure")
-# # 画像
-# img_origin=image #original image
-# img_n=N_Frame_Image(n0) #N frames image
-# scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
+
+# 画像
+img_origin=image #original image
+img_n=N_Frame_Image(n0) #N frames image
+scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # # 画像として可視化する
 # fig = plt.figure(figsize=(18,9))
 # ax1=fig.add_subplot(1,2,1)
-# ax2=fig.add_subplot(1,2,2,projection="polar")
+# # ax2=fig.add_subplot(1,2,2,projection="polar")
+# ax2=fig.add_subplot(1,2,2)
+
 
 # #元画像(gray)
 # cv2.line(img_origin, (x-5,y-5), (x+5,y+5), (255, 0, 0), 2)
@@ -328,47 +364,90 @@ print("Start Making Figure")
 # plt.savefig(str(name_tag)+".png")
 
 # 画像として可視化する
-fig2, ax3 = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(9,9))
+fig2, ax2 = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(9,9))
 
 #theta-半径グラフ
-ax3.set_axis_off()
-ax3.set_axis_on()
-ax3.set_xticks(
+ax2.set_axis_off()
+ax2.set_axis_on()
+ax2.set_xticks(
     [0, np.pi/4, np.pi/2, np.pi*3/4, np.pi, np.pi*5/4, np.pi*3/2, np.pi*7/4], 
     ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
 )
 
 for i , r in enumerate(search_range):
     for j in range(len(position[i])):
-        ax3.scatter(position[i][j][1],r,s=1,c="k")
+        ax2.scatter(position[i][j][1],r,s=1,c="k")
 
 for i in range(len(node)):
-    ax3.scatter(node[i][0],node[i][1],s=10,c="r")
+    ax2.scatter(node[i][0],node[i][1],s=10,c="r")
 
 for i in range(len(edge)):
-    ax3.scatter(edge[i][0],edge[i][1],s=10,c="b")
+    ax2.scatter(edge[i][0],edge[i][1],s=10,c="b")
+
+ax2.scatter(position[len(position)-1][0][1],position[len(position)-1][0][0],s=10,c="m") #Plot Center
 
 lc1 = mc.LineCollection(branch, colors="k", linewidths=1)
-# lc2 = mc.LineCollection(branch_vector,colors="g",linewidth=2)
+# lc2 = mc.LineCollection(branch_vector,colors="m",linewidth=1)
 
-ax3.add_collection(lc1)
-# ax3.add_collection(lc2)
+ax2.add_collection(lc1)
+# ax2.add_collection(lc2)
 
 # make branch vector angle
-color_list = ["r", "b", "g", "y", "m", "c" , "coral" , "orange" , "gold" , "olive" , "greenyellow" , "turquoise" , "lightseagreen" , "navy" , "plum" , "crimson"]
-branch_vector_pair=[]
+color_list = ["g", "y", "c" , "coral" , "orange" , "gold" , "olive" , "greenyellow" , "turquoise" , "lightseagreen" , "navy" , "plum" , "crimson"]
+# branch_vector_pair=[]
 branch_vector_angle=[]
-for i in range(len(branch_vector)):
-    for j in range(i+1,len(branch_vector)):
-        if branch_vector[i][1]==branch_vector[j][1]:
-            branch_vector_pair.append([branch_vector[i],branch_vector[j]])
-            lc_tmp1 = mc.LineCollection([branch_vector[i],branch_vector[j]], colors=color_list[i%len(color_list)], linewidths=1)
-            ax3.add_collection(lc_tmp1)
-            angle=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
-            branch_vector_angle.append(angle)
+# for i in range(len(branch_vector)):
+#     for j in range(i+1,len(branch_vector)):
+#         if branch_vector[i][1]==branch_vector[j][1]:
+#             branch_vector_pair.append([branch_vector[i],branch_vector[j]])
+#             # lc_tmp1 = mc.LineCollection([branch_vector[i],branch_vector[j]], colors=color_list[i%len(color_list)], linewidths=1)
+#             # ax3.add_collection(lc_tmp1)
+#             angle=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
+#             branch_vector_angle.append(angle)
+#             if angle>= 2*math.pi/3:
+#                 lc_tmp2 = mc.LineCollection([branch_vector[i],branch_vector[j]], colors=color_list[i%len(color_list)], linewidths=1)
+#                 ax2.add_collection(lc_tmp2)
 
-plt.savefig(str(name_tag)+"_lareg.png")
-# plt.savefig(str(name_tag)+"_teat_lareg.png")
+# plt.savefig(str(name_tag)+"_lareg_compare.pdf")
+# plt.savefig(str(name_tag)+"_lareg_compare.eps")
+
+for i in reversed(range(len(branch_vector))):
+    angle_tmp=math.pi
+    for j in reversed(range(0,i)):
+        if branch_vector[i][1]==branch_vector[j][1]:
+            angle=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
+            if angle <= angle_tmp:
+                angle_tmp=angle
+                i_tmp=i
+                j_tmp=j
+
+    # branch_vector_pair.append([branch_vector[i_tmp],branch_vector[j_tmp]])
+    branch_vector_angle.append(angle)
+    # if angle>= 2*math.pi/3:
+    #     lc_tmp2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
+    #     ax2.add_collection(lc_tmp2)
+
+#Making Long Branch Vector
+Long_branch_vector=[]
+for i in reversed(range(len(branch_vector))):
+    angle_tmp=0
+    for j in reversed(range(0,i)):
+        if branch_vector[i][0]==branch_vector[j][1]:
+            angle=branch_angle(branch_vector[i][0],branch_vector[i][1],branch_vector[j][0])
+            if angle >= angle_tmp:
+                angle_tmp=angle
+                i_tmp=i
+                j_tmp=j
+
+    branch_vector_angle.append(angle)
+    if angle>= 2*math.pi/3:
+        lc_tmp2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
+        ax2.add_collection(lc_tmp2)
+            
+
+plt.savefig(str(name_tag)+"_lareg.pdf")
+# plt.savefig(str(name_tag)+"_lareg.eps")
+# plt.savefig(str(name_tag)+".png")
 
 path=str(name_tag)+".dat"
 unit=11/681 #cm/pix
