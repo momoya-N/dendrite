@@ -75,7 +75,11 @@ def Remove_Dust(Matrix):#remove dust funvtion
     return Matrix
 
 def search_branch(binary,r,x_c,y_c):  # binary data,radius r, cm_x,cm_y
-    dth = 1 / r  # delta theta,十分大きいrではokそう？→f(x)=2arcsin(1/2x)-1/xは、x=2で0.005360...
+    if r==1:
+        dth=math.pi/2
+    else:
+        dth = 2*math.asin(1/(2*r))
+        
     t = 0  # 角度のステップ数
     th = 0  # 角度
     branch_th=[]
@@ -314,7 +318,7 @@ for i in range(len(branch_vector_edge)):
             branch_vector_origin.append([branch_vector_edge[i],branch_vector_edge[j]])
 
 print("Finish Calculation")
-print(branch_vector)
+# print(branch_vector)
 # print("Branch ID:" + str(branch_id)+" ,Branch Nomber:" +str(len(branch_vector)))
 print("Start Making Figure")
 
@@ -412,39 +416,77 @@ branch_vector_angle=[]
 # plt.savefig(str(name_tag)+"_lareg_compare.eps")
 
 for i in reversed(range(len(branch_vector))):
-    angle_tmp=math.pi
+    angle=math.pi
     for j in reversed(range(0,i)):
         if branch_vector[i][1]==branch_vector[j][1]:
-            angle=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
-            if angle <= angle_tmp:
+            angle_tmp=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
+            if angle_tmp <= angle:
                 angle_tmp=angle
                 i_tmp=i
                 j_tmp=j
 
     # branch_vector_pair.append([branch_vector[i_tmp],branch_vector[j_tmp]])
-    branch_vector_angle.append(angle)
-    # if angle>= 2*math.pi/3:
-    #     lc_tmp2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
-    #     ax2.add_collection(lc_tmp2)
+    branch_vector_angle.append(angle_tmp)
+    # if angle_tmp>= 2*math.pi/3:
+    #     lc2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
+    #     ax2.add_collection(lc2)
 
 #Making Long Branch Vector
-Long_branch_vector=[]
+threshold_angle=math.pi-math.pi/6
+print("Threshold Angle is " + str(threshold_angle/math.pi) +"\u03c0")
+Long_branch_vector_tmp=[]
 for i in reversed(range(len(branch_vector))):
-    angle_tmp=0
+    angle=0
     for j in reversed(range(0,i)):
         if branch_vector[i][0]==branch_vector[j][1]:
-            angle=branch_angle(branch_vector[i][0],branch_vector[i][1],branch_vector[j][0])
-            if angle >= angle_tmp:
-                angle_tmp=angle
+            angle_tmp = branch_angle(branch_vector[i][0],branch_vector[i][1],branch_vector[j][0])
+            if angle_tmp >= angle:
+                angle=angle_tmp
                 i_tmp=i
                 j_tmp=j
-
-    branch_vector_angle.append(angle)
+    # branch_vector_angle.append(angle)
     if angle>= 2*math.pi/3:
-        lc_tmp2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
-        ax2.add_collection(lc_tmp2)
+        rev1=list(reversed(branch_vector[i_tmp]))
+        rev2=list(reversed(branch_vector[j_tmp]))
+        Long_branch_vector_tmp.append([rev1,rev2]) #内側,外側ベクトルの順で格納,rについても内から外に格納
+        # Long_branch_vector.append([branch_vector[j_tmp],branch_vector[i_tmp]]) #外側,内側ベクトルの順で格納,rについては内から外に格納
+        lc3 = mc.LineCollection([branch_vector[j_tmp],branch_vector[i_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
+        ax2.add_collection(lc3)
+
+# print(err_log)
+# print(Long_branch_vector)
+def Next_Long_Branch(i:int):
+    for j in range(len(Long_branch_vector_tmp)):
+        if j==i:
+            continue
+        if Long_branch_vector_tmp[i][1]==Long_branch_vector_tmp[j][0]:
+            return j
+
+    return len(Long_branch_vector_tmp)
+        
+def Make_Long_Branch(i:int):
+    i_tmp=Next_Long_Branch(i)
+    if i_tmp < len(Long_branch_vector_tmp):
+        skip_list.append(i_tmp)
+        tmp.append(Long_branch_vector_tmp[i_tmp])
+        Make_Long_Branch(i_tmp)
+
+skip_list=[]
+Long_branch_vector=[]
+for i in range(len(Long_branch_vector_tmp)):
+    if i in skip_list:
+        # print("Continue")
+        continue
+    skip_list.append(i)
+    tmp=[Long_branch_vector_tmp[i]]
+    Make_Long_Branch(i)
+    Long_branch_vector.append([tmp[0][0][0],tmp[-1][-1][-1]])
+
+lc4 = mc.LineCollection(Long_branch_vector, colors="m", linewidths=1)
+ax2.add_collection(lc4)
 
 
+# print(Long_branch_vector)
 plt.savefig(str(name_tag)+"_lareg.pdf")
 # plt.savefig(str(name_tag)+"_lareg.eps")
 # plt.savefig(str(name_tag)+".png")
