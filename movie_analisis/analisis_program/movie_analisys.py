@@ -8,6 +8,7 @@ from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.collections as mc
 import matplotlib.cm as cm
 import time
+import copy
 
 def N_Frame_Image(frameIndex):  # N番目のフレーム画像を返す
     # インデックスがフレームの範囲内なら…
@@ -114,47 +115,62 @@ def search_branch(binary,r,x_c,y_c):  # binary data,radius r, cm_x,cm_y
 
     return branch_th
 
-def next_point(position_now,position_next_list):#position[i][j],position[i+1]
-    rnow=position_now[0]
-    thnow=position_now[1]
-    rnext=position_next_list[0][0]
-    dist_tmp2=pow(r_max,2) #十分大きな数で
-    for i in range(len(position_next_list)):
-        thnext=position_next_list[i][1]
-        dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-        if dist_tmp2 > dist2:
-            dist_tmp2=dist2
-            index=i
+# def next_point_tmp(position_now,position_next_list):#position[i][j],position[i+1]
+#     rnow=position_now[0]
+#     thnow=position_now[1]
+#     rnext=position_next_list[0][0]
+#     dist_tmp2=pow(r_max,2) #十分大きな数で
+#     for i in range(len(position_next_list)):
+#         thnext=position_next_list[i][1]
+#         dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+#         if dist_tmp2 > dist2:
+#             dist_tmp2=dist2
+#             index=i
 
-    return index
+#     return index
 
 # def next_point(i:int,j:int):#position[i][j]
 #     rnow=position[i][j][0]
 #     thnow=position[i][j][1]
-#     dist_tmp2=pow(r_max,2) #十分大きな数で
-#     if len(position[i-1])!=0:
-#         itr_start=i-1
-#     else:
-#         itr_start=i
-    
-#     for k in range(max(0,itr_start),min(i+2,len(position))):
-#         rnext=position[k][0][0]
-#         for l in range(len(position[k])):
-#             if (k!=i) and (l!=j):
-#                 thnext=position[k][l][1]
-#                 dist2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
-#                 if dist_tmp2 > dist2:
-#                     dist_tmp2=dist2
-#                     index_i=k
-#                     index_j=l
+#     rnext=position[i+1][0][0]
+#     dist2=pow(r_max,2) #十分大きな数で
+#     for k in range(len(position[i+1])):
+#         thnext=position[i+1][k][1]
+#         dist_tmp2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+#         if dist2 > dist_tmp2:
+#             dist2=dist_tmp2
+#             index=k
 
-#     return index_i , index_j
+#     return index
+
+def next_point_new(i:int,j:int):#position[i][j]
+    rnow=position[i][j][0]
+    thnow=position[i][j][1]
+    dist2=pow(r_max,2) #十分大きな数で
+    for k in range(i,min(i+3,len(position))):
+        rnext=position[k][0][0]
+        for l in range(len(position[k])):
+            if (k==i and l==j) or ((k in skip_list_i) and (l in skip_list_j)):
+                continue
+            thnext=position[k][l][1]
+            dist_tmp2=pow(rnow,2)+pow(rnext,2)-2*rnow*rnext*math.cos(thnow-thnext)
+            if dist2 > dist_tmp2:
+                dist2=dist_tmp2
+                index_i=k
+                index_j=l
+
+    skip_list_i.append(index_i)
+    skip_list_j.append(index_j)
+    
+    return index_i , index_j
 
 def tree_search(i,j):
     if i < len(position)-1:
-        i_tmp=i+1
-        j_tmp=next_point(position[i][j],position[i_tmp])
-        # i_tmp , j_tmp = next_point(i,j)
+        # i_tmp=i+1
+        # j_tmp=next_point(i,j)
+        # j_tmp=next_point_tmp(position[i][j],position[i_tmp])
+        i_tmp , j_tmp = next_point_new(i,j)
+        # print(i_tmp,j_tmp,position[i_tmp][j_tmp])
         # print([i,j],[i_tmp,j_tmp])
         position[i][j][3]=position[i_tmp][j_tmp][2] #[i][j] in <- [i_tmp][j_tmp] position_id
         if position[i_tmp][j_tmp][4]!=0:
@@ -162,13 +178,15 @@ def tree_search(i,j):
             return
         else:
             position[i_tmp][j_tmp][4]=position[i][j][2] #[i_tmp][j_tmp] out <- [i][j] position_id
-        
+
         tree_search(i_tmp,j_tmp)
 
 def branch_search(i,j):
-    if i < len(position)-1:
-        i_tmp=i+1
-        j_tmp=next_point(position[i][j],position[i_tmp])
+    if i < len(position):
+        # i_tmp=i+1
+        # j_tmp=next_point(i,j)
+        # j_tmp=next_point_tmp(position[i][j],position[i_tmp])
+        i_tmp , j_tmp = next_point_new(i,j)
         position[i][j].append(branch_id[0])
         if position[i][j][5] == 1:
             branch_id[0]+=1
@@ -176,7 +194,10 @@ def branch_search(i,j):
 
         if i_tmp==len(position)-1: #中心の例外処理
             position[i_tmp][0].append(branch_id[0])
-            
+            return
+
+        branch.append([[position[i][j][1],position[i][j][0]],[position[i_tmp][j_tmp][1],position[i_tmp][j_tmp][0]]])
+        
         branch_search(i_tmp,j_tmp)
 
 def branch_angle(node:list,branch1:list,branch2:list): #各点の極座標(theta,r)をわたす
@@ -191,9 +212,34 @@ def branch_angle(node:list,branch1:list,branch2:list): #各点の極座標(theta
     r12_2=pow(r1,2)+pow(r2,2)-2*r1*r2*math.cos(th1-th2)
     r20_2=pow(r2,2)+pow(r0,2)-2*r2*r0*math.cos(th2-th0)
 
+    if r01_2==0 or r12_2==0 or r20_2==0:
+        print(node,branch1,branch2)
+        print("Emergency Stop")
+        sys.exit(1)
+
     angle=math.acos((-r12_2+r01_2+r20_2)/(2*math.sqrt(r01_2*r20_2)))
 
     return angle
+
+def Next_Long_Branch(i:int):
+    for j in range(len(Long_branch_vector_tmp)):
+        if j==i:
+            continue
+        if Long_branch_vector_tmp[i][1]==Long_branch_vector_tmp[j][0]:
+            return j
+
+    return len(Long_branch_vector_tmp)
+        
+def Make_Long_Branch(i:int):
+    i_tmp=Next_Long_Branch(i)
+    if i_tmp < len(Long_branch_vector_tmp):
+        skip_list.append(i_tmp)
+        tmp.append(Long_branch_vector_tmp[i_tmp])
+        Make_Long_Branch(i_tmp)
+
+def get_unique_list(seq):
+    seen = []
+    return [x for x in seq if x not in seen and not seen.append(x)]
 
 #Main
 #time
@@ -230,7 +276,7 @@ print("Frame Count : ", Total_Frames)
 
 n0 = First_Frame() # origin frame number, time=0
 
-#Last Frame
+#Getting Last Frame
 cap.set(cv2.CAP_PROP_POS_FRAMES,Total_Frames-1)
 ret,image=cap.read()
 
@@ -240,7 +286,7 @@ threshold,nongray_binary=cv2.threshold(image,cut,255,cv2.THRESH_BINARY)#RGBを�
 
 binary=Remove_Dust(binary)
 
-#位置データの作成
+#Making Position Data
 print("Start Calculation")
 x,y=CM(n0) #重心計算
 r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
@@ -255,40 +301,56 @@ for i , r in enumerate(search_range):
         position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0]) #radius ,theta,position,in,out,node
         position_id+=1
 
-#中心軸の追加
+#Adding origin point
 position_id+=1
 position.append([[0,0,position_id,0,0,0]]) #radius ,theta,position,in,out,node
 
-#枝のトラッキング&諸量の計算
-#Making position data
+#Tree search 
 for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==0: #最外端の判定
+            skip_list_i=[]
+            skip_list_j=[]
+            skip_list_i.append(i)
+            skip_list_j.append(j)
             position[i][j][4]=-1
             tree_search(i,j)
 
-#Add branch ID
+#Adding branch ID & Tracking branch
+branch=[]
 for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==-1: 
+            skip_list_i=[]
+            skip_list_j=[]
+            skip_list_i.append(i)
+            skip_list_j.append(j)
             branch_search(i,j)
             branch_id[0]+=1
 
-#Traking branch
-branch=[]
-for i in range(0,len(position)-1):
-    for j in range(len(position[i])):
-        thnow=position[i][j][1]
-        rnow=position[i][0][0]
-        thnext=position[i+1][next_point(position[i][j],position[i+1])][1]
-        rnext=position[i+1][0][0]
-        branch.append([[thnow,rnow],[thnext,rnext]])
+branch=get_unique_list(branch)
+# #Traking branch
+# branch=[]
+# skip_list_i=[]
+# skip_list_j=[]
+# for i in range(0,len(position)-1):
+#     for j in range(len(position[i])):
+#         thnow=position[i][j][1]
+#         rnow=position[i][0][0]
+#         # thnext=position[i+1][next_point_tmp(position[i][j],position[i+1])][1]
+#         # thnext=position[i+1][next_point(i,j)][1]
+#         i_tmp,j_tmp=next_point_new(i,j)
+#         skip_list_i.append(i)
+#         skip_list_j.append(j)
+#         thnext=position[i_tmp][j_tmp][1]
+#         rnext=position[i_tmp][0][0]
+#         # rnext=position[i+1][0][0]
+#         branch.append([[thnow,rnow],[thnext,rnext]])
 
 # Search node & edge
 node=[]
 edge=[]
 branch_vector_edge=[]
-
 for i in range(len(position)):
     for j in range(len(position[i])):
         if position[i][j][4]==-1:
@@ -300,9 +362,8 @@ for i in range(len(position)):
 
 # make branch vector
 branch_vector=[]
-branch_vector_origin=[]
+# branch_vector_origin=[]
 branch_vector_length=[]
-
 for i in range(len(branch_vector_edge)):
     for j in range(i+1,len(branch_vector_edge)):
         len1=len(branch_vector_edge[i])
@@ -313,16 +374,63 @@ for i in range(len(branch_vector_edge)):
             rev1=list(reversed(branch_vector_edge[i][0:2]))
             rev2=list(reversed(branch_vector_edge[j][0:2]))
             branch_vector.append([rev1,rev2])
-            length=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
-            branch_vector_length.append(length)
-            branch_vector_origin.append([branch_vector_edge[i],branch_vector_edge[j]])
+            # length=np.sqrt(pow(rev1[1],2)+pow(rev2[1],2)-2*rev1[1]*rev2[1]*math.cos(rev1[0]-rev2[0]))
+            # branch_vector_length.append(length)
+            # # branch_vector_origin.append([branch_vector_edge[i],branch_vector_edge[j]])
+
+# make branch vector angle
+for i in range(len(branch_vector)-10,len(branch_vector)):
+    print(branch_vector[i])
+
+branch_vector_angle=[]
+for i in reversed(range(len(branch_vector))):
+    angle=math.pi
+    for j in reversed(range(0,i)):
+        if branch_vector[i][1]==branch_vector[j][1]:
+            angle_tmp=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
+            if angle_tmp <= angle:
+                angle_tmp=angle
+                i_tmp=i
+                j_tmp=j
+
+    branch_vector_angle.append(angle_tmp)
+
+#Making Long & Short Branch Vector
+threshold_angle=(2/3)*math.pi
+print("Threshold Angle is " + str(threshold_angle/math.pi) +"\u03c0")
+Long_branch_vector_tmp=[]
+Short_branch_vector=copy.deepcopy(branch_vector)#copy methodを使わないと、Pythonの場合リストは"代入"ではなく、"同じリストオブジェクトの参照"の意味になる。
+for i in reversed(range(len(branch_vector))):
+    angle=0
+    for j in reversed(range(0,i)):
+        if branch_vector[i][0]==branch_vector[j][1]:
+            angle_tmp = branch_angle(branch_vector[i][0],branch_vector[i][1],branch_vector[j][0])
+            if angle_tmp >= angle:
+                angle=angle_tmp
+                i_tmp=i
+                j_tmp=j
+    if angle>= threshold_angle:
+        rev1=list(reversed(branch_vector[i_tmp]))
+        rev2=list(reversed(branch_vector[j_tmp]))
+        Long_branch_vector_tmp.append([rev1,rev2]) #内側,外側ベクトルの順で格納,rについても内から外に格納
+        if branch_vector[i_tmp] in Short_branch_vector:
+            Short_branch_vector.remove(branch_vector[i_tmp])
+        if branch_vector[j_tmp] in Short_branch_vector:
+            Short_branch_vector.remove(branch_vector[j_tmp])
+skip_list=[]
+Long_branch_vector=[]
+for i in range(len(Long_branch_vector_tmp)):
+    if i in skip_list:
+        continue
+    skip_list.append(i)
+    tmp=[Long_branch_vector_tmp[i]]
+    Make_Long_Branch(i)
+    Long_branch_vector.append([tmp[0][0][0],tmp[-1][-1][-1]])
 
 print("Finish Calculation")
-# print(branch_vector)
-# print("Branch ID:" + str(branch_id)+" ,Branch Nomber:" +str(len(branch_vector)))
 print("Start Making Figure")
 
-# 画像
+# Making Images
 img_origin=image #original image
 img_n=N_Frame_Image(n0) #N frames image
 scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
@@ -367,7 +475,6 @@ scalebar=ScaleBar(11/681,"cm",length_fraction=0.5,location="lower right")
 
 # plt.savefig(str(name_tag)+".png")
 
-# 画像として可視化する
 fig2, ax2 = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(9,9))
 
 #theta-半径グラフ
@@ -390,107 +497,23 @@ for i in range(len(edge)):
 
 ax2.scatter(position[len(position)-1][0][1],position[len(position)-1][0][0],s=10,c="m") #Plot Center
 
+color_list = ["y", "c" , "coral" , "orange" , "gold" , "olive" , "greenyellow" , "turquoise" , "lightseagreen" , "navy" , "plum" , "crimson"]
+
 lc1 = mc.LineCollection(branch, colors="k", linewidths=1)
-# lc2 = mc.LineCollection(branch_vector,colors="m",linewidth=1)
+# lc2 = mc.LineCollection(branch_vector,colors=color_list,linewidth=1)
+lc3 = mc.LineCollection(Short_branch_vector, colors="orchid", linewidths=1)
+lc4 = mc.LineCollection(Long_branch_vector, colors="g", linewidths=1)
 
 ax2.add_collection(lc1)
 # ax2.add_collection(lc2)
-
-# make branch vector angle
-color_list = ["g", "y", "c" , "coral" , "orange" , "gold" , "olive" , "greenyellow" , "turquoise" , "lightseagreen" , "navy" , "plum" , "crimson"]
-# branch_vector_pair=[]
-branch_vector_angle=[]
-# for i in range(len(branch_vector)):
-#     for j in range(i+1,len(branch_vector)):
-#         if branch_vector[i][1]==branch_vector[j][1]:
-#             branch_vector_pair.append([branch_vector[i],branch_vector[j]])
-#             # lc_tmp1 = mc.LineCollection([branch_vector[i],branch_vector[j]], colors=color_list[i%len(color_list)], linewidths=1)
-#             # ax3.add_collection(lc_tmp1)
-#             angle=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
-#             branch_vector_angle.append(angle)
-#             if angle>= 2*math.pi/3:
-#                 lc_tmp2 = mc.LineCollection([branch_vector[i],branch_vector[j]], colors=color_list[i%len(color_list)], linewidths=1)
-#                 ax2.add_collection(lc_tmp2)
-
-# plt.savefig(str(name_tag)+"_lareg_compare.pdf")
-# plt.savefig(str(name_tag)+"_lareg_compare.eps")
-
-for i in reversed(range(len(branch_vector))):
-    angle=math.pi
-    for j in reversed(range(0,i)):
-        if branch_vector[i][1]==branch_vector[j][1]:
-            angle_tmp=branch_angle(branch_vector[i][1],branch_vector[i][0],branch_vector[j][0])
-            if angle_tmp <= angle:
-                angle_tmp=angle
-                i_tmp=i
-                j_tmp=j
-
-    # branch_vector_pair.append([branch_vector[i_tmp],branch_vector[j_tmp]])
-    branch_vector_angle.append(angle_tmp)
-    # if angle_tmp>= 2*math.pi/3:
-    #     lc2 = mc.LineCollection([branch_vector[i_tmp],branch_vector[j_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
-    #     ax2.add_collection(lc2)
-
-#Making Long Branch Vector
-threshold_angle=math.pi-math.pi/6
-print("Threshold Angle is " + str(threshold_angle/math.pi) +"\u03c0")
-Long_branch_vector_tmp=[]
-for i in reversed(range(len(branch_vector))):
-    angle=0
-    for j in reversed(range(0,i)):
-        if branch_vector[i][0]==branch_vector[j][1]:
-            angle_tmp = branch_angle(branch_vector[i][0],branch_vector[i][1],branch_vector[j][0])
-            if angle_tmp >= angle:
-                angle=angle_tmp
-                i_tmp=i
-                j_tmp=j
-    # branch_vector_angle.append(angle)
-    if angle>= 2*math.pi/3:
-        rev1=list(reversed(branch_vector[i_tmp]))
-        rev2=list(reversed(branch_vector[j_tmp]))
-        Long_branch_vector_tmp.append([rev1,rev2]) #内側,外側ベクトルの順で格納,rについても内から外に格納
-        # Long_branch_vector.append([branch_vector[j_tmp],branch_vector[i_tmp]]) #外側,内側ベクトルの順で格納,rについては内から外に格納
-        lc3 = mc.LineCollection([branch_vector[j_tmp],branch_vector[i_tmp]], colors=color_list[i%len(color_list)], linewidths=1)
-        ax2.add_collection(lc3)
-
-# print(err_log)
-# print(Long_branch_vector)
-def Next_Long_Branch(i:int):
-    for j in range(len(Long_branch_vector_tmp)):
-        if j==i:
-            continue
-        if Long_branch_vector_tmp[i][1]==Long_branch_vector_tmp[j][0]:
-            return j
-
-    return len(Long_branch_vector_tmp)
-        
-def Make_Long_Branch(i:int):
-    i_tmp=Next_Long_Branch(i)
-    if i_tmp < len(Long_branch_vector_tmp):
-        skip_list.append(i_tmp)
-        tmp.append(Long_branch_vector_tmp[i_tmp])
-        Make_Long_Branch(i_tmp)
-
-skip_list=[]
-Long_branch_vector=[]
-for i in range(len(Long_branch_vector_tmp)):
-    if i in skip_list:
-        # print("Continue")
-        continue
-    skip_list.append(i)
-    tmp=[Long_branch_vector_tmp[i]]
-    Make_Long_Branch(i)
-    Long_branch_vector.append([tmp[0][0][0],tmp[-1][-1][-1]])
-
-lc4 = mc.LineCollection(Long_branch_vector, colors="m", linewidths=1)
+ax2.add_collection(lc3)
 ax2.add_collection(lc4)
 
-
-# print(Long_branch_vector)
 plt.savefig(str(name_tag)+"_lareg.pdf")
 # plt.savefig(str(name_tag)+"_lareg.eps")
 # plt.savefig(str(name_tag)+".png")
 
+# Making Date File
 path=str(name_tag)+".dat"
 unit=11/681 #cm/pix
 
@@ -510,11 +533,3 @@ print("Finish Making Figure")
 total_time=finish-start
 print("total time:",total_time)
 print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
-
-#時間計測メモ file3で計測
-# 系サイズ最大、1ステップ毎：75.58797311782837 sec ->20倍になっても時間は10倍ほど
-# 系サイズ最大、r_max/20毎：7.566540241241455 sec
-# 重心から系の端まで、1ステップ毎：77.58949756622314 sec ->こっちの方がむしろ長い？
-# 重心から系の端まで、1ステップ毎、探索関数にif文をかませない：83.54880547523499 sec ->ifをかませない方が長い？
-# 重心から系の端まで、r_max/20毎：6.782961368560791 sec
-# 点数が増えるとplot関数により時間がかかる印象,cpuの使用状況に多少よるかも

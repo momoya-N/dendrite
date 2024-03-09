@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math 
 import pandas as pd
+import copy
 
-a=list(range(10))
+a=[i for i in range(5)]
 print(a)
-for i in reversed(range(len(a))):
-    print("Iteration:"+str(i))
-    for j in reversed(range(0,i)):
+for i in range(len(a)):
+    for j in range(i,min(i+3,len(a))):
         print(a[j])
-    print("-------------")
+    print("---------")
