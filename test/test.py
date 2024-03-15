@@ -1,21 +1,34 @@
-import numpy as np
+import os
+import sys
+import os
+import glob
+import cv2
 import matplotlib.pyplot as plt
-import math 
-import pandas as pd
-import copy
+import numpy as np
+from matplotlib_scalebar.scalebar import ScaleBar
+import matplotlib.collections as mc
+import matplotlib.cm as cm
 
-r0=241
-r1=232
-r2=245
-th0=3.990652542207994
-th1=3.981459387415673
-th2=3.9729796219037206
+print(cv2.getBuildInformation())
+#Video Source
+Dir_path="/mnt/d/dendrite_data/edited_data/edited_movie/"
+# Dir_path="/mnt/c/Users/PC/Desktop/"
+file_path_list=glob.glob(Dir_path+"*.avi")
+file_count=1
+Total_file_count=len(file_path_list)
 
-r01_2=pow(r0,2)+pow(r1,2)-2*r0*r1*math.cos(th0-th1)
-r12_2=pow(r1,2)+pow(r2,2)-2*r1*r2*math.cos(th1-th2)
-r20_2=pow(r2,2)+pow(r0,2)-2*r2*r0*math.cos(th2-th0)
-
-print((th0-th1)/math.pi,(th1-th2)/math.pi,(th2-th0)/math.pi)
-print((-r12_2+r01_2+r20_2))
-print(2*math.sqrt(r01_2*r20_2))
-print(math.acos((-r12_2+r01_2+r20_2)/(2*math.sqrt(r01_2*r20_2)))/math.pi)
+for path in file_path_list:
+    print("Progress:"+ str(file_count) + "/" + str(Total_file_count))
+    fname=os.path.basename(path)
+    file_path=Dir_path + fname
+    name_tag=fname.replace(".avi","")
+    print(file_path)
+    print(name_tag)
+    cap = cv2.VideoCapture(file_path)
+    if not cap.isOpened():
+        print("Video Source Reading is... :",cap.isOpened())
+        print("Video reading Error")
+        sys.exit(1)
+    else:
+        print("Video Source Reading is... :",cap.isOpened())
+        file_count+=1

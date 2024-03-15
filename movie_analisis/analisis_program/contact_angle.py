@@ -53,7 +53,7 @@ def color_hist(filename):
 #hypabolic tangent での境界表現
 def surface(epsilnon,R): #epsilon:境界の幅(2*epsilon),R:円の半径
     step=100
-    dth=2*math.pi()/step
+    dth=2*math.pi/step
     dr=2*R/step
 
     theta=[dth*i for i in range(step)]
