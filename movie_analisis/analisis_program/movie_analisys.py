@@ -83,16 +83,11 @@ def search_branch(binary,r,x_c,y_c):  # binary data,radius r, cm_x,cm_y
         dth=math.pi/2
     else:
         dth = 2*math.asin(1/(2*r))
-        
-    t = 0  # 角度のステップ数
+
     th = 0  # 角度
     branch_th=[]
 
-    r_x = int(r * math.cos(0) + x_c)
-    r_y = int(r * math.sin(0) + y_c)
-
     while th < 2 * math.pi:
-        th = dth * t
         r_x = int(r * math.cos(th) + x_c)
         r_y = int(r * math.sin(th) + y_c)
 
@@ -101,20 +96,19 @@ def search_branch(binary,r,x_c,y_c):  # binary data,radius r, cm_x,cm_y
         if (1 <= r_x < Lx-1) and (1 <= r_y < Ly-1):
             while binary[r_y, r_x] == 255:#枝の重心計測
                 th_tmp.append(th)
-                t += 1
-                th = dth * t
+                th += dth
                 
-                if th > 2 * math.pi:
+                if th >= 2 * math.pi:
                     break
                 
-                r_x = int(r * math.cos(th) + x_c)  # dth分回転させる
+                r_x = int(r * math.cos(th) + x_c) # dth分回転させる
                 r_y = int(r * math.sin(th) + y_c)
 
         if np.size(th_tmp)!=0:
-            th=np.average(th_tmp)
-            branch_th.append(th)
+            th_ave=np.average(th_tmp)
+            branch_th.append(th_ave)
 
-        t += 1
+        th+=dth
 
     return branch_th
 
@@ -122,7 +116,7 @@ def next_point(i:int,j:int):#position[i][j]
     rnow=position[i][j][0]
     thnow=position[i][j][1]
     dist2=pow(r_max,2) #十分大きな数で
-    for k in range(i,min(i+5,len(position))):
+    for k in range(i,min(i+20,len(position))):
         rnext=position[k][0][0]
         for l in range(len(position[k])):
             if (k==i and l==j) or ((k in skip_list_i) and (l in skip_list_j)):
@@ -161,6 +155,7 @@ def branch_search(i,j):
 
         if i_tmp==len(position)-1: #中心の例外処理
             position[i_tmp][0].append(branch_id[0])
+            branch.append([[position[i][j][1],position[i][j][0]],[position[i_tmp][j_tmp][1],position[i_tmp][j_tmp][0]]])
             return
 
         branch.append([[position[i][j][1],position[i][j][0]],[position[i_tmp][j_tmp][1],position[i_tmp][j_tmp][0]]])
@@ -180,12 +175,7 @@ def branch_angle(node:list,branch1:list,branch2:list): #各点の極座標(theta
     r20_2=pow(r2,2)+pow(r0,2)-2*r2*r0*math.cos(th2-th0)
 
     value=(-r12_2+r01_2+r20_2)/(2*math.sqrt(r01_2*r20_2))
-    
-    if r01_2==0 or r12_2==0 or r20_2==0: #エラー処理
-        print(node,branch1,branch2)
-        print("Emergency Stop")
-        sys.exit(1)
-        
+
     #数値誤差で+-1を超えることがたまにあるのでその例外処理
     if value < -1.0:
         angle=math.acos(-1.0)
@@ -232,7 +222,6 @@ Total_file_count=len(file_path_list)
 
 # Check Video Source
 for path in file_path_list:
-    print("Progress:"+ str(file_count) + "/" + str(Total_file_count))
     fname=os.path.basename(path)
     file_path=Video_dir_path + fname
     name_tag=fname.replace(".avi","")
@@ -241,12 +230,16 @@ for path in file_path_list:
         print("Video reading Error :" + file_path)
         sys.exit(1)
     else:
-        print("Video readed :" + file_path)
+        print("Video readed :" + file_path,str(file_count) + "/" + str(Total_file_count))
         file_count+=1
+
+print("----------------------------")
 
 print("Start Analize")
 file_count=1
-for path in file_path_list:
+# for path in file_path_list:
+for p in [17]:
+    path=file_path_list[p]
     print("Progress:"+ str(file_count) + "/" + str(Total_file_count))
     fname=os.path.basename(path)
     file_path=Video_dir_path + fname
@@ -280,10 +273,11 @@ for path in file_path_list:
 
     binary=Remove_Dust(binary)
 
+    print("Start Calculation")
     #Making Position Data
     x,y=CM(n0) #重心計算
     r_max=max(x,(Lx-x),y,(Ly-y))#最大半径＝重心からの距離の最大値
-    search_range=[r for r in reversed(range(1,r_max))]
+    search_range=[r for r in reversed(range(2,r_max))] #r=1は上下左右の四方向しか取れないため除く
     position=[[]for i in range(len(search_range))]
     position_id=1
     branch_id=[1] #Pythonには参照渡しは存在しない(objectのaddressを値渡しする)ため、関数内ではコピーして渡されたaddressにアクセスしてobjectを書き換えることで参照渡しのような挙動を実現するらしい。
@@ -291,12 +285,16 @@ for path in file_path_list:
     for i , r in enumerate(search_range):
         branch_th=search_branch(binary,r,x,y)
         for j in range(len(branch_th)):
-            position[i].append([r,2*math.pi-branch_th[j],position_id,0,0,0]) #radius ,theta,position,in,out,node
+            theta=2*math.pi-branch_th[j]
+            position[i].append([r,theta,position_id,0,0,0]) #radius ,theta,position,in,out,node
             position_id+=1
 
     #Adding origin point
     position_id+=1
     position.append([[0,0,position_id,0,0,0]]) #radius ,theta,position,in,out,node
+    position=get_unique_list(position)
+    if [] in position:
+        position.remove([]) #rが小さいと、計測に一つもかからない場合があり、[]が残ってしまうため、除去している。
 
     #Tree search 
     for i in range(len(position)):
@@ -452,7 +450,8 @@ for path in file_path_list:
         ["0", "\u03c0/4", "\u03c0/2", "3\u03c0/4", "\u03c0", "5\u03c0/4", "3\u03c0/2", "7\u03c0/4"]
     )
 
-    for i , r in enumerate(search_range):
+    for i in range(len(position)):
+        r=position[i][0][0]
         for j in range(len(position[i])):
             ax2.scatter(position[i][j][1],r,s=1,c="k")
 
@@ -519,3 +518,4 @@ for path in file_path_list:
     print("total time:",total_time)
     print("x:",x,",(Lx-x):",(Lx-x),",y:",y,",(Ly-y):",(Ly-y))
     file_count+=1
+    print("--------------")

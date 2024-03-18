@@ -8,27 +8,16 @@ import numpy as np
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.collections as mc
 import matplotlib.cm as cm
+import time
+import math
+import gc
 
-print(cv2.getBuildInformation())
-#Video Source
-Dir_path="/mnt/d/dendrite_data/edited_data/edited_movie/"
-# Dir_path="/mnt/c/Users/PC/Desktop/"
-file_path_list=glob.glob(Dir_path+"*.avi")
-file_count=1
-Total_file_count=len(file_path_list)
+def get_unique_list(seq):
+    seen = []
+    return [x for x in seq if x not in seen and not seen.append(x)]
 
-for path in file_path_list:
-    print("Progress:"+ str(file_count) + "/" + str(Total_file_count))
-    fname=os.path.basename(path)
-    file_path=Dir_path + fname
-    name_tag=fname.replace(".avi","")
-    print(file_path)
-    print(name_tag)
-    cap = cv2.VideoCapture(file_path)
-    if not cap.isOpened():
-        print("Video Source Reading is... :",cap.isOpened())
-        print("Video reading Error")
-        sys.exit(1)
-    else:
-        print("Video Source Reading is... :",cap.isOpened())
-        file_count+=1
+a=[[[5, 4.079502041625272, 5486, 0, 0, 0], [5, 3.378330093494353, 5487, 0, 0, 0], [5, 2.076153618394076, 5488, 0, 0, 0]], [[4, 3.651300852650212, 5489, 0, 0, 0]], [[3, 3.604016039664557, 5490, 0, 0, 0]], [], [[0, 0, 5492, 0, 0, 0]]]
+for i in range(len(a)):
+    if a[i]==[]:
+        print(a[i])
+print(a)
