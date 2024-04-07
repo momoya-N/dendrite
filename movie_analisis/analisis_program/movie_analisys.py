@@ -237,9 +237,9 @@ print("----------------------------")
 
 print("Start Analize")
 file_count=1
-# for path in file_path_list:
-for p in [17]:
-    path=file_path_list[p]
+for path in file_path_list:
+# for p in [17]:
+#     path=file_path_list[p]
     print("Progress:"+ str(file_count) + "/" + str(Total_file_count))
     fname=os.path.basename(path)
     file_path=Video_dir_path + fname

@@ -12,12 +12,12 @@ import time
 import math
 import gc
 
-def get_unique_list(seq):
-    seen = []
-    return [x for x in seq if x not in seen and not seen.append(x)]
-
-a=[[[5, 4.079502041625272, 5486, 0, 0, 0], [5, 3.378330093494353, 5487, 0, 0, 0], [5, 2.076153618394076, 5488, 0, 0, 0]], [[4, 3.651300852650212, 5489, 0, 0, 0]], [[3, 3.604016039664557, 5490, 0, 0, 0]], [], [[0, 0, 5492, 0, 0, 0]]]
-for i in range(len(a)):
-    if a[i]==[]:
-        print(a[i])
+a = [0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0]
+b = [i for i in range(len(a))]
+c = [a for i in range(5)]
+print(c)
+test = [[y == 1 for y in x] for x in c]
+test2 = [[2 if y == 1 else -1 for y in x] for x in c]
 print(a)
+print(test)
+print(test2)
