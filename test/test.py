@@ -1,4 +1,4 @@
-import os
+import random
 import sys
 import os
 import glob
@@ -12,12 +12,22 @@ import time
 import math
 import gc
 
-a = [0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0]
-b = [i for i in range(len(a))]
-c = [a for i in range(5)]
-print(c)
-test = [[y == 1 for y in x] for x in c]
-test2 = [[2 if y == 1 else -1 for y in x] for x in c]
-print(a)
-print(test)
-print(test2)
+constellation = [
+    "牡羊座",
+    "金牛座",
+    "双子座",
+    "巨蟹座",
+    "狮子座",
+    "处女座",
+    "天秤座",
+    "天蝎座",
+    "射手座",
+    "摩羯座",
+    "水瓶座",
+    "双鱼座",
+]
+list = ["1位", "2位", "3位", "4位", "5位", "6位", "7位", "8位", "9位", "10位", "11位", "12位"]
+random.shuffle(constellation)
+print("星座占い")
+for i in range(12):
+    print(list[i] + ":" + constellation[i])
