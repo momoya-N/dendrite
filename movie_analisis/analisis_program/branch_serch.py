@@ -91,6 +91,23 @@ def search(i: int, j: int, k: int, image):  # Search branch, edge and node, k is
     return count  # 自分も含めた周囲の粒子数
 
 
+def check_video_path(file_path_list: list):
+    file_count = 1
+    for path in file_path_list:
+        fname = os.path.basename(path)
+        file_path = Video_dir_path + fname
+        cap = cv2.VideoCapture(file_path)
+
+        if not cap.isOpened():
+            print("Video reading Error :" + file_path)
+            sys.exit(1)
+        else:
+            print("Video readed :" + file_path, str(file_count) + "/" + str(Total_file_count))
+            file_count += 1
+
+    print("----------------------------")
+
+
 # Main
 # time
 start = time.time()
@@ -101,24 +118,23 @@ cut = 30  # threshold value,輝度値は0が黒色、255が白色。
 
 # Video Source
 Video_dir_path = "/mnt/d/dendrite_data/edited_data/edited_movie/"
+Data_dir_path = "/mnt/c/Users/PC/Desktop/Master_Thesis/movie_analisis/movie_analisis_data/"
 file_path_list = glob.glob(Video_dir_path + "*.avi")
 file_count = 1
 Total_file_count = len(file_path_list)
 
+# Check Video Source
+check_video_path(file_path_list)
+
 print("Start Analize")
-file_count = 1
 # for path in file_path_list:
-for p in [5]:
+for p in range(len(file_path_list)):
     path = file_path_list[p]
     print("Progress:" + str(file_count) + "/" + str(Total_file_count))
     fname = os.path.basename(path)
     file_path = Video_dir_path + fname
     name_tag = fname.replace(".avi", "")
     cap = cv2.VideoCapture(file_path)
-
-    if not cap.isOpened():
-        print("Video reading Error :" + file_path)
-        sys.exit(1)
 
     Lx = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     Ly = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -182,8 +198,12 @@ for p in [5]:
     ax1.add_artist(scalebar)
     ax1.imshow(color_img)
     # color_img[skeleton == 255] = (0, 255, 0)
-
-    plt.savefig(str(name_tag) + "_GUOHALL.pdf")
+    img_path = Data_dir_path + "pdf_image_thinning/"
+    os.makedirs(img_path, exist_ok=True)
+    plt.savefig(img_path + str(name_tag) + "_GUOHALL.pdf")
+    img_path = Data_dir_path + "png_image_thinning/"
+    os.makedirs(img_path, exist_ok=True)
+    plt.savefig(img_path + str(name_tag) + "_GUOHALL.png")
 
     finish = time.time()
     print("Finish Making Figure")
