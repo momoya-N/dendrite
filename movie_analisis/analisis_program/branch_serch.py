@@ -198,10 +198,10 @@ for p in range(len(file_path_list)):
     ax1.add_artist(scalebar)
     ax1.imshow(color_img)
     # color_img[skeleton == 255] = (0, 255, 0)
-    img_path = Data_dir_path + "pdf_image_thinning/"
+    img_path = Data_dir_path + "pdf_img_thinning/"
     os.makedirs(img_path, exist_ok=True)
     plt.savefig(img_path + str(name_tag) + "_GUOHALL.pdf")
-    img_path = Data_dir_path + "png_image_thinning/"
+    img_path = Data_dir_path + "png_img_thinning/"
     os.makedirs(img_path, exist_ok=True)
     plt.savefig(img_path + str(name_tag) + "_GUOHALL.png")
 
