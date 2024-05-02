@@ -10,4 +10,8 @@ import matplotlib.collections as mc
 import matplotlib.cm as cm
 import cv2
 
-print(cv2.getBuildInformation())
+for test_i in range(10):
+    print(test_i)
+    print("test")
+
+print("test_end")

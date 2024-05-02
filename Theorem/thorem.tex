@@ -3,11 +3,12 @@
 \usepackage{mypackage}
 \begin{document}
 
-\title{計算メモ}
+\title{研究メモ}
 \author{中村友哉}
 \maketitle
-\section{Bejie Curv}
-\subsection{The Definition of Bezier Curve}
+\section{計算メモ}
+\subsection{Bejie Curv}
+\subsubsection{The Definition of Bezier Curve}
 Def.
 
 \begin{equation}
@@ -23,8 +24,7 @@ Def.
   \end{pmatrix}
   =(1-t)^3\vb*{q}_1+3(1-t)^2t\vb*{q}_2+3(1-t)t^2\vb*{q}_3+t^3\vb*{q}_4
 \end{equation}
-
-\subsection{Calculating Area}
+\subsubsection{Calculating Area}
 Bezier Curve 以下の面積は
 \begin{equation}
   dx=\{-3(1-t)^2a_1-3(1-t)(3t-1)a_2+3t(2-3t)a_3+3t^2a_4\}dt
@@ -40,4 +40,34 @@ Bezier Curve 以下の面積は
   \end{split}
 \end{equation}
 
+\subsection{デバイ遮蔽長}
+デバイ遮蔽長は以下のように定義される。ただし、各記号は以下の通りである。(\ce{ZnSO_4 2ML}の場合、$Z=2$)
+\begin{itemize}
+  \item $\varepsilon_r$ : 比誘電率 $80.4$ (\ce{H_2O})
+  \item $\varepsilon_0$ : 真空の誘電率 $8.85\times 10^{-12} \si{F\cdot m^{-1}}$
+  \item $k_B$ : ボルツマン定数 $1.38\times 10^{-23} \si{J\cdot K^{-1}}$
+  \item $T$ : 絶対温度 $298 \si{K}$
+  \item $n$ : イオンの数密度 $1.20\times 10^{27} \si{m^{-3}}$
+  \item $Z$ : イオンの価数 $2$
+  \item $e$ : 電子の電荷 $1.60\times 10^{-19} \si{C}$
+\end{itemize}
+\begin{equation}
+  \begin{split}
+    \lambda_D&=\sqrt{\frac{\varepsilon_r \varepsilon_0 k_BT}{2nZ^2e^2}}\\
+    &=\sqrt{\frac{80.4\times 8.85\times 10^{-12}\times 1.38\times 10^{-23}\times 298}{2\times 1.20\times 10^{27}\times 2^2\times (1.60\times 10^{-19})^2}} \si{m}\\
+    &\approx 1.09 \times 10^{-1} \si{nm}
+  \end{split}
+\end{equation}
+参考：
+\url{https://polymer-physics.jp/uneyama/note/softmatter_electrolyte.pdf}\\
+\url{https://www2.tagen.tohoku.ac.jp/lab/muramatsu/html/MURA/kogi/kaimen/06-test.pdf}\\
+
+\section{実験操作メモ}
+\subsection{非イオン性界面活性剤の曇点}
+ポリエチレングリコール型非イオン性界面活性剤はエーテル結合している酸素原子と水が水素結合することで親水性を得るが、温度上昇に伴い水素結合が破壊されたり、塩が溶液に溶け込むことで親水性が失われる。親水性が減少し、界面活性剤が析出する温度のことを曇点という。
+TWEEN系列の非イオン性界面活性剤はエステルエーテル型であり、おそらくエーテル部分の水素結合が破壊されることで曇点が生じると考えられる。
+実際\ce{ZnSO_4 2ML}に対してTWEEN20 \ce{0.05\% _{aq}} を添加した溶液では白濁が生じた。\\
+参考：\\
+\url{https://solutions.sanyo-chemical.co.jp/technology/2024/01/102509/}\\
+\url{https://www.jstage.jst.go.jp/article/nikkashi1948/86/3/86_3_299/_pdf}
 \end{document}
