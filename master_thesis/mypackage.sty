@@ -2,7 +2,6 @@
 \usepackage[top=30truemm,bottom=30truemm,left=20truemm,right=20truemm]{geometry}
 
 %画像描画関係
-%\usepackage{xparse} %なくてもいけるか？physics packageに関係ありそう
 \usepackage{graphicx}
 \usepackage[hang,small,bf]{caption}
 \usepackage[subrefformat=parens]{subcaption}
@@ -12,8 +11,18 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{siunitx}
-\usepackage{physics}
+\usepackage{physics2}
+\usepackage{derivative}
+\usepackage{fixdif}
 \usepackage[version=4]{mhchem}
+
+%physics packageを継続使用するための設定、\bmへの切り替えを推奨
+\makeatletter
+\newcommand\vb{\@ifstar\boldsymbol\mathbf}
+\newcommand\va[1]{\@ifstar{\vec{#1}}{\vec{\mathrm{#1}}}}
+\newcommand\vu[1]{%
+  \@ifstar{\hat{\boldsymbol{#1}}}{\hat{\mathbf{#1}}}}
+\makeatother
 
 %テキスト関係
 \usepackage{url}
@@ -25,7 +34,7 @@
 % \usepackage{pxjahyper} % (u)pLaTeXのときのみかく
 \hypersetup{%
   setpagesize=false,%
-  %bookmarks=true,%
+  bookmarks=true,%
   bookmarksdepth=tocdepth,%
   bookmarksnumbered=true,%
   colorlinks=true,%
