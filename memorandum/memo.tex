@@ -1,9 +1,8 @@
 \documentclass{ltjsarticle}
 \usepackage{mypackage}
-\begin{document}
-
 \title{研究メモ}
 \author{中村友哉}
+\begin{document}
 \maketitle
 \section{計算メモ}
 \subsection{Bejie Curv}
@@ -62,6 +61,7 @@ Bezier Curve 以下の面積は
 \url{https://www2.tagen.tohoku.ac.jp/lab/muramatsu/html/MURA/kogi/kaimen/06-test.pdf}\\
 
 \section{実験操作メモ}
+赤字は要出典の意味
 \subsection{非イオン性界面活性剤の曇点}
 ポリエチレングリコール型非イオン性界面活性剤はエーテル結合している酸素原子と水が水素結合することで親水性を得るが、温度上昇に伴い水素結合が破壊されたり、塩が溶液に溶け込むことで親水性が失われる。親水性が減少し、界面活性剤が析出する温度のことを曇点という。
 TWEEN系列の非イオン性界面活性剤はエステルエーテル型であり、おそらくエーテル部分の水素結合が破壊されることで曇点が生じると考えられる。
@@ -70,6 +70,84 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
 \url{https://solutions.sanyo-chemical.co.jp/technology/2024/01/102509/}\\
 \url{https://www.jstage.jst.go.jp/article/nikkashi1948/86/3/86_3_299/_pdf}
 
-\bibliographystyle{physics}
-\bibliography{memo.bib}
+\subsection{実験について}
+\begin{enumerate}
+  \item 界面張力や粘性の測定の時、温度や界面活性剤の緩和による影響を減らすため、測定器に静置した後、{\color{red}5分ほどおいて}測定を行う。
+  \item 濃度とCMCについて、
+        \begin{figure}[H]
+          \begin{minipage}[H]{0.49\columnwidth}
+            \centering
+            \includegraphics[width=0.5\textwidth]{figure/surface_tesion_tempreture.png}
+            \caption{TWEEN系列の界面張力の濃度依存性(30\si{\degreeCelsius})\cite{kothekar2007comparative}}
+            \label{fig:figure1}
+          \end{minipage}
+          \begin{minipage}[H]{0.49\columnwidth}
+            \centering
+            \includegraphics[width=0.5\textwidth]{figure/TWEEN_CMC.png}
+            \caption{TWEEN系列のCMC(298\si{\kelvin})\cite{hait2001determination}}
+            \label{fig:figure2}
+          \end{minipage}
+        \end{figure}
+        \begin{figure}[H]
+          \centering
+          \includegraphics[scale=0.8]{figure/TWEEN_CMC_298K.png}
+          \caption{TWEEN系列のCMC(298\si{\kelvin})\cite{hait2001determination}}
+          \label{fig:figure3}
+        \end{figure}
+        \begin{figure}
+          \centering
+          \includegraphics[scale=0.8]{figure/TWEEN_CMC_tmprature.png}
+          \caption{TWEEN系列の温度ごとのCMC変化\cite{mahmood2013effect}}
+          \label{fig:figure4}
+        \end{figure}
+        調べるべき濃度の候補は以下の通りである。\\
+        Tween20:0.0mM,0.01mM,0.02mM,0.03mM,0.04mM,0.05mM(CMC),0.06mM,0.07mM\\
+        Tween40:0.0mM,0.01mM,0.02mM,0.03mM(over CMC),0.04mM,0.05mM,0.06mM,0.07mM\\
+        Tween60:0.0mM,0.01mM,0.02mM,0.03mM(over CMC),0.04mM,0.05mM,0.06mM,0.07mM\\
+        Tween80:0.0mM,0.01mM,0.02mM(over CMC),0.03mM,0.04mM,0.05mM,0.06mM,0.07mM\\
+  \item {\color{red}本当に溶液中で電位は表面で遮蔽されているのか？}\rightarrow 電位測定計で当てながら実際に測ってみる、その時に高さ方向についても測る（なぜ表面だけに成長するのか？）。また、壁の影響についても見てみる。
+  \item 電極の異方性とかは？\rightarrow 電極の置き方を変えて測定してみる。
+  \item {\color{red}そもそもの実験系として、フラクタル構造が見える温度、電圧パラメータなのか？\rightarrow 参考文献を精査}
+\end{enumerate}
+\subsection{3,4の実験の進め方、予備実験として}
+2Mの硫酸亜鉛水溶液(古いやつの残り)を亜鉛線がギリギリ浸るくらい入れて、四角形の皿に入れて電極線を並行に置く。その状態で電圧をかけ、まず、xy方向に対して電位を測定する。この時、4端子法を用いる。プローブは先端だけ線が出るように絶縁体（テープ）をまく。片方を固定（析出しない方）をして、-の方を動かしながら測定する。この時、電極には付けない（4端子法なので）。次に、円形皿に入れて、片側にだけ電極を置き電析する、この時、電極を立てて並行に置く。最後に余った液をすべて深めの皿に入れ、縦方向に電極を置きxz方向の電位を見る。\\
+位置と電圧を手入力で解析し、プロットする。
+
+
+\section{実験解析について}
+\subsection{統計処理}
+取得したデータの確率分布を知るために、ヒストグラムを使うことが多いが、ビン幅の影響など考慮・調整が必要な点で面倒。そこで\textbf{相補累積分布関数}(complementary cumulative distribution function, CCDF)を用いる。これは、確率変数$X$が$x$以上の値を取る確率を表す関数であり、以下のように定義される。
+\begin{equation}
+  \bar{F}_X(x):= P(X\geq x)=1-P(X<x)=\int_{x}^{+\infty}f_X(x')\d x'
+\end{equation}
+ここで$P(X<x)$は\textbf{累積分布関数}(cumulative distribution function, CDF)であり、以下のように定義される。
+\begin{equation}
+  F_X(x):=P(X<x)=\int_{-\infty}^{x}f_X(x')\d x' \qquad (f_X(x')は確率密度関数)
+\end{equation}
+Ex.1) あるデータセットがべき分布に従うと仮定すると、そのCCDFは以下のようになる。
+\begin{equation}
+  \begin{split}
+    f_X(x)&=Cx^{-\alpha}\\
+    \bar{F}_X(x)&=\int_{x}^{+\infty}Cx'^{-\alpha}\d x'=C\left[-\frac{1}{\alpha-1}x^{1-\alpha}\right]_{x}^{+\infty}\\
+    &=\frac{C}{\alpha-1}x^{1-\alpha} \qquad(\alpha>1)
+  \end{split}
+\end{equation}
+Ex.2) あるデータセットが指数分布に従うと仮定すると、そのCCDFは以下のようになる。
+\begin{equation}
+  \begin{split}
+    f_X(x)&=C e^{-\alpha x}\\
+    \bar{F}_X(x)&=\int_{x}^{+\infty}C e^{-\alpha x'}\d x'=C\left[-\frac{1}{\alpha}e^{-\alpha x'}\right]_{x}^{+\infty}\\
+    &=\frac{C}{\alpha}e^{-\alpha x} \qquad(\alpha>0)
+  \end{split}
+\end{equation}
+これより、CCDFをプロットし、両対数、あるいは方対数グラフにプロットし、直線になるかどうかを確認することで、データがべき分布や指数分布に従うかどうかを調べることができる。また、CCDFはビン幅に依存しないため、{\color{red}ヒストグラムよりも信頼性が高いとされる。}\\
+\section{Tip-splitingの理論的側面について}
+\subsection{研究計画}
+\begin{enumerate}
+  \item マクロな実験 \rightarrow 枝の本数や分岐角度などのマクロな統計量が取れる \rightarrow ここから得られるパラメータの物理的意味付け？
+  \item ミクロな形状の測定\cite{schilardi2000stable}\rightarrow 特徴波数や界面粗さの測定
+  \item ミクロとマクロの中間を結ぶのはどうするの？\rightarrow なにがしかのモデルは存在する？
+\end{enumerate}
+\bibliographystyle{Physics}
+\bibliography{memo}
 \end{document}
