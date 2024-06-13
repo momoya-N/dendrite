@@ -14,4 +14,5 @@ a.out
 *.csv
 *.js
 *.bbl
+*.log
 DLA

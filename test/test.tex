@@ -1,0 +1,11 @@
+% for LuaLaTeX
+\documentclass{article}
+\begin{document}
+Hello Lua{\TeX} world!
+\directlua{
+  local ts = math.floor(os.gettimeofday()*1000)
+  local f = assert(io.open('./\jobname-'..ts..'.zrchk','wb'))
+  f:write('OK')
+  f:close()
+}
+\end{document}

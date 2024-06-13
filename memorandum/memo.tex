@@ -77,28 +77,28 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
         \begin{figure}[H]
           \begin{minipage}[H]{0.49\columnwidth}
             \centering
-            \includegraphics[width=0.5\textwidth]{figure/surface_tesion_tempreture.png}
+            \includegraphics[width=0.8\textwidth]{figure/surface_tesion_tempreture.png}
             \caption{TWEEN系列の界面張力の濃度依存性(30\si{\degreeCelsius})\cite{kothekar2007comparative}}
-            \label{fig:figure1}
+            \label{fig:界面張力の濃度依存性}
           \end{minipage}
           \begin{minipage}[H]{0.49\columnwidth}
             \centering
-            \includegraphics[width=0.5\textwidth]{figure/TWEEN_CMC.png}
+            \includegraphics[width=0.8\textwidth]{figure/TWEEN_CMC.png}
             \caption{TWEEN系列のCMC(298\si{\kelvin})\cite{hait2001determination}}
-            \label{fig:figure2}
+            \label{fig:TWEENのCMC}
           \end{minipage}
         \end{figure}
         \begin{figure}[H]
           \centering
           \includegraphics[scale=0.8]{figure/TWEEN_CMC_298K.png}
           \caption{TWEEN系列のCMC(298\si{\kelvin})\cite{hait2001determination}}
-          \label{fig:figure3}
+          \label{fig:TWEENのCMC2}
         \end{figure}
         \begin{figure}
           \centering
           \includegraphics[scale=0.8]{figure/TWEEN_CMC_tmprature.png}
           \caption{TWEEN系列の温度ごとのCMC変化\cite{mahmood2013effect}}
-          \label{fig:figure4}
+          \label{fig:TWEENのCMCの温度変化}
         \end{figure}
         調べるべき濃度の候補は以下の通りである。\\
         Tween20:0.0mM,0.01mM,0.02mM,0.03mM,0.04mM,0.05mM(CMC),0.06mM,0.07mM\\
@@ -113,7 +113,87 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
 2Mの硫酸亜鉛水溶液(古いやつの残り)を亜鉛線がギリギリ浸るくらい入れて、四角形の皿に入れて電極線を並行に置く。その状態で電圧をかけ、まず、xy方向に対して電位を測定する。この時、4端子法を用いる。プローブは先端だけ線が出るように絶縁体（テープ）をまく。片方を固定（析出しない方）をして、-の方を動かしながら測定する。この時、電極には付けない（4端子法なので）。次に、円形皿に入れて、片側にだけ電極を置き電析する、この時、電極を立てて並行に置く。最後に余った液をすべて深めの皿に入れ、縦方向に電極を置きxz方向の電位を見る。\\
 位置と電圧を手入力で解析し、プロットする。
 
+\subsection{実験条件についてのメモ}
+電圧について、ある一定値を超えるとフラクタル次元が増加する（図\ref{fig:電圧とフラクタル次元}）。これは析出結晶がより密になることで２次元的になったためである\cite{matsushita1984fractal}。電圧が高くなることで拡散よりも電場によるドリフトの影響が大きくなったためと言及されている。この実験条件は15\si{\degreeCelsius}、溶液液厚さ4\si{mm}程度である。液の厚さに関して、物質間のファンデアワールス力はおおよそ距離$\lambda<1000$ \AA $=10^{-7}\si{m}=0.1\si{\mu m}=10^{-4}\si{mm}$の範囲で効いてくる。$1\sim10\si{\mu m}$以降はクーロン力が優勢になる。そのため液厚は$2\si{mm}$程度でも十分（底面の影響を受けない）と思われる\cite{表面張力の物理学}。(参考：\url{https://www.sbd.jp/column/powder_vol10_van-der-waals-force.html})この時の閾値となる電圧はおよそ8Vのため、それより{\color{blue}低い電圧(5V)}で実験を行う。温度を上昇させるとフラクタル次元が上昇していく\cite{suda2003temperature}（図\ref{fig:温度とフラクタル次元}）。これも同じようにパターンが密になるためである。温度による拡散が原因と言及している。閾値はおよそ25\si{\degreeCelsius}なので、それ以下の{\color{blue}20\si{\degreeCelsius}}で実験を行う。また、液の厚さや水中か界面にできるかで形態は変わってくる\cite{sawada1986dendritic}。この実験では厚さ0.25\si{mm}のガラス板内の液中に成長させている。ガラス板とのファンデアワールス力による影響や、そもそも溶液中での成長である点で異なる（図\ref{fig:電圧、濃度と形態}）。
 
+\begin{figure}[H]
+  \begin{minipage}{0.3\columnwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/Matsushita.png}
+    \caption{フラクタル次元と電圧の関係\cite{matsushita1984fractal}}
+    \label{fig:電圧とフラクタル次元}
+  \end{minipage}
+  \begin{minipage}{0.3\columnwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/Suda_2003.png}
+    \caption{フラクタル次元と温度の関係\cite{suda2003temperature}}
+    \label{fig:温度とフラクタル次元}
+  \end{minipage}
+  \begin{minipage}{0.3\columnwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/Sawada_1986.png}
+    \caption{電圧、濃度と形態の関係\cite{sawada1986dendritic}}
+    \label{fig:電圧、濃度と形態}
+  \end{minipage}
+\end{figure}
+
+\subsection{実験に用いる界面活性剤の量計算}
+\begin{itemize}
+  \item TWEENの水溶液濃度 : $C_{\mathrm{aq}} \ \%_{\mathrm{vol}}$
+  \item TWEENの分子量 : $M_{\mathrm{TWEEN}} \ \si{g/mol}$
+  \item TWEENの密度 : $d_{\mathrm{TWEEN}} \ \si{g/ml}$
+  \item TWEEN水溶液の量 : $V_{\mathrm{TWEEN_{aq}}} \ \si{ml}$
+  \item 最終的な溶液量 : $V_{\mathrm{total}} \ \si{ml}$
+  \item 最終的なモル濃度 : $C_{\mathrm{TWEEN}} \ \si{mM}$
+\end{itemize}
+\begin{table}[H]
+  \centering
+  \caption{TWEENの物性値（参考 : \cite{hait2001determination},各種販売会社のサイト）}
+  \begin{tabular}{|c||c|c|c|c|}
+    \hline
+    物質名                                  & TWEEN20 & TWEEN40 & TWEEN60 & TWEEN80 \\
+    \hline \hline
+    分子量 $M_{\mathrm{TWEEN}}$\ \si{g/mol} & 1227.54 & 1283.65 & 1311.70 & 1309.68 \\
+    \hline 
+    密度 $d_{\mathrm{TWEEN}}$\ \si{g/ml}    & 1.11    & 1.10    & 1.10    & 1.08    \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\begin{equation}
+  \begin{split}
+    \frac{V_{\mathrm{TEWWN_{aq}}} \ \si{ml} \times C_{\mathrm{aq}} \times 10^{-2} \times d_{\mathrm{TWEEN}} \ \si{g/ml}}{M_{\mathrm{TWEEN}} \ \si{g/mol} \times V_{\mathrm{total}} \ \si{ml} } &= \frac{V_{\mathrm{TEWWN_{aq}}}C_{\mathrm{aq}} d_{\mathrm{TWEEN}}}{M_{\mathrm{TWEEN}}V_{\mathrm{total}}}\times10^4 \ \si{mM} \\
+    &= C_{\mathrm{TWEEN}} \quad\si{mM}
+  \end{split}
+\end{equation}
+$V_{\mathrm{total}}=135,C_{\mathrm{aq}}=10 $として、各濃度に必要な水溶液の量を求める。（{\color{red}始めの時点で物理量を単位付きで定義しているため、ややこしいか？}）
+\begin{equation}
+  V_{\mathrm{TWEEN_{aq}}}=\frac{C_{\mathrm{TWEEN}}M_{\mathrm{TWEEN}}V_{\mathrm{total}}}{C_{\mathrm{aq}}d_{\mathrm{TWEEN}}}\times10^{-1} \ \si{\mu l}
+\end{equation}
+より、各濃度に必要な水溶液の量は以下のとおりである。。\\
+\begin{table}[H]
+  \centering
+  \caption{各濃度に必要な水溶液の量(単位：\si{\mu l})}
+  \begin{tabular}{|c||c|c|c|c|}
+    \hline
+    TWEEN濃度 \ \si{mM}$$ & TWEEN20     & TWEEN40     & TWEEN60     & TWEEN80 \\
+    \hline \hline
+    0.01                  & 14.92954054 & 15.75388636 & 16.09813636 & 16.371  \\
+    \hline
+    0.02                  & 29.85908108 & 31.50777273 & 32.19627273 & 32.742  \\
+    \hline
+    0.03                  & 44.78862162 & 47.26165909 & 48.29440909 & 49.113  \\
+    \hline
+    0.04                  & 59.71816216 & 63.01554545 & 64.39254545 & 65.484  \\
+    \hline
+    0.05                  & 74.6477027  & 78.76943182 & 80.49068182 & 81.855  \\
+    \hline
+    0.06                  & 89.57724324 & 94.52331818 & 96.58881818 & 98.226  \\
+    \hline
+    0.07                  & 104.5067838 & 110.2772045 & 112.6869545 & 114.597 \\
+    \hline
+  \end{tabular}
+\end{table}
 \section{実験解析について}
 \subsection{統計処理}
 取得したデータの確率分布を知るために、ヒストグラムを使うことが多いが、ビン幅の影響など考慮・調整が必要な点で面倒。そこで\textbf{相補累積分布関数}(complementary cumulative distribution function, CCDF)を用いる。これは、確率変数$X$が$x$以上の値を取る確率を表す関数であり、以下のように定義される。
@@ -127,17 +207,17 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
 Ex.1) あるデータセットがべき分布に従うと仮定すると、そのCCDFは以下のようになる。
 \begin{equation}
   \begin{split}
-    f_X(x)&=Cx^{-\alpha}\\
-    \bar{F}_X(x)&=\int_{x}^{+\infty}Cx'^{-\alpha}\d x'=C\left[-\frac{1}{\alpha-1}x^{1-\alpha}\right]_{x}^{+\infty}\\
-    &=\frac{C}{\alpha-1}x^{1-\alpha} \qquad(\alpha>1)
+    f_X(x)&=ax^{-b}\\
+    \bar{F}_X(x)&=\int_{x}^{+\infty}ax'^{-b}\d x'=a\left[-\frac{1}{b-1}x^{1-b}\right]_{x}^{+\infty}\\
+    &=\frac{a}{b-1}x^{1-b} \qquad(b>1)
   \end{split}
 \end{equation}
 Ex.2) あるデータセットが指数分布に従うと仮定すると、そのCCDFは以下のようになる。
 \begin{equation}
   \begin{split}
-    f_X(x)&=C e^{-\alpha x}\\
-    \bar{F}_X(x)&=\int_{x}^{+\infty}C e^{-\alpha x'}\d x'=C\left[-\frac{1}{\alpha}e^{-\alpha x'}\right]_{x}^{+\infty}\\
-    &=\frac{C}{\alpha}e^{-\alpha x} \qquad(\alpha>0)
+    f_X(x)&=a e^{-b x}\\
+    \bar{F}_X(x)&=\int_{x}^{+\infty}a e^{-b x'}\d x'=a\left[-\frac{1}{b}e^{-b x'}\right]_{x}^{+\infty}\\
+    &=\frac{a}{b}e^{-b x} \qquad(b>0)
   \end{split}
 \end{equation}
 これより、CCDFをプロットし、両対数、あるいは方対数グラフにプロットし、直線になるかどうかを確認することで、データがべき分布や指数分布に従うかどうかを調べることができる。また、CCDFはビン幅に依存しないため、{\color{red}ヒストグラムよりも信頼性が高いとされる。}\\
