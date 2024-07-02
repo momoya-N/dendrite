@@ -245,5 +245,5 @@ for p in range(len(file_path_list)):
     # color_img0[method1 == 255] = (0, 255, 0) #緑色
     # color_img0[common==255] = (0,0,255) #青色、両方にあるもの
     # ax1.imshow(color_img0)
-    # plt.savefig(str(name_tag)+ "_test.pdf")
+    plt.savefig(str(name_tag) + "_test.pdf")
     # #GUOHALL methodの方が端の方がよく取れている->採用#

@@ -15,4 +15,5 @@ a.out
 *.js
 *.bbl
 *.log
+!/memorandum/figure/
 DLA
