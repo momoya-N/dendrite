@@ -6,10 +6,6 @@
 \maketitle
 \section{計算メモ}
 \subsection{フラクタル次元（相似次元）}
-フラクタル次元の定義は以下の通りである。
-\begin{equation}
-  D=\lim_{\varepsilon \to 0}\frac{\log N(\varepsilon)}{\log \frac{1}{\varepsilon}}
-\end{equation}
 \begin{wrapfigure}{r}[0pt]{0.33\textwidth}
   \begin{center}
     \includegraphics[scale=0.5]{figure/Fractaldimensionexample.png}
@@ -17,17 +13,115 @@
   \caption{スケールと個数の関係}
   \label{fig:相似次元の考え方}
 \end{wrapfigure}
-ここで$N(\varepsilon)$は$\varepsilon$で覆われる点の数($\varepsilon$の物差しで何個になるか)である。フラクタル次元は、図形の複雑さを表す指標であり、整数である場合はユークリッド空間における次元を表す。フラクタル次元は、図形のスケール不変性を表すため、図形の形状を表す指標として用いられる。
-２本ずつ分岐し、長さが$\varepsilon~(0<\varepsilon<1)$倍になるフラクタルツリーの相似次元は分岐の角度によらず、以下のようになる。
+フラクタル次元の定義は以下の通りである。
+\begin{equation}
+  D=\lim_{\varepsilon \to 0}\frac{\log N(\varepsilon)}{\log \frac{1}{\varepsilon}}
+\end{equation}
+ここで$N(\varepsilon)$は$\varepsilon$で覆われる点の数($\varepsilon$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元を表す。フラクタル次元は，図形のスケール不変性を表すため，図形の形状を表す指標として用いられる。
+２本ずつ分岐し，長さが$\varepsilon~(0<\varepsilon<1)$倍になるフラクタルツリーの相似次元は分岐の角度によらず，以下のようになる。
 \begin{equation}
   D=\frac{\log 2}{\log \frac{1}{\varepsilon}}
+\end{equation}
+\subsection{フラクタル次元の計測法}
+\subsubsection{ボックスカウント法}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{figure/boxcounting.png}
+  \caption{ボックスカウンティング法の模式図。\\
+    \url{https://www.gitc.pref.nagano.lg.jp/reports/pdf/H22/02Seimitsu/H22P14_52-55.pdf}}
+\end{figure}
+あるスケール$\varepsilon$を一辺にもつ箱(box)を敷き詰めた際，パターンが含まれるboxの数$N(\varepsilon)$が
+\begin{equation}
+  N(\varepsilon)\sim\varepsilon^{-D_f}
+\end{equation}
+のように変化するのならば，$D_f$はフラクタル次元に等しく，
+\begin{equation}
+  D_f=\frac{\log{N(\varepsilon)}}{\log\ab(\frac{1}{\varepsilon})}
+\end{equation}
+と表される。この方法は機械的にスケールを変えるだけで済むため，コンピュータ計算に実装しやすい。
+\subsubsection{密度相関関数法}まずはじめに与えられたパターンをパターンに最適と思われる最小サイズのpixelで表す。このpixelが「粒子」を表す。そして，位置$\vb*{r}$にあるpixelの密度を次のように定義する。
+\begin{equation}
+  \rho(\vb*{r})=\left\{
+  \begin{array}{ll}
+    0 & (粒子が存在しない場合) \\
+    1 & (粒子が存在する場合)
+  \end{array}
+  \right.
+\end{equation}
+この定義の元，位置$\vb*{r}'$とそこから半径$\vb*{r}$離れた位置$\vb*{r}'+\vb*{r}$の相関関係を考える。$\vb*{r}$だけ離れた点との相関を考える場合，この2点の積を考えるとよく，
+\begin{equation}
+  \rho(\vb*{r}'+\vb*{r})\rho(\vb*{r}')
+\end{equation}
+は0か1の値を取る相関関数とすることができる。これを用いて以下の量$C(\vb*{r})$を定義する。
+\begin{equation}
+  C(\vb*{r})=\frac{1}{N}\sum_{\vb*{r}'} \rho(\vb*{r}'+\vb*{r})\rho(\vb*{r}')
+\end{equation}
+ただし，$N$は総粒子数で，粒子の存在する全ての位置$\vb*{r}'$について総和を取っている。これを用いると\textbf{密度相関関数}$C(r)$ は以下のように定義される。
+\begin{equation}
+  C(r)=\frac{1}{\Omega_t}\int C(\vb{r})\d \Omega
+\end{equation}
+ただし$\Omega$は立体角，$\Omega_t$は全立体角を表し，空間次元$n\geq2$に対して，
+\begin{equation}
+  \left\{
+  \begin{aligned}
+    \d \Omega & =\prod^{n-1}_{i=1} (\sin\theta_i)^{n-i-1} \d \theta_1...\d \theta_{n-1} \qquad(0\leqq \theta_i\leqq \pi\,,\,0\leqq\theta_{n-1}<2\pi) \\
+    \Omega_t  & =2^{n-2}\cdot2\pi
+  \end{aligned}
+  \right.
+\end{equation}
+となる。次に，密度相関関数とフラクタル次元の関係について考える。スケール変換に対して，変換後の長さを$\tilde{r}$とすると，$r=\varepsilon \tilde{r}$となる($C(r)=C(\varepsilon \tilde{r})$)。以下，$C(r)$と$C(\tilde{r})$の関係について考える。考えるパターンが自己相似フラクタルの場合，スケール変換しても粒子の相関関係は変わらないはずであり，$C(r)$と$C(\tilde{r})$は同じ関数型になるはずである。よってこの二つは比例関係にあるといえ，またパラメータ$\varepsilon$が含まれるため，関数$f(\varepsilon)$を用いて，
+\begin{equation}
+  C(\varepsilon \tilde{r})=f(\varepsilon)C(\tilde{r})
+\end{equation}
+と表される。式10の両辺を$\varepsilon$で微分すると，左辺は
+\begin{equation}
+  \pdv{C(\varepsilon \tilde{r})}{\varepsilon}=\tilde{r}\odv{C(\varepsilon \tilde{r})}{(\varepsilon \tilde{r})}
+\end{equation}
+より，
+\begin{equation}
+  \tilde{r}\odv{C(\varepsilon \tilde{r})}{(\varepsilon \tilde{r})}=\odv{f(\varepsilon)}{\varepsilon}C(\tilde{r})
+\end{equation}
+となる$\tilde{r}$を$r$と置き直して，定数$\lim_{\varepsilon \to 1}\odv{f(\varepsilon)}{\varepsilon}
+  =-\alpha$とすると，式12は
+\begin{equation}
+  r\odv{C(r)}{r}=-\alpha C(r)
+\end{equation}
+となる。以下，スケールに対する変化を知りたいので，主要な比例項のみを取り出して計算する。式13を解くと，
+\begin{equation}
+  C(r)\sim r^{-\alpha}
+\end{equation}
+となる。最後に$\alpha$とフラクタル次元$D_f$の関係を求める。密度相関関数はある位置から$\vb*{r}$ベクトル離れた点の粒子の存在確率を表している。そのため空間次元$d$とすると，$C(r)\d d{\vb*{r}}$は相対位置$\vb*{r}$近傍の微小体積要素$\d d \vb*{r}$の内部にある粒子数を表す。これをパターンの回転半径$R_g$まで積分する。回転半径は以下のように定義される。
+\begin{equation}
+  R_g=\sqrt{\frac{1}{N}\sum^{N}_{i=1}(\vb*{r}_i-\vb*{r}_c)^2}
+\end{equation}
+ここで，$N$は粒子数であり，$\vb*{r}_c$はパターンの重心である。$R_g$はパターンのおおよその大きさを与えるので，この積分は大まかにパターン中の粒子数を与える。体積要素は角度成分による定数を省けば，$\d d\vb*{r}\sim r^{d-1}\d r$となるので，総粒子数は
+\begin{equation}
+  \begin{split}
+    N&=\int^{R_g}C(r)\d \vb*{r}\\
+    &\sim\int^{R_g}r^{-\alpha+d-1}\d r\\
+    &\sim R_g\,^{d-\alpha}
+  \end{split}
+\end{equation}
+また，粒子数$N$は面積に比例する。そのため，フラクタルパターンの場合，
+\begin{equation}
+  N\sim R_g^{D_f}
+\end{equation}
+と表される。以上の議論より，粒子数$N$の指数部分を比べると，
+\begin{equation}
+  D_f=d-\alpha
+\end{equation}
+と表すことができる。コンピュータで$C(r)$を計算することで$\alpha$を導出し，フラクタル次元を計算することができる。
+\subsubsection{回転半径法}
+密度相関関数法のセクションでも言及したように，パターンの粒子数(面積)$N$,
+\begin{equation}
+  N\sim R_g^{D_f} \Leftrightarrow D_f\sim\frac{\log N}{\log R_g}
 \end{equation}
 \subsection{スケールフリー関数はべき関数のみの証明}
 スケールフリー関数はスケール$a$のみに依存する関数$g(a)$を用いて以下のように表される。
 \begin{equation}
   \frac{f(ax)}{f(x)}=g(a) \quad (a>0)
 \end{equation}
-これを両辺$a$で微分し、変形していく。
+これを両辺$a$で微分し，変形していく。
 \begin{equation}
   \begin{split}
     \frac{\d (ax)}{\d a}\frac{\d f(ax)}{\d (ax)}&=\frac{\d g(a)}{\d a}f(x)\\
@@ -39,14 +133,14 @@
     f(x)&=f(x_0)\left(\frac{x}{x_0}\right)^{D_f}
   \end{split}
 \end{equation}
-\subsubsection{The Definition of Bezier Curve}
+\subsection{The Definition of Bezier Curve}
 Def.
 
 \begin{equation}
   \vb*{P}(t)=\sum_{k=0}^{N-1}\binom{n}{k}t^k(1-t)^{n-k}\vb*{Q}_i
 \end{equation}
 
-ここで$\vb*{Q}_i$は制御点を表す。$\vb*{q}_i=(a_i,b_i)^t$ (縦ベクトル)と置くと、ベジェ曲線のパラメータ表示は制御点が４つの場合以下のようになる。
+ここで$\vb*{Q}_i$は制御点を表す。$\vb*{q}_i=(a_i,b_i)^t$ (縦ベクトル)と置くと，ベジェ曲線のパラメータ表示は制御点が４つの場合以下のようになる。
 
 \begin{equation}
   \vb*{x}(t)=
@@ -60,7 +154,7 @@ Bezier Curve 以下の面積は
 \begin{equation}
   \d x=\{-3(1-t)^2a_1-3(1-t)(3t-1)a_2+3t(2-3t)a_3+3t^2a_4\}dt
 \end{equation}
-より、以下で与えられる。
+より，以下で与えられる。
 \begin{equation}
   \begin{split}
     S&=\int_{a_1}^{a_4}y(t)\d x(t)\\
@@ -72,7 +166,7 @@ Bezier Curve 以下の面積は
 \end{equation}
 
 \subsection{デバイ遮蔽長}
-デバイ遮蔽長は以下のように定義される。ただし、各記号は以下の通りである。(\ce{ZnSO_4 2ML}の場合、$Z=2$)
+デバイ遮蔽長は以下のように定義される。ただし，各記号は以下の通りである。(\ce{ZnSO_4 2ML}の場合，$Z=2$)
 \begin{itemize}
   \item $\varepsilon_r$ : 比誘電率 $80.4$ (\ce{H_2O})
   \item $\varepsilon_0$ : 真空の誘電率 $8.85\times 10^{-12} \si{F\cdot m^{-1}}$
@@ -96,8 +190,8 @@ Bezier Curve 以下の面積は
 \section{実験操作メモ}
 赤字は要出典の意味
 \subsection{非イオン性界面活性剤の曇点}
-ポリエチレングリコール型非イオン性界面活性剤はエーテル結合している酸素原子と水が水素結合することで親水性を得るが、温度上昇に伴い水素結合が破壊されたり、塩が溶液に溶け込むことで親水性が失われる。親水性が減少し、界面活性剤が析出する温度のことを曇点という。
-TWEEN系列の非イオン性界面活性剤はエステルエーテル型であり、おそらくエーテル部分の水素結合が破壊されることで曇点が生じると考えられる。
+ポリエチレングリコール型非イオン性界面活性剤はエーテル結合している酸素原子と水が水素結合することで親水性を得るが，温度上昇に伴い水素結合が破壊されたり，塩が溶液に溶け込むことで親水性が失われる。親水性が減少し，界面活性剤が析出する温度のことを曇点という。
+TWEEN系列の非イオン性界面活性剤はエステルエーテル型であり，おそらくエーテル部分の水素結合が破壊されることで曇点が生じると考えられる。
 実際\ce{ZnSO_4 2ML}に対してTWEEN20 \ce{0.05\% _{aq}} を添加した溶液では白濁が生じた。\\
 参考：\\
 \url{https://solutions.sanyo-chemical.co.jp/technology/2024/01/102509/}\\
@@ -105,8 +199,8 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
 
 \subsection{実験について}
 \begin{enumerate}
-  \item 界面張力や粘性の測定の時、温度や界面活性剤の緩和による影響を減らすため、計測を開始して3分ほどおいて安定したときの値を採用する。それを3回繰り返し，平均値を採用する。
-  \item 濃度とCMCについて、
+  \item 界面張力や粘性の測定の時，温度や界面活性剤の緩和による影響を減らすため，計測を開始して3分ほどおいて安定したときの値を採用する。それを3回繰り返し，平均値を採用する。
+  \item 濃度とCMCについて，
         \begin{figure}[H]
           \begin{minipage}[H]{0.49\columnwidth}
             \centering
@@ -138,16 +232,16 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
         Tween40:0.0mM,0.01mM,0.02mM,0.03mM(over CMC),0.04mM,0.05mM,0.06mM,0.07mM\\
         Tween60:0.0mM,0.01mM,0.02mM,0.03mM(over CMC),0.04mM,0.05mM,0.06mM,0.07mM\\
         Tween80:0.0mM,0.01mM,0.02mM(over CMC),0.03mM,0.04mM,0.05mM,0.06mM,0.07mM\\
-  \item {\color{red}本当に溶液中で電位は表面で遮蔽されているのか？}\rightarrow 電位測定計で当てながら実際に測ってみる、その時に高さ方向についても測る（なぜ表面だけに成長するのか？）。また、壁の影響についても見てみる。
+  \item {\color{red}本当に溶液中で電位は表面で遮蔽されているのか？}\rightarrow 電位測定計で当てながら実際に測ってみる，その時に高さ方向についても測る（なぜ表面だけに成長するのか？）。また，壁の影響についても見てみる。
   \item 電極の異方性とかは？\rightarrow 電極の置き方を変えて測定してみる。
-  \item {\color{red}そもそもの実験系として、フラクタル構造が見える温度、電圧パラメータなのか？\rightarrow 参考文献を精査}
+  \item {\color{red}そもそもの実験系として，フラクタル構造が見える温度，電圧パラメータなのか？\rightarrow 参考文献を精査}
 \end{enumerate}
-\subsection{3,4の実験の進め方、予備実験として}
-2Mの硫酸亜鉛水溶液(古いやつの残り)を亜鉛線がギリギリ浸るくらい入れて、四角形の皿に入れて電極線を並行に置く。その状態で電圧をかけ、まず、xy方向に対して電位を測定する。この時、4端子法を用いる。プローブは先端だけ線が出るように絶縁体（テープ）をまく。片方を固定（析出しない方）をして、-の方を動かしながら測定する。この時、電極には付けない（4端子法なので）。次に、円形皿に入れて、片側にだけ電極を置き電析する、この時、電極を立てて並行に置く。最後に余った液をすべて深めの皿に入れ、縦方向に電極を置きxz方向の電位を見る。\\
-位置と電圧を手入力で解析し、プロットする。\\
-\rightarrow 極板ー極板で電析を行おうとしたが、析出せず。電流密度が低すぎたことが原因か？
+\subsection{3,4の実験の進め方，予備実験として}
+2Mの硫酸亜鉛水溶液(古いやつの残り)を亜鉛線がギリギリ浸るくらい入れて，四角形の皿に入れて電極線を並行に置く。その状態で電圧をかけ，まず，xy方向に対して電位を測定する。この時，4端子法を用いる。プローブは先端だけ線が出るように絶縁体（テープ）をまく。片方を固定（析出しない方）をして，-の方を動かしながら測定する。この時，電極には付けない（4端子法なので）。次に，円形皿に入れて，片側にだけ電極を置き電析する，この時，電極を立てて並行に置く。最後に余った液をすべて深めの皿に入れ，縦方向に電極を置きxz方向の電位を見る。\\
+位置と電圧を手入力で解析し，プロットする。\\
+\rightarrow 極板ー極板で電析を行おうとしたが，析出せず。電流密度が低すぎたことが原因か？
 \subsection{実験条件についてのメモ}
-電圧について、ある一定値を超えるとフラクタル次元が増加する（図\ref{fig:電圧とフラクタル次元}）。これは析出結晶がより密になることで２次元的になったためである\cite{matsushita1984fractal}。電圧が高くなることで拡散よりも電場によるドリフトの影響が大きくなったためと言及されている。この実験条件は15\si{\degreeCelsius}、溶液液厚さ4\si{mm}程度である。液の厚さに関して、物質間のファンデアワールス力はおおよそ距離$\lambda<1000$ \AA $=10^{-7}\si{m}=0.1\si{\mu m}=10^{-4}\si{mm}$の範囲で効いてくる。$1\sim10\si{\mu m}$以降はクーロン力が優勢になる。そのため液厚は$2\si{mm}$程度でも十分（底面の影響を受けない）と思われる\cite{表面張力の物理学}。(参考：\url{https://www.sbd.jp/column/powder_vol10_van-der-waals-force.html})この時の閾値となる電圧はおよそ8Vのため、それより{\color{blue}低い電圧(5V)}で実験を行う。温度を上昇させるとフラクタル次元が上昇していく\cite{suda2003temperature}（図\ref{fig:温度とフラクタル次元}）。これも同じようにパターンが密になるためである。温度による拡散が原因と言及している。閾値はおよそ25\si{\degreeCelsius}なので、それ以下の{\color{blue}20\si{\degreeCelsius}}で実験を行う。また、液の厚さや水中か界面にできるかで形態は変わってくる\cite{sawada1986dendritic}。この実験では厚さ0.25\si{mm}のガラス板内の液中に成長させている。ガラス板とのファンデアワールス力による影響や、そもそも溶液中での成長である点で異なる（図\ref{fig:電圧、濃度と形態}）。
+電圧について，ある一定値を超えるとフラクタル次元が増加する（図\ref{fig:電圧とフラクタル次元}）。これは析出結晶がより密になることで２次元的になったためである\cite{matsushita1984fractal}。電圧が高くなることで拡散よりも電場によるドリフトの影響が大きくなったためと言及されている。この実験条件は15\si{\degreeCelsius}，溶液液厚さ4\si{mm}程度である。液の厚さに関して，物質間のファンデアワールス力はおおよそ距離$\lambda<1000$ \AA $=10^{-7}\si{m}=0.1\si{\mu m}=10^{-4}\si{mm}$の範囲で効いてくる。$1\sim10\si{\mu m}$以降はクーロン力が優勢になる。そのため液厚は$2\si{mm}$程度でも十分（底面の影響を受けない）と思われる\cite{表面張力の物理学}。(参考：\url{https://www.sbd.jp/column/powder_vol10_van-der-waals-force.html})この時の閾値となる電圧はおよそ8Vのため，それより{\color{blue}低い電圧(5V)}で実験を行う。温度を上昇させるとフラクタル次元が上昇していく\cite{suda2003temperature}（図\ref{fig:温度とフラクタル次元}）。これも同じようにパターンが密になるためである。温度による拡散が原因と言及している。閾値はおよそ25\si{\degreeCelsius}なので，それ以下の{\color{blue}20\si{\degreeCelsius}}で実験を行う。また，液の厚さや水中か界面にできるかで形態は変わってくる\cite{sawada1986dendritic}。この実験では厚さ0.25\si{mm}のガラス板内の液中に成長させている。ガラス板とのファンデアワールス力による影響や，そもそも溶液中での成長である点で異なる（図\ref{fig:電圧，濃度と形態}）。
 
 \begin{figure}[H]
   \begin{minipage}{0.3\columnwidth}
@@ -165,8 +259,8 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
   \begin{minipage}{0.3\columnwidth}
     \centering
     \includegraphics[width=0.8\textwidth]{figure/Sawada_1986.png}
-    \caption{電圧、濃度と形態の関係\cite{sawada1986dendritic}}
-    \label{fig:電圧、濃度と形態}
+    \caption{電圧，濃度と形態の関係\cite{sawada1986dendritic}}
+    \label{fig:電圧，濃度と形態}
   \end{minipage}
 \end{figure}
 
@@ -199,11 +293,11 @@ TWEEN系列の非イオン性界面活性剤はエステルエーテル型であ
     &= C_{\mathrm{TWEEN}} \quad\si{mM}
   \end{split}
 \end{equation}
-$V_{\mathrm{total}}=90,C_{\mathrm{aq}}=0.1 $として、各濃度に必要な水溶液の量を求める。（{\color{red}始めの時点で物理量を単位付きで定義しているため、ややこしいか？}）
+$V_{\mathrm{total}}=90,C_{\mathrm{aq}}=0.1 $として，各濃度に必要な水溶液の量を求める。（{\color{red}始めの時点で物理量を単位付きで定義しているため，ややこしいか？}）
 \begin{equation}
   V_{\mathrm{TWEEN_{aq}}}=\frac{C_{\mathrm{TWEEN}}M_{\mathrm{TWEEN}}V_{\mathrm{total}}}{C_{\mathrm{aq}}d_{\mathrm{TWEEN}}}\times10^{-1} \ \si{\mu l}
 \end{equation}
-より、各濃度に必要な水溶液の量は以下のとおりである。\\
+より，各濃度に必要な水溶液の量は以下のとおりである。\\
 \begin{table}[H]
   \centering
   \caption{各濃度に必要な水溶液の量(単位：\si{\mu l},0.1\%(v/v))}
@@ -245,15 +339,15 @@ $V_{\mathrm{total}}=90,C_{\mathrm{aq}}=0.1 $として、各濃度に必要な水
 \end{table}
 \section{実験解析について}
 \subsection{統計処理}
-取得したデータの確率分布を知るために、ヒストグラムを使うことが多いが、ビン幅の影響など考慮・調整が必要な点で面倒。そこで\textbf{相補累積分布関数}(complementary cumulative distribution function, CCDF)を用いる。これは、確率変数$X$が$x$以上の値を取る確率を表す関数であり、以下のように定義される。
+取得したデータの確率分布を知るために，ヒストグラムを使うことが多いが，ビン幅の影響など考慮・調整が必要な点で面倒。そこで\textbf{相補累積分布関数}(complementary cumulative distribution function, CCDF)を用いる。これは，確率変数$X$が$x$以上の値を取る確率を表す関数であり，以下のように定義される。
 \begin{equation}
   \bar{F}_X(x):= P(X\geq x)=1-P(X<x)=\int_{x}^{+\infty}f_X(x')\d x'
 \end{equation}
-ここで$P(X<x)$は\textbf{累積分布関数}(cumulative distribution function, CDF)であり、以下のように定義される。
+ここで$P(X<x)$は\textbf{累積分布関数}(cumulative distribution function, CDF)であり，以下のように定義される。
 \begin{equation}
   F_X(x):=P(X<x)=\int_{-\infty}^{x}f_X(x')\d x' \qquad (f_X(x')は確率密度関数)
 \end{equation}
-Ex.1) あるデータセットがべき分布に従うと仮定すると、そのCCDFは以下のようになる。
+Ex.1) あるデータセットがべき分布に従うと仮定すると，そのCCDFは以下のようになる。
 \begin{equation}
   \begin{split}
     f_X(x)&=ax^{-b}\\
@@ -261,7 +355,7 @@ Ex.1) あるデータセットがべき分布に従うと仮定すると、そ�
     &=\frac{a}{b-1}x^{1-b} \qquad(b>1)
   \end{split}
 \end{equation}
-Ex.2) あるデータセットが指数分布に従うと仮定すると、そのCCDFは以下のようになる。
+Ex.2) あるデータセットが指数分布に従うと仮定すると，そのCCDFは以下のようになる。
 \begin{equation}
   \begin{split}
     f_X(x)&=a e^{-b x}\\
@@ -269,9 +363,26 @@ Ex.2) あるデータセットが指数分布に従うと仮定すると、そ�
     &=\frac{a}{b}e^{-b x} \qquad(b>0)
   \end{split}
 \end{equation}
-これより、CCDFをプロットし、両対数、あるいは方対数グラフにプロットし、直線になるかどうかを確認することで、データがべき分布や指数分布に従うかどうかを調べることができる。また、CCDFはビン幅に依存しないため、{\color{red}ヒストグラムよりも信頼性が高いとされる。}\\
+これより，CCDFをプロットし，両対数，あるいは方対数グラフにプロットし，直線になるかどうかを確認することで，データがべき分布や指数分布に従うかどうかを調べることができる。また，CCDFはビン幅に依存しないため，{\color{red}ヒストグラムよりも信頼性が高いとされる。}\\
+\subsection{フレームステップの求め方}
+粒子追跡をするよさげなフレームステップの求め方
+\begin{itemize}
+  \item $l$ : 最大半径 $\sim 10 \si{cm}$
+  \item $unit$ : $5\si{cm}$あたりのピクセル数$\sim231.00/5 \si{pix/cm}$
+  \item $N_f$ : 総フレーム数 frame
+  \item $v_\mathrm{pix}$ : 1 frame あたりの成長ピクセル数 pix/frame
+  \item $N_s$ : 飛ばすべきフレーム数 frame
+\end{itemize}
+\begin{equation}
+  v_\mathrm{pix}=\frac{l ~\si{cm}\times unit ~\si{pix/cm}}{N_f ~\si{frame}}
+\end{equation}
+$N_s\times v_\mathrm{pix}$が成長したピクセル数。成長ピクセル数を4とすると，
+\begin{equation}
+  N_s= \frac{4\times N_f}{l \times unit} ~\si{pix}
+\end{equation}
+となる。
 \subsection{解析時の範囲について}
-解析時にフィットする範囲は枝の太さ以上の構造を取らねばならない。太さ以下の構造は成長する際のゆらぎで、完全に枝になっていないもののため。
+解析時にフィットする範囲は枝の太さ以上の構造を取らねばならない。太さ以下の構造は成長する際のゆらぎで，完全に枝になっていないもののため。
 \section{Tip-splitingの理論的側面について}
 \subsection{研究計画}
 \begin{enumerate}

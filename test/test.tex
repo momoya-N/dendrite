@@ -1,11 +1,8 @@
 % for LuaLaTeX
 \documentclass{article}
+\usepackage{mypackage}
 \begin{document}
-Hello Lua{\TeX} world!
-\directlua{
-  local ts = math.floor(os.gettimeofday()*1000)
-  local f = assert(io.open('./\jobname-'..ts..'.zrchk','wb'))
-  f:write('OK')
-  f:close()
-}
+\begin{equation}
+  \ab(\frac{1}{2})
+\end{equation}
 \end{document}
