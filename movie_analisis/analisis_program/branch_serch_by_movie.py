@@ -72,26 +72,27 @@ class Video:
 
 
 # 動画操作関連
-# フレーム取得
-def n_frame_image(frame_index: int):  # return n frame image
-    # インデックスがフレームの範囲内なら…
-    if 0 <= frame_index < int(cap.get(cv2.CAP_PROP_FRAME_COUNT)):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)  # フレームの位置変更，全体で開始フレームが変わるので注意
-        ret, img = cap.read()  # ret:bool値(画像が読めれば True) img:画像のndarray
-    else:
-        print("Out of video frames")
-        sys.exit(1)
+# # フレーム取得
+# def n_frame_image(frame_index: int):  # return n frame image
+#     # インデックスがフレームの範囲内なら…
+#     if 0 <= frame_index < int(cap.get(cv2.CAP_PROP_FRAME_COUNT)):
+#         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)  # フレームの位置変更，全体で開始フレームが変わるので注意
+#         ret, img = cap.read()  # ret:bool値(画像が読めれば True) img:画像のndarray
+#     else:
+#         print("Out of video frames")
+#         sys.exit(1)
 
-    return img
+#     return img
 
 
 # 解析開始・終了点の設定
-def set_start_end_point(file_path_dci: str, dci_mA_diff_thresh: float):  # dci_thresh: 単位 mA
+# dci_thresh: 単位 mA
+def set_start_end_point(file_path_dci: str, dci_mA_diff_thresh: float):
     df = pd.read_excel(file_path_dci)
     time = df["#Time(sec.msec)"]
     dci = df["#DCI Value(A)"]
     dci_mA = dci * 1000
-    window_size = len(time[time < 60])  # 60秒間の移動平均を取る
+    window_size = len(time[time < 60])  # 60秒間(分のデータ数)の移動平均を取る
     dci_mA_mean = dci_mA.rolling(window=window_size, min_periods=1).mean()
     dci_mA_diff = np.gradient(dci_mA_mean, time)
     for i in range(len(dci_mA_diff)):
@@ -149,95 +150,95 @@ def mk_dust_removed_frames(file_path_avi: str, thresh_otsu: float):
     return frames
 
 
-# 回転半径計算
-def r_g(frame: int, thresh_otsu: float, x: int, y: int):
-    tmp_rg = 0
-    img = remove_dust(n_frame_image(frame), dust, thresh_otsu)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-    nonzero = np.nonzero(binary)
+# # 回転半径計算
+# def r_g(frame: int, thresh_otsu: float, x: int, y: int):
+#     tmp_rg = 0
+#     img = remove_dust(n_frame_image(frame), dust, thresh_otsu)
+#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+#     nonzero = np.nonzero(binary)
 
-    if len(nonzero[0]) == 0:
-        return 0
+#     if len(nonzero[0]) == 0:
+#         return 0
 
-    for i in range(len(nonzero[0])):
-        tmp_rg += (nonzero[0][i] - y) ** 2 + (nonzero[1][i] - x) ** 2
-    tmp_rg = tmp_rg / len(nonzero[0])
-    r_g = np.sqrt(tmp_rg)
+#     for i in range(len(nonzero[0])):
+#         tmp_rg += (nonzero[0][i] - y) ** 2 + (nonzero[1][i] - x) ** 2
+#     tmp_rg = tmp_rg / len(nonzero[0])
+#     r_g = np.sqrt(tmp_rg)
 
-    return r_g
+#     return r_g
 
 
-# 成長点のトラッキング
-def mk_tracking_movie(start_frame: int, end_frame: int, frame_step: int, dust: int):
-    # get Otsu threshold value
-    frame = n_frame_image(total_frames - 1)
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    thresh_otsu, _ = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_OTSU)
-    # バックの輝度値は常に一定か？ー＞後半はほぼ一定で，最後の輝度値を取るので問題なさそう
+# # 成長点のトラッキング
+# def mk_tracking_movie(start_frame: int, end_frame: int, frame_step: int, dust: int):
+#     # get Otsu threshold value
+#     frame = n_frame_image(total_frames - 1)
+#     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     thresh_otsu, _ = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_OTSU)
+#     # バックの輝度値は常に一定か？ー＞後半はほぼ一定で，最後の輝度値を取るので問題なさそう
 
-    # make empty data array
-    branch_pos = []
-    data_len = len(list(range(start_frame, end_frame, frame_step)))
-    time = np.zeros(data_len)
-    particle = np.zeros(data_len)
-    area = np.zeros(data_len)
-    R_g = np.zeros(data_len)
-    data = pd.DataFrame()
+#     # make empty data array
+#     branch_pos = []
+#     data_len = len(list(range(start_frame, end_frame, frame_step)))
+#     time = np.zeros(data_len)
+#     particle = np.zeros(data_len)
+#     area = np.zeros(data_len)
+#     R_g = np.zeros(data_len)
+#     data = pd.DataFrame()
 
-    # get initital frame
-    frame_before = remove_dust(n_frame_image(start_frame), dust, thresh_otsu)
-    befor_gray = cv2.cvtColor(frame_before, cv2.COLOR_BGR2GRAY)
-    _, before_binary = cv2.threshold(befor_gray, 127, 255, cv2.THRESH_BINARY)
+#     # get initital frame
+#     frame_before = remove_dust(n_frame_image(start_frame), dust, thresh_otsu)
+#     befor_gray = cv2.cvtColor(frame_before, cv2.COLOR_BGR2GRAY)
+#     _, before_binary = cv2.threshold(befor_gray, 127, 255, cv2.THRESH_BINARY)
 
-    for frame_i in tqdm(range(start_frame + frame_step, end_frame, frame_step), desc="Tracking"):
-        itr = (frame_i - start_frame) // frame_step - 1
-        time[itr] = frame_i / fps
-        frame_after = remove_dust(n_frame_image(frame_i), dust, thresh_otsu)
-        after_gray = cv2.cvtColor(frame_after, cv2.COLOR_BGR2GRAY)
-        _, after_binary = cv2.threshold(after_gray, 127, 255, cv2.THRESH_BINARY)
+#     for frame_i in tqdm(range(start_frame + frame_step, end_frame, frame_step), desc="Tracking"):
+#         itr = (frame_i - start_frame) // frame_step - 1
+#         time[itr] = frame_i / fps
+#         frame_after = remove_dust(n_frame_image(frame_i), dust, thresh_otsu)
+#         after_gray = cv2.cvtColor(frame_after, cv2.COLOR_BGR2GRAY)
+#         _, after_binary = cv2.threshold(after_gray, 127, 255, cv2.THRESH_BINARY)
 
-        # contureで領域がくっついているものを同じ枝とみなすとよい
-        frame_xor = cv2.bitwise_xor(after_binary, before_binary)
-        frame_diff = cv2.bitwise_and(after_binary, frame_xor)
-        contours, _ = cv2.findContours(frame_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contours = [contour for contour in contours if cv2.contourArea(contour) > 0]
-        cv2.drawContours(frame_after, contours, -1, (0, 255, 0), 3)
-        # get radius of gyration
-        radius_gyr = r_g(frame_i, thresh_otsu, x_c, y_c)
-        R_g[itr] = radius_gyr
+#         # contureで領域がくっついているものを同じ枝とみなすとよい
+#         frame_xor = cv2.bitwise_xor(after_binary, before_binary)
+#         frame_diff = cv2.bitwise_and(after_binary, frame_xor)
+#         contours, _ = cv2.findContours(frame_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#         contours = [contour for contour in contours if cv2.contourArea(contour) > 0]
+#         cv2.drawContours(frame_after, contours, -1, (0, 255, 0), 3)
+#         # get radius of gyration
+#         radius_gyr = r_g(frame_i, thresh_otsu, x_c, y_c)
+#         R_g[itr] = radius_gyr
 
-        for contour_i in range(len(contours)):
-            m = cv2.moments(contours[contour_i])
-            if m["m00"] == 0:
-                continue
-            x, y = m["m10"] / m["m00"], m["m01"] / m["m00"]
-            x, y = round(x), round(y)
-            branch_pos.append([x, y])
+#         for contour_i in range(len(contours)):
+#             m = cv2.moments(contours[contour_i])
+#             if m["m00"] == 0:
+#                 continue
+#             x, y = m["m10"] / m["m00"], m["m01"] / m["m00"]
+#             x, y = round(x), round(y)
+#             branch_pos.append([x, y])
 
-        for i in range(len(branch_pos)):
-            cv2.circle(frame_after, (branch_pos[i][0], branch_pos[i][1]), 2, (0, 0, 255), -1)
+#         for i in range(len(branch_pos)):
+#             cv2.circle(frame_after, (branch_pos[i][0], branch_pos[i][1]), 2, (0, 0, 255), -1)
 
-        # plot center of mass
-        cv2.line(frame_after, (x_c - 5, y_c - 5), (x_c + 5, y_c + 5), (0, 255, 0), 2)
-        cv2.line(frame_after, (x_c + 5, y_c - 5), (x_c - 5, y_c + 5), (0, 255, 0), 2)
+#         # plot center of mass
+#         cv2.line(frame_after, (x_c - 5, y_c - 5), (x_c + 5, y_c + 5), (0, 255, 0), 2)
+#         cv2.line(frame_after, (x_c + 5, y_c - 5), (x_c - 5, y_c + 5), (0, 255, 0), 2)
 
-        # get area
-        particle_count = np.nonzero(after_binary)[0].shape[0]
-        particle[itr] = particle_count
-        area[itr] = particle_count / (unit**2)
+#         # get area
+#         particle_count = np.nonzero(after_binary)[0].shape[0]
+#         particle[itr] = particle_count
+#         area[itr] = particle_count / (unit**2)
 
-        out_tracking.write(frame_after)
-        before_binary = cv2.bitwise_or(before_binary, after_binary)
+#         out_tracking.write(frame_after)
+#         before_binary = cv2.bitwise_or(before_binary, after_binary)
 
-    # save data
-    data["time"] = time
-    data["particle"] = particle
-    data["area"] = area
-    data["R_g"] = R_g
-    data.to_csv(file_path + "/data.csv", index=False)
+#     # save data
+#     data["time"] = time
+#     data["particle"] = particle
+#     data["area"] = area
+#     data["R_g"] = R_g
+#     data.to_csv(file_path + "/data.csv", index=False)
 
-    print("Tracking Movie is done.")
+#     print("Tracking Movie is done.")
 
 
 # メイン処理
@@ -246,7 +247,6 @@ if __name__ == "__main__":
     start_time = time.time()
 
     # constants
-    dust = 4  # チリの大きさ判定用変数
 
     # Video Source
     dir_path = "/mnt/d/master_thesis_data/experment_data/movie_data/movie_data/data_for_analisis"
@@ -265,7 +265,6 @@ if __name__ == "__main__":
             video = Video(file_path_avi)
             video.show_info()
             start_frame, end_frame = set_start_end_point(file_path_dci, 0.2)
-            sys.exit(1)
 
     start_frame = 0
     end_frame = len(frames)
@@ -327,18 +326,6 @@ start_time = time.time()
 
 # constants
 dust = 4  # チリの大きさ判定用変数
-
-# Video Source
-
-
-# Reading Video
-cap = cv2.VideoCapture(file_path_avi)
-
-# Check Video Source
-check_video_source(file_path_avi)
-
-# Video Information
-fname, unit, Lx, Ly, fps, total_frames, total_time, frame_step = video_info(file_path_avi)
 
 # get start and end frame
 start_frame, end_frame = set_start_end_point(0.2)
