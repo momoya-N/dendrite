@@ -17,12 +17,14 @@ import re
 
 
 class Particle:
-    def __init__(self, x=0, y=0, z=0, track_nr=0, in_track=False):
+    def __init__(self, x=0.0, y=0.0, time=0.0, branch_no=0, in_branch=False, edge=False, node=False):
         self.x = x
         self.y = y
-        self.z = z
-        self.track_nr = track_nr
-        self.in_track = in_track
+        self.time = time
+        self.branch_no = branch_no
+        self.in_branch = in_branch
+        self.edge = edge
+        self.node = node
 
     def distance(self, p):
         return math.sqrt((self.x - p.x) ** 2 + (self.y - p.y) ** 2)
@@ -40,9 +42,11 @@ class Video:
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         thresh_otsu, _ = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_OTSU)
 
+        self.last_img = frame
         self.bool = cap.isOpened()
         self.path = file_path_avi
         self.fname = fname
+        # 5cmあたりのピクセル数
         self.unit = float(param[6].replace("pix", "")) / 5.0
         self.Lx = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.Ly = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -50,8 +54,10 @@ class Video:
         self.otsu = thresh_otsu
         self.total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.total_time = self.total_frames / self.fps
-        self.frame_step = int(5 * self.total_frames / (10 * self.unit))
+        # おおよそ6ピクセル成長するフレーム数
+        self.frame_delta = int(6 * self.total_frames / (10 * self.unit))
 
+    # 動画情報の表示
     def show_info(self):
         if not self.bool:
             print("Video reading error :" + self.fname)
@@ -67,178 +73,223 @@ class Video:
         m = int((self.total_time % 3600) // 60)
         s = int(self.total_time % 60)
         print("Total time  : ", self.total_time, "s (", h, "h", m, "m", s, "s)")
-        print("Frame Step : ", self.frame_step, " frame")
+        print("Frame Delta : ", self.frame_delta, " frame")
         print("----------------------------")
 
+    # 解析開始・終了点の設定
+    def get_start_end(self, file_path_dci: str, dci_mA_diff_thresh: float):
+        df = pd.read_excel(file_path_dci)
+        time = df["#Time(sec.msec)"]
+        dci = df["#DCI Value(A)"]
+        dci_mA = dci * 1000
+        window_size = len(time[time < 60])  # 60秒間(分のデータ数)の移動平均を取る
+        dci_mA_mean = dci_mA.rolling(window=window_size, min_periods=1).mean()
+        dci_mA_diff = np.gradient(dci_mA_mean, time)
+        for i in range(len(dci_mA_diff)):
+            if dci_mA_diff[i] < dci_mA_diff_thresh:
+                # plt.vlines(time[i], 0, 700, "red", linestyles="dashed", alpha=0.5)
+                start_frame = int(time[i] // 10)
+                break
+        for i in range(int(len(dci_mA_diff) / 2), len(dci_mA_diff)):
+            if dci_mA_diff[i] > dci_mA_diff_thresh:
+                # plt.vlines(time[i], 0, 700, "blue", linestyles="dashed", alpha=0.5)
+                end_frame = int(time[i] // 10)
+                break
+            else:
+                end_frame = self.total_frames
 
-# 動画操作関連
-# # フレーム取得
-# def n_frame_image(frame_index: int):  # return n frame image
-#     # インデックスがフレームの範囲内なら…
-#     if 0 <= frame_index < int(cap.get(cv2.CAP_PROP_FRAME_COUNT)):
-#         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)  # フレームの位置変更，全体で開始フレームが変わるので注意
-#         ret, img = cap.read()  # ret:bool値(画像が読めれば True) img:画像のndarray
-#     else:
-#         print("Out of video frames")
-#         sys.exit(1)
-
-#     return img
-
-
-# 解析開始・終了点の設定
-# dci_thresh: 単位 mA
-def set_start_end_point(file_path_dci: str, dci_mA_diff_thresh: float):
-    df = pd.read_excel(file_path_dci)
-    time = df["#Time(sec.msec)"]
-    dci = df["#DCI Value(A)"]
-    dci_mA = dci * 1000
-    window_size = len(time[time < 60])  # 60秒間(分のデータ数)の移動平均を取る
-    dci_mA_mean = dci_mA.rolling(window=window_size, min_periods=1).mean()
-    dci_mA_diff = np.gradient(dci_mA_mean, time)
-    for i in range(len(dci_mA_diff)):
-        if dci_mA_diff[i] < dci_mA_diff_thresh:
-            # plt.vlines(time[i], 0, 700, "red", linestyles="dashed", alpha=0.5)
-            start_frame = int(time[i] // 10 + 1)
-            break
-    for i in range(int(len(dci_mA_diff) / 2), len(dci_mA_diff)):
-        if dci_mA_diff[i] > dci_mA_diff_thresh:
-            # plt.vlines(time[i], 0, 700, "blue", linestyles="dashed", alpha=0.5)
-            end_frame = int(time[i] // 10 + 1)
-            break
-
-    return start_frame, end_frame
+        return start_frame, end_frame
 
 
-# 動画解析関連
-# チリ除去
-# def remove_dust(frame, dust_area: int, thresh_otsu: float):
-#     # チリを除去する関数
-#     # チリの面積がdust_area以下の輪郭を除去する
-#     # frame:入力画像,dust_area:チリとみなす面積の閾値
-#     # 出力:チリを除去したbinary画像
-#     black = np.zeros_like(frame, dtype=np.uint8)
-#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#     _, binary = cv2.threshold(gray, thresh_otsu, 255, cv2.THRESH_BINARY)
-#     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-#     for contour_i in range(len(contours)):
-#         if cv2.contourArea(contours[contour_i]) > dust_area:
-#             cv2.fillPoly(black, [contours[contour_i]], (255, 255, 255))
-
-#     return black
-
-
-def mk_dust_removed_frames(file_path_avi: str, thresh_otsu: float):
+def mk_dust_removed_frames(file_path_avi: str, thresh_otsu: float, frame_index: int):
     dust = 4
     cap = cv2.VideoCapture(file_path_avi)
-    frames = []
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+    ret, frame = cap.read()
     # チリの除去＆二値化
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        black = np.zeros_like(frame, dtype=np.uint8)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        _, binary = cv2.threshold(gray, thresh_otsu, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        for contour_i in range(len(contours)):
-            if cv2.contourArea(contours[contour_i]) > dust:
-                cv2.fillPoly(black, [contours[contour_i]], (255, 255, 255))
-        remove_dust_gray = cv2.cvtColor(black, cv2.COLOR_BGR2GRAY)
-        _, remove_dust_binary = cv2.threshold(remove_dust_gray, 127, 255, cv2.THRESH_BINARY)
-        frames.append(remove_dust_binary)
+    black = np.zeros_like(frame, dtype=np.uint8)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, thresh_otsu, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for contour_i in range(len(contours)):
+        if cv2.contourArea(contours[contour_i]) > dust:
+            cv2.fillPoly(black, [contours[contour_i]], (255, 255, 255))
+    dust_removed_gray = cv2.cvtColor(black, cv2.COLOR_BGR2GRAY)
+    _, dust_removed_binary = cv2.threshold(dust_removed_gray, 127, 255, cv2.THRESH_BINARY)
 
-    return frames
+    return dust_removed_binary
 
 
-# # 回転半径計算
-# def r_g(frame: int, thresh_otsu: float, x: int, y: int):
-#     tmp_rg = 0
-#     img = remove_dust(n_frame_image(frame), dust, thresh_otsu)
-#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-#     nonzero = np.nonzero(binary)
+def mk_particl_frames(
+    file_path_avi: str, thresh_otsu: float, total_frame: int, start_frame: int, end_frame: int, frame_delta: int
+):
+    particle_frames = []
+    for frame_i in tqdm(range(start_frame, end_frame), desc="Making Particle Frames"):
+        before_frame = mk_dust_removed_frames(file_path_avi, thresh_otsu, frame_i)
+        if not frame_i + frame_delta > total_frame:
+            after_frame = mk_dust_removed_frames(file_path_avi, thresh_otsu, frame_i + frame_delta)
+        else:
+            after_frame = mk_dust_removed_frames(file_path_avi, thresh_otsu, total_frame)
+        frame_xor = cv2.bitwise_xor(after_frame, before_frame)
+        frame_diff = cv2.bitwise_and(after_frame, frame_xor)
+        binary_movie.write(after_frame)
+        particle_frames.append(frame_diff)
 
-#     if len(nonzero[0]) == 0:
-#         return 0
-
-#     for i in range(len(nonzero[0])):
-#         tmp_rg += (nonzero[0][i] - y) ** 2 + (nonzero[1][i] - x) ** 2
-#     tmp_rg = tmp_rg / len(nonzero[0])
-#     r_g = np.sqrt(tmp_rg)
-
-#     return r_g
+    return particle_frames
 
 
-# # 成長点のトラッキング
-# def mk_tracking_movie(start_frame: int, end_frame: int, frame_step: int, dust: int):
-#     # get Otsu threshold value
-#     frame = n_frame_image(total_frames - 1)
-#     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#     thresh_otsu, _ = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_OTSU)
-#     # バックの輝度値は常に一定か？ー＞後半はほぼ一定で，最後の輝度値を取るので問題なさそう
+def analyze_frame(particle_frame, time, min_size, max_size):
+    particles = []
+    contours, _ = cv2.findContours(particle_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if min_size <= area <= max_size:
+            M = cv2.moments(contour)
+            if M["m00"] != 0:
+                cx = M["m10"] / M["m00"]
+                cy = M["m01"] / M["m00"]
+                particles.append(Particle(cx, cy, time))
+    return particles
 
-#     # make empty data array
-#     branch_pos = []
-#     data_len = len(list(range(start_frame, end_frame, frame_step)))
-#     time = np.zeros(data_len)
-#     particle = np.zeros(data_len)
-#     area = np.zeros(data_len)
-#     R_g = np.zeros(data_len)
-#     data = pd.DataFrame()
 
-#     # get initital frame
-#     frame_before = remove_dust(n_frame_image(start_frame), dust, thresh_otsu)
-#     befor_gray = cv2.cvtColor(frame_before, cv2.COLOR_BGR2GRAY)
-#     _, before_binary = cv2.threshold(befor_gray, 127, 255, cv2.THRESH_BINARY)
+def tree_search(all_particles, particle, n_frame, max_velocity):
+    particle.in_branch = True
+    # max_velocity未満の粒子を探す
+    next_particles = [
+        next_particle
+        for sublist in all_particles[n_frame + 1 : min(n_frame + 4, len(all_particles))]
+        for next_particle in sublist
+    ]
+    next_particles = [
+        next_particle for next_particle in next_particles if particle.distance(next_particle) < max_velocity
+    ]
+    for next_particle in next_particles:
+        if next_particle.in_branch:
+            continue
+        tree_search(all_particles, next_particle, n_frame + 1, max_velocity)
+    # distance_tmp = 1000  # 十分大きな値
+    # found_particle = None
+    # for next_particle in next_particles:
+    #     if next_particle.in_branch:
+    #         continue
+    #     distance = particle.distance(next_particle)
+    #     # 速度がmax_velocity未満かつ最短距離の粒子を見つける
+    #     if distance < distance_tmp:
+    #         distance_tmp = distance
+    #         found_particle = next_particle
+    # if found_particle:
+    #     tree_search(all_particles, found_particle, n_frame + 1, max_velocity)
+    # else:
+    #     particle.edge = True
 
-#     for frame_i in tqdm(range(start_frame + frame_step, end_frame, frame_step), desc="Tracking"):
-#         itr = (frame_i - start_frame) // frame_step - 1
-#         time[itr] = frame_i / fps
-#         frame_after = remove_dust(n_frame_image(frame_i), dust, thresh_otsu)
-#         after_gray = cv2.cvtColor(frame_after, cv2.COLOR_BGR2GRAY)
-#         _, after_binary = cv2.threshold(after_gray, 127, 255, cv2.THRESH_BINARY)
 
-#         # contureで領域がくっついているものを同じ枝とみなすとよい
-#         frame_xor = cv2.bitwise_xor(after_binary, before_binary)
-#         frame_diff = cv2.bitwise_and(after_binary, frame_xor)
-#         contours, _ = cv2.findContours(frame_diff, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-#         contours = [contour for contour in contours if cv2.contourArea(contour) > 0]
-#         cv2.drawContours(frame_after, contours, -1, (0, 255, 0), 3)
-#         # get radius of gyration
-#         radius_gyr = r_g(frame_i, thresh_otsu, x_c, y_c)
-#         R_g[itr] = radius_gyr
+def track_particles(particle_frames, start_frame, min_size, max_size, max_velocity, min_track_length, last_img):
+    n_frames = len(particle_frames)
+    all_particles = []
+    time = (start_frame + 1) * 10
 
-#         for contour_i in range(len(contours)):
-#             m = cv2.moments(contours[contour_i])
-#             if m["m00"] == 0:
-#                 continue
-#             x, y = m["m10"] / m["m00"], m["m01"] / m["m00"]
-#             x, y = round(x), round(y)
-#             branch_pos.append([x, y])
+    # 各フレームで粒子を検出
+    for frame_i in range(n_frames):
+        particles = analyze_frame(particle_frames[frame_i], time, min_size, max_size)
+        # Plot particles on the frame
+        for particle in particles:
+            cv2.circle(last_img, (int(particle.x), int(particle.y)), 2, (0, 255, 0), -1)
+        tracking_movie.write(last_img)
+        all_particles.append(particles)
+        time = time + 10
 
-#         for i in range(len(branch_pos)):
-#             cv2.circle(frame_after, (branch_pos[i][0], branch_pos[i][1]), 2, (0, 0, 255), -1)
+    branches = []
+    edge = []
+    node = []
+    branch_count = 0
 
-#         # plot center of mass
-#         cv2.line(frame_after, (x_c - 5, y_c - 5), (x_c + 5, y_c + 5), (0, 255, 0), 2)
-#         cv2.line(frame_after, (x_c + 5, y_c - 5), (x_c - 5, y_c + 5), (0, 255, 0), 2)
+    # 枝の検出&再構成
+    # tracks = []
+    # track_count = 0
 
-#         # get area
-#         particle_count = np.nonzero(after_binary)[0].shape[0]
-#         particle[itr] = particle_count
-#         area[itr] = particle_count / (unit**2)
+    # for i in range(n_frames):
+    #     for particle in all_particles[i]:
+    #         if not particle.in_branch:
+    #             track_count += 1
+    #             particle.in_branch = True
+    #             particle.branch_no = track_count
+    #             track = [particle]
 
-#         out_tracking.write(frame_after)
-#         before_binary = cv2.bitwise_or(before_binary, after_binary)
+    #             for j in range(i + 1, n_frames):
+    #                 found_particle = None
+    #                 for next_particle in all_particles[j]:
+    #                     if not next_particle.in_branch and particle.distance(next_particle) < max_velocity:
+    #                         if found_particle is None or particle.distance(next_particle) < particle.distance(
+    #                             found_particle
+    #                         ):
+    #                             found_particle = next_particle
 
-#     # save data
-#     data["time"] = time
-#     data["particle"] = particle
-#     data["area"] = area
-#     data["R_g"] = R_g
-#     data.to_csv(file_path + "/data.csv", index=False)
+    #                 if found_particle:
+    #                     found_particle.in_branch = True
+    #                     found_particle.branch_no = track_count
+    #                     track.append(found_particle)
+    #                     particle = found_particle
+    #                 else:
+    #                     break
 
-#     print("Tracking Movie is done.")
+    #             if len(track) >= min_track_length:
+    #                 tracks.append(track)
+
+    # return tracks
+    # for first_particle in all_particles[0]:
+    #     first_particle.edge = True
+    #     tree_search(all_particles, first_particle, 0, max_velocity)  # 枝のrootの粒子から開始
+
+    # for all_particle in all_particles:
+    #     for particle in all_particle:
+    #         if particle.edge:
+    #             edge.append(particle)
+    #         elif particle.node:
+    #             node.append(particle)
+    # return edge, node
+    # for frame_i in reversed(range(n_frames)):
+    #     for particle in all_particles[frame_i]:
+    #         if particle.in_branch:
+    #             continue
+    #         branch_count += 1
+    #         particle.edge = True
+    #         particle.in_branch = True
+    #         particle.branch_no = branch_count
+    #         branch = [particle]
+    #         for frame_j in reversed(range(frame_i)):
+    #             found_particle = None
+    #             # 距離がmax_velocity未満の粒子をリストアップ
+    #             next_particles = [
+    #                 next_particle
+    #                 for sublist in all_particles[max(0, frame_j - 4) : frame_j]
+    #                 for next_particle in sublist
+    #                 if particle.distance(next_particle) < max_velocity
+    #             ]
+    #             distance_tmp = 1000  # 十分大きな値
+    #             for next_particle in next_particles:
+    #                 distance = particle.distance(next_particle)
+    #                 # 速度がmax_velocity以下の場合かつ最短距離の粒子を見つける
+    #                 if distance < distance_tmp:
+    #                     distance_tmp = distance
+    #                     found_particle = next_particle
+
+    #             # 空でない文字列はTrue
+    #             if found_particle and not found_particle.in_branch:
+    #                 found_particle.in_branch = True
+    #                 found_particle.branch_no = branch_count
+    #                 branch.append(found_particle)
+    #                 particle = found_particle
+    #             elif found_particle and found_particle.in_branch:
+    #                 found_particle.node = True
+    #                 branch.append(found_particle)
+    #                 break
+    #             else:
+    #                 break
+
+    #         if len(branch) >= min_track_length:  # 最低トラック長の設定
+    #             branches.append(branch)
+
+    return branches
 
 
 # メイン処理
@@ -246,7 +297,18 @@ if __name__ == "__main__":
     # time
     start_time = time.time()
 
-    # constants
+    # set parameters
+    min_size = 1
+    max_size = 999999
+    min_track_length = 1
+    max_velocity = 10.0
+    show_labels = False
+    show_positions = False
+    show_paths = True
+    show_path_lengths = False
+    save_results_file = False
+    # setting for video writer
+    fourcc = cv2.VideoWriter.fourcc("M", "J", "P", "G")  # 動画保存時のfourcc設定、確認のためだけなので圧縮形式
 
     # Video Source
     dir_path = "/mnt/d/master_thesis_data/experment_data/movie_data/movie_data/data_for_analisis"
@@ -259,197 +321,61 @@ if __name__ == "__main__":
         for file in file_list:
             if not file == file_list[1]:
                 continue
+
+            # get video file path
             file_path = os.path.join(surafactant_path, file)
             file_path_avi = file_path + "/" + file + "_edited.avi"
             file_path_dci = file_path + "/" + file + ".xlsm"
+            file_path_png = file_path + "/" + file + "_tracking.png"
             video = Video(file_path_avi)
             video.show_info()
-            start_frame, end_frame = set_start_end_point(file_path_dci, 0.2)
+            file_path_tracking = file_path_avi.replace(".avi", "_tracking.avi")  # 保存する動画ファイル名
+            file_path_tracking_binary = file_path_avi.replace(".avi", "_tracking_binary.avi")  # 保存する動画ファイル名
+            tracking_movie = cv2.VideoWriter(file_path_tracking, fourcc, video.fps, (video.Lx, video.Ly), isColor=True)
+            binary_movie = cv2.VideoWriter(
+                file_path_tracking_binary, fourcc, video.fps, (video.Lx, video.Ly), isColor=False
+            )
 
-    start_frame = 0
-    end_frame = len(frames)
-    frame_step = 10  # 必要に応じて調整
+            # get particle frames
+            print("Start Analize")
+            start_frame, end_frame = video.get_start_end(file_path_dci, 0.25)
+            # end_frame = video.total_frames - video.frame_step
+            start_frame = 600
+            end_frame = 700
+            particle_frames = mk_particl_frames(
+                file_path_avi, video.otsu, video.total_frames, start_frame, end_frame, video.frame_delta
+            )
+            get_particle_time = time.time()
+            print("Get Particle Frames : ", get_particle_time - start_time)
 
-    mk_tracking_movie(frames, start_frame, end_frame, frame_step, dust=4)
+            # tracking particles
+            branches = track_particles(
+                particle_frames, start_frame, min_size, max_size, max_velocity, min_track_length, video.last_img
+            )
+            get_tracks_time = time.time()
+            print("Get Tracks : ", get_tracks_time - get_particle_time)
+            # if show_paths:
+            #     origin_frames = video.last_img
+            #     for track in tracks:
+            #         for i in range(len(track) - 1):
+            #             cv2.line(
+            #                 origin_frames,
+            #                 (int(track[i].x), int(track[i].y)),
+            #                 (int(track[i + 1].x), int(track[i + 1].y)),
+            #                 (255, 0, 0),
+            #                 2,
+            #             )
+            #     cv2.imwrite(file_path_png, origin_frames)
+            if show_paths:
+                origin_frames = video.last_img
+                for branch in branches:
+                    cv2.circle(origin_frames, (int(branch[0].x), int(branch[0].y)), 2, (255, 0, 0), -1)
+                    cv2.circle(origin_frames, (int(branch[-1].x), int(branch[-1].y)), 2, (0, 0, 255), -1)
+                # for edge in edges:
+                #     cv2.circle(origin_frames, (int(edge.x), int(edge.y)), 2, (0, 0, 255), -1)
+                # for node in nodes:
+                #     cv2.circle(origin_frames, (int(node.x), int(node.y)), 2, (255, 0, 0), -1)
+                cv2.imwrite(file_path_png, origin_frames)
+            print("Total time : ", time.time() - start_time)
 
-
-# 動画情報取得・初期化
-def get_video_frames(file_path_avi):
-    cap_tmp = cv2.VideoCapture(file_path_avi)
-    # get Otsu threshold value
-    frame_tmp = cap_tmp.set(
-        cv2.CAP_PROP_POS_FRAMES, cap_tmp.get()
-    )  # フレームの位置変更，全体で開始フレームが変わるので注意
-    ret, img = cap.read()  # ret:bool値(画像が読めれば True) img:画像のndarray
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    thresh_otsu, _ = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_OTSU)
-    cap = cv2.VideoCapture(file_path_avi)
-    frames = []
-
-    if not cap.isOpened():
-        print("Video reading error :" + file_path_avi)
-        sys.exit(1)
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frames.append(frame)
-
-    cap.release()
-    return frames
-
-
-# 重心計算
-# def center():
-#     cap.set(cv2.CAP_PROP_POS_FRAMES, cap.get(cv2.CAP_PROP_FRAME_COUNT) - 1)
-#     ret, img = cap.read()
-#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#     thresh_otsu, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-#     # initialization
-#     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-#     while 1:
-#         ret, img = cap.read()
-#         img = remove_dust(img, 4, thresh_otsu)
-#         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#         _, binary = cv2.threshold(gray, thresh_otsu, 255, cv2.THRESH_BINARY)
-#         count = np.count_nonzero(binary)
-#         if count > 4:
-#             m = cv2.moments(binary, True)
-#             x, y = round(m["m10"] / m["m00"]), round(m["m01"] / m["m00"])
-#             break
-
-#     return x, y
-# main
-# time
-start_time = time.time()
-
-# constants
-dust = 4  # チリの大きさ判定用変数
-
-# get start and end frame
-start_frame, end_frame = set_start_end_point(0.2)
-print("Start Frame : ", start_frame, " End Frame : ", end_frame)
-
-# Start Movie Analize
-print("Start Analize")
-
-# get center of mass
-x_c, y_c = center()
-
-# Making Front Tracking VideoWriter & Movie
-output_tracking_movie = file_path_avi.replace(".avi", "_tracking.avi")  # 保存する動画ファイル名
-fourcc = cv2.VideoWriter.fourcc("I", "4", "2", "0")  # 動画保存時のfourcc設定、無圧縮avi
-# fourcc = cv2.VideoWriter.fourcc(*"MJPG")
-if os.path.exists(output_tracking_movie):
-    os.remove(output_tracking_movie)
-# 録画データにトラッキング点を追加して保存するためI420かつisColor=Trueとする。データはY800のはずなのに3つ引数があるのは謎？
-out_tracking = cv2.VideoWriter(output_tracking_movie, fourcc, fps, (Lx, Ly), isColor=True)
-# FFmpegはI420形式の動画を読み込めないので一括で処理すること。
-mk_tracking_movie(start_frame, end_frame, frame_step, 4)
-
-cap.release()
-
-finish_time = time.time()
-print("Total time : ", finish_time - start_time)
-
-
-# 以下はMtrack2のようなプログラムを作成するためのコード
-import math
-import sys
-import os
-import cv2
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
-
-
-def analyze_frame(frame, dust_area, thresh_otsu):
-    particles = []
-    contours, _ = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for contour in contours:
-        if cv2.contourArea(contour) > dust_area:
-            M = cv2.moments(contour)
-            if M["m00"] != 0:
-                cx = int(M["m10"] / M["m00"])
-                cy = int(M["m01"] / M["m00"])
-                particles.append(Particle(cx, cy))
-    return particles
-
-
-def track_particles(frames, min_size, max_velocity):
-    n_frames = len(frames)
-    all_particles = []
-
-    # 各フレームで粒子を検出
-    for i in range(n_frames):
-        particles = analyze_frame(frames[i], min_size, 127)
-        all_particles.append(particles)
-
-    tracks = []
-    track_count = 0
-
-    for i in range(n_frames):
-        for particle in all_particles[i]:
-            if not particle.in_track:
-                track_count += 1
-                particle.in_track = True
-                particle.track_nr = track_count
-                track = [particle]
-
-                for j in range(i + 1, n_frames):
-                    found_particle = None
-                    for next_particle in all_particles[j]:
-                        if not next_particle.in_track and particle.distance(next_particle) < max_velocity:
-                            if found_particle is None or particle.distance(next_particle) < particle.distance(
-                                found_particle
-                            ):
-                                found_particle = next_particle
-
-                    if found_particle:
-                        found_particle.in_track = True
-                        found_particle.track_nr = track_count
-                        track.append(found_particle)
-                        particle = found_particle
-                    else:
-                        break
-
-                if len(track) >= 2:  # 最低トラック長の設定
-                    tracks.append(track)
-
-    return tracks
-
-
-def save_tracking_results(tracks, file_path):
-    data = {"Frame": [], "X": [], "Y": [], "Track": []}
-    for track in tracks:
-        for particle in track:
-            data["Frame"].append(particle.z)
-            data["X"].append(particle.x)
-            data["Y"].append(particle.y)
-            data["Track"].append(particle.track_nr)
-
-    df = pd.DataFrame(data)
-    df.to_csv(file_path, index=False)
-    print(f"Results saved to {file_path}")
-
-
-# 成長点のトラッキングと結果保存
-def mk_tracking_movie(frames, start_frame, end_frame, frame_step, dust):
-    # get Otsu threshold value
-    frame = frames[-1]
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    thresh_otsu, _ = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_OTSU)
-
-    # create list of frames for tracking
-    selected_frames = []
-    for frame_i in range(start_frame, end_frame, frame_step):
-        selected_frames.append(frames[frame_i])
-
-    tracks = track_particles(selected_frames, dust, max_velocity=10.0)
-
-    # トラッキング結果を保存
-    output_csv = file_path_avi.replace(".avi", "_tracking_results.csv")
-    save_tracking_results(tracks, output_csv)
-
-    print("Tracking and saving results is done.")
+sys.exit(0)

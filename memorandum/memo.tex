@@ -378,11 +378,20 @@ Ex.2) あるデータセットが指数分布に従うと仮定すると，そ�
 \end{equation}
 $N_s\times v_\mathrm{pix}$が成長したピクセル数。成長ピクセル数を4とすると，
 \begin{equation}
-  N_s= \frac{4\times N_f}{l \times unit} ~\si{pix}
+  N_s= \frac{4\times N_f}{l \times \mathrm{unit}} ~\si{pix}
 \end{equation}
 となる。
 \subsection{解析時の範囲について}
 解析時にフィットする範囲は枝の太さ以上の構造を取らねばならない。太さ以下の構造は成長する際のゆらぎで，完全に枝になっていないもののため。
+\subsection{差分画像の取り方（bit演算について）}
+白色部分が成長した部分，黒色部分が成長していない部分とする。この時，差分画像を取るためには，以下のようにbit演算を行う。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figure/bit_cal.pdf}
+  \caption{差分画像の取り方}
+  \label{fig:bit_cal}
+\end{figure}
+
 \section{Tip-splitingの理論的側面について}
 \subsection{研究計画}
 \begin{enumerate}
