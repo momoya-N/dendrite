@@ -14,10 +14,11 @@ import copy
 from tqdm import tqdm
 import pandas as pd
 import re
+import csv
 
 
 class Particle:
-    def __init__(self, x=0.0, y=0.0, time=0.0, branch_no=0, in_branch=False, edge=False, node=False):
+    def __init__(self, x=0.0, y=0.0, time=0.0, branch_no=[], in_branch=False, edge=False, node=False):
         self.x = x
         self.y = y
         self.time = time
@@ -152,38 +153,7 @@ def analyze_frame(particle_frame, time, min_size, max_size):
     return particles
 
 
-def tree_search(all_particles, particle, n_frame, max_velocity):
-    particle.in_branch = True
-    # max_velocity未満の粒子を探す
-    next_particles = [
-        next_particle
-        for sublist in all_particles[n_frame + 1 : min(n_frame + 4, len(all_particles))]
-        for next_particle in sublist
-    ]
-    next_particles = [
-        next_particle for next_particle in next_particles if particle.distance(next_particle) < max_velocity
-    ]
-    for next_particle in next_particles:
-        if next_particle.in_branch:
-            continue
-        tree_search(all_particles, next_particle, n_frame + 1, max_velocity)
-    # distance_tmp = 1000  # 十分大きな値
-    # found_particle = None
-    # for next_particle in next_particles:
-    #     if next_particle.in_branch:
-    #         continue
-    #     distance = particle.distance(next_particle)
-    #     # 速度がmax_velocity未満かつ最短距離の粒子を見つける
-    #     if distance < distance_tmp:
-    #         distance_tmp = distance
-    #         found_particle = next_particle
-    # if found_particle:
-    #     tree_search(all_particles, found_particle, n_frame + 1, max_velocity)
-    # else:
-    #     particle.edge = True
-
-
-def track_particles(particle_frames, start_frame, min_size, max_size, max_velocity, min_track_length, last_img):
+def track_particles(particle_frames, start_frame, min_size, max_size, max_velocity, min_branch_length, last_img):
     n_frames = len(particle_frames)
     all_particles = []
     time = (start_frame + 1) * 10
@@ -201,93 +171,62 @@ def track_particles(particle_frames, start_frame, min_size, max_size, max_veloci
     branches = []
     edge = []
     node = []
-    branch_count = 0
+    branch_no = 0
 
-    # 枝の検出&再構成
-    # tracks = []
-    # track_count = 0
+    for i in range(n_frames):
+        for particle in all_particles[i]:
+            if particle.in_branch:
+                continue
+            branch_no += 1
+            particle.in_branch = True
+            particle.branch_no = particle.branch_no + [branch_no]
+            particle.edge = True
+            branch = [particle]
 
-    # for i in range(n_frames):
-    #     for particle in all_particles[i]:
-    #         if not particle.in_branch:
-    #             track_count += 1
-    #             particle.in_branch = True
-    #             particle.branch_no = track_count
-    #             track = [particle]
+            before_particles = [
+                before_particle
+                for tmp in all_particles[max(i - 3, 0) : i]
+                for before_particle in tmp
+                if particle.distance(before_particle) < max_velocity and before_particle.in_branch
+            ]
+            found_particle = None
+            dist_tmp = 1000  # とりあえず大きな値を入れておく
+            # 3つ前までのフレームに存在する粒子の中で最も近い粒子を探す
+            for before_particle in before_particles:
+                if particle.distance(before_particle) < dist_tmp:
+                    dist_tmp = particle.distance(before_particle)
+                    found_particle = before_particle
+            if found_particle:
+                found_particle.in_branch = True
+                found_particle.branch_no = found_particle.branch_no + [branch_no]
+                found_particle.node = True
+                particle.edge = False
+                branch.insert(0, found_particle)
 
-    #             for j in range(i + 1, n_frames):
-    #                 found_particle = None
-    #                 for next_particle in all_particles[j]:
-    #                     if not next_particle.in_branch and particle.distance(next_particle) < max_velocity:
-    #                         if found_particle is None or particle.distance(next_particle) < particle.distance(
-    #                             found_particle
-    #                         ):
-    #                             found_particle = next_particle
+            for j in range(i + 1, n_frames):
+                found_particle = None
+                next_particles = [
+                    next_particle
+                    for tmp in all_particles[j : min(j + 2, len(all_particles))]
+                    for next_particle in tmp
+                    if not next_particle.in_branch and particle.distance(next_particle) < max_velocity
+                ]
+                # 最短距離のnext particleを探す
+                for next_particle in next_particles:
+                    if found_particle is None or particle.distance(next_particle) < particle.distance(found_particle):
+                        found_particle = next_particle
 
-    #                 if found_particle:
-    #                     found_particle.in_branch = True
-    #                     found_particle.branch_no = track_count
-    #                     track.append(found_particle)
-    #                     particle = found_particle
-    #                 else:
-    #                     break
+                if found_particle:
+                    found_particle.in_branch = True
+                    found_particle.branch_no = found_particle.branch_no + [branch_no]
+                    branch.append(found_particle)
+                    particle = found_particle
+                else:
+                    particle.edge = True
+                    break
 
-    #             if len(track) >= min_track_length:
-    #                 tracks.append(track)
-
-    # return tracks
-    # for first_particle in all_particles[0]:
-    #     first_particle.edge = True
-    #     tree_search(all_particles, first_particle, 0, max_velocity)  # 枝のrootの粒子から開始
-
-    # for all_particle in all_particles:
-    #     for particle in all_particle:
-    #         if particle.edge:
-    #             edge.append(particle)
-    #         elif particle.node:
-    #             node.append(particle)
-    # return edge, node
-    # for frame_i in reversed(range(n_frames)):
-    #     for particle in all_particles[frame_i]:
-    #         if particle.in_branch:
-    #             continue
-    #         branch_count += 1
-    #         particle.edge = True
-    #         particle.in_branch = True
-    #         particle.branch_no = branch_count
-    #         branch = [particle]
-    #         for frame_j in reversed(range(frame_i)):
-    #             found_particle = None
-    #             # 距離がmax_velocity未満の粒子をリストアップ
-    #             next_particles = [
-    #                 next_particle
-    #                 for sublist in all_particles[max(0, frame_j - 4) : frame_j]
-    #                 for next_particle in sublist
-    #                 if particle.distance(next_particle) < max_velocity
-    #             ]
-    #             distance_tmp = 1000  # 十分大きな値
-    #             for next_particle in next_particles:
-    #                 distance = particle.distance(next_particle)
-    #                 # 速度がmax_velocity以下の場合かつ最短距離の粒子を見つける
-    #                 if distance < distance_tmp:
-    #                     distance_tmp = distance
-    #                     found_particle = next_particle
-
-    #             # 空でない文字列はTrue
-    #             if found_particle and not found_particle.in_branch:
-    #                 found_particle.in_branch = True
-    #                 found_particle.branch_no = branch_count
-    #                 branch.append(found_particle)
-    #                 particle = found_particle
-    #             elif found_particle and found_particle.in_branch:
-    #                 found_particle.node = True
-    #                 branch.append(found_particle)
-    #                 break
-    #             else:
-    #                 break
-
-    #         if len(branch) >= min_track_length:  # 最低トラック長の設定
-    #             branches.append(branch)
+            if len(branch) >= min_branch_length:
+                branches.append(branch)
 
     return branches
 
@@ -300,8 +239,8 @@ if __name__ == "__main__":
     # set parameters
     min_size = 1
     max_size = 999999
-    min_track_length = 1
-    max_velocity = 10.0
+    min_branch_length = 3
+    max_velocity = 6.0
     show_labels = False
     show_positions = False
     show_paths = True
@@ -339,9 +278,8 @@ if __name__ == "__main__":
             # get particle frames
             print("Start Analize")
             start_frame, end_frame = video.get_start_end(file_path_dci, 0.25)
-            # end_frame = video.total_frames - video.frame_step
-            start_frame = 600
-            end_frame = 700
+            start_frame = 700
+            end_frame = 800
             particle_frames = mk_particl_frames(
                 file_path_avi, video.otsu, video.total_frames, start_frame, end_frame, video.frame_delta
             )
@@ -350,31 +288,59 @@ if __name__ == "__main__":
 
             # tracking particles
             branches = track_particles(
-                particle_frames, start_frame, min_size, max_size, max_velocity, min_track_length, video.last_img
+                particle_frames, start_frame, min_size, max_size, max_velocity, min_branch_length, video.last_img
             )
+            # Write branches to CSV
+            csv_file_path = file_path_avi.replace(".avi", "_branches.csv")
+            with open(csv_file_path, mode="w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(["Branch No", "X", "Y", "Time", "In Branch", "Edge", "Node"])
+                for branch_no, branch in enumerate(branches, start=1):
+                    for particle_no, particle in enumerate(branch, start=1):
+                        writer.writerow(
+                            [
+                                particle.branch_no,
+                                particle.x,
+                                particle.y,
+                                particle.time,
+                                particle.in_branch,
+                                particle.edge,
+                                particle.node,
+                            ]
+                        )
+            print(f"Branches data saved to {csv_file_path}")
             get_tracks_time = time.time()
             print("Get Tracks : ", get_tracks_time - get_particle_time)
-            # if show_paths:
-            #     origin_frames = video.last_img
-            #     for track in tracks:
-            #         for i in range(len(track) - 1):
-            #             cv2.line(
-            #                 origin_frames,
-            #                 (int(track[i].x), int(track[i].y)),
-            #                 (int(track[i + 1].x), int(track[i + 1].y)),
-            #                 (255, 0, 0),
-            #                 2,
-            #             )
-            #     cv2.imwrite(file_path_png, origin_frames)
             if show_paths:
                 origin_frames = video.last_img
                 for branch in branches:
+                    # node
                     cv2.circle(origin_frames, (int(branch[0].x), int(branch[0].y)), 2, (255, 0, 0), -1)
+                    # edge
                     cv2.circle(origin_frames, (int(branch[-1].x), int(branch[-1].y)), 2, (0, 0, 255), -1)
-                # for edge in edges:
-                #     cv2.circle(origin_frames, (int(edge.x), int(edge.y)), 2, (0, 0, 255), -1)
-                # for node in nodes:
-                #     cv2.circle(origin_frames, (int(node.x), int(node.y)), 2, (255, 0, 0), -1)
+                    # branch
+                    node = branch[0]
+                    # 枝の途中にnodeがある場合の分割描画処理
+                    for i in range(len(branch)):
+                        if branch[i].node:
+                            edge = branch[i]
+                            cv2.line(
+                                origin_frames,
+                                (int(node.x), int(node.y)),
+                                (int(edge.x), int(edge.y)),
+                                (255, 255, 0),
+                                1,
+                            )
+                            node = branch[i]
+                    # 最後のnodeからedgeまでの描画処理
+                    edge = branch[-1]
+                    cv2.line(
+                        origin_frames,
+                        (int(node.x), int(node.y)),
+                        (int(edge.x), int(edge.y)),
+                        (255, 255, 0),
+                        1,
+                    )
                 cv2.imwrite(file_path_png, origin_frames)
             print("Total time : ", time.time() - start_time)
 
