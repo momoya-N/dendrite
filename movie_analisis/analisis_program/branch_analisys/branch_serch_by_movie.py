@@ -1,27 +1,22 @@
 import math
 import sys
 import os
-import glob
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib_scalebar.scalebar import ScaleBar
-import matplotlib.collections as mc
-
-# import matplotlib.cm as cm
 import time
-import copy
 from tqdm import tqdm
 import pandas as pd
-import re
 import csv
 
 
 class Particle:
-    def __init__(self, x=0.0, y=0.0, time=0.0, branch_no=[], in_branch=False, edge=False, node=False):
+    def __init__(self, x=0.0, y=0.0, time=0.0, contour=[],width=0.0,branch_no=[], in_branch=False, edge=False, node=False):
         self.x = x
         self.y = y
         self.time = time
+        self.contours = contour
+        self.width = width
         self.branch_no = branch_no
         self.in_branch = in_branch
         self.edge = edge
@@ -102,133 +97,74 @@ class Video:
         return start_frame, end_frame
 
 
-def mk_dust_removed_frames(file_path_avi: str, thresh_otsu: float, frame_index: int):
-    dust = 4
-    cap = cv2.VideoCapture(file_path_avi)
+
+
+def mk_binary_frames(cap,thresh_otsu: float, frame_index: int):
     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
     ret, frame = cap.read()
-    # チリの除去＆二値化
-    black = np.zeros_like(frame, dtype=np.uint8)
+    # 二値化
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     _, binary = cv2.threshold(gray, thresh_otsu, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for contour_i in range(len(contours)):
-        if cv2.contourArea(contours[contour_i]) > dust:
-            cv2.fillPoly(black, [contours[contour_i]], (255, 255, 255))
-    dust_removed_gray = cv2.cvtColor(black, cv2.COLOR_BGR2GRAY)
-    _, dust_removed_binary = cv2.threshold(dust_removed_gray, 127, 255, cv2.THRESH_BINARY)
-
-    return dust_removed_binary
-
+    return frame,binary
 
 def mk_particl_frames(
     file_path_avi: str, thresh_otsu: float, total_frame: int, start_frame: int, end_frame: int, frame_delta: int
-):
+):#ある時刻（フレーム）の粒子（成長点）の位置を検出
+    cap=cv2.VideoCapture(file_path_avi)
+    kernel=np.ones((1,1),np.uint8)
     particle_frames = []
     for frame_i in tqdm(range(start_frame, end_frame), desc="Making Particle Frames"):
-        before_frame = mk_dust_removed_frames(file_path_avi, thresh_otsu, frame_i)
+        before_frame,before_frame_binary = mk_binary_frames(cap, thresh_otsu, frame_i)
         if not frame_i + frame_delta > total_frame:
-            after_frame = mk_dust_removed_frames(file_path_avi, thresh_otsu, frame_i + frame_delta)
+            after_frame,after_frame_binary = mk_binary_frames(cap, thresh_otsu, frame_i + frame_delta)
         else:
-            after_frame = mk_dust_removed_frames(file_path_avi, thresh_otsu, total_frame)
-        frame_xor = cv2.bitwise_xor(after_frame, before_frame)
-        frame_diff = cv2.bitwise_and(after_frame, frame_xor)
-        binary_movie.write(after_frame)
-        particle_frames.append(frame_diff)
+            after_frame,after_frame_binary = mk_binary_frames(cap, thresh_otsu, total_frame)
+        frame_xor = cv2.bitwise_xor(after_frame_binary, before_frame_binary)
+        frame_diff = cv2.bitwise_and(after_frame_binary, frame_xor)
+        opening=cv2.morphologyEx(frame_diff, cv2.MORPH_OPEN, kernel)
+        closing=cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+        frame_diff_gray = cv2.subtract(after_frame, before_frame)
+        # binary_movie.write(frame_diff)
+        binary_movie.write(closing)
+        particle_gray_movie.write(frame_diff_gray)
+        # particle_frames.append(frame_diff)
+        particle_frames.append(closing)
 
     return particle_frames
 
 
-def analyze_frame(particle_frame, time, min_size, max_size):
+
+def analyze_frame(particle_frame, time, min_size, max_size):#ある時刻（フレーム）の粒子（成長点）の位置とその輪郭を検出＆配列に保存
     particles = []
     contours, _ = cv2.findContours(particle_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for contour in contours:
         area = cv2.contourArea(contour)
         if min_size <= area <= max_size:
+            pt=[[int(point[0][0]), int(point[0][1])] for point in contour]
             M = cv2.moments(contour)
             if M["m00"] != 0:
                 cx = M["m10"] / M["m00"]
                 cy = M["m01"] / M["m00"]
-                particles.append(Particle(cx, cy, time))
+                particles.append(Particle(cx, cy, time, pt))
     return particles
 
+def branch_serch(particle_frames,start_frame,min_size,max_size,max_velositiy,min_branch_length,last_img):
+    n_frames=len(particle_frames)
+    all_particles=[]
+    time=(start_frame+1)*10
 
-def track_particles(particle_frames, start_frame, min_size, max_size, max_velocity, min_branch_length, last_img):
-    n_frames = len(particle_frames)
-    all_particles = []
-    time = (start_frame + 1) * 10
-
-    # 各フレームで粒子を検出
     for frame_i in range(n_frames):
-        particles = analyze_frame(particle_frames[frame_i], time, min_size, max_size)
-        # Plot particles on the frame
+        particles=analyze_frame(particle_frames[frame_i],time,min_size,max_size)
         for particle in particles:
-            cv2.circle(last_img, (int(particle.x), int(particle.y)), 2, (0, 255, 0), -1)
+            cv2.circle(last_img,(int(particle.x),int(particle.y)),2,(0,255,0),-1)
         tracking_movie.write(last_img)
         all_particles.append(particles)
-        time = time + 10
+        time=time+10
 
-    branches = []
-    edge = []
-    node = []
-    branch_no = 0
+    
 
-    for i in range(n_frames):
-        for particle in all_particles[i]:
-            if particle.in_branch:
-                continue
-            branch_no += 1
-            particle.in_branch = True
-            particle.branch_no = particle.branch_no + [branch_no]
-            particle.edge = True
-            branch = [particle]
 
-            before_particles = [
-                before_particle
-                for tmp in all_particles[max(i - 3, 0) : i]
-                for before_particle in tmp
-                if particle.distance(before_particle) < max_velocity and before_particle.in_branch
-            ]
-            found_particle = None
-            dist_tmp = 1000  # とりあえず大きな値を入れておく
-            # 3つ前までのフレームに存在する粒子の中で最も近い粒子を探す
-            for before_particle in before_particles:
-                if particle.distance(before_particle) < dist_tmp:
-                    dist_tmp = particle.distance(before_particle)
-                    found_particle = before_particle
-            if found_particle:
-                found_particle.in_branch = True
-                found_particle.branch_no = found_particle.branch_no + [branch_no]
-                found_particle.node = True
-                particle.edge = False
-                branch.insert(0, found_particle)
 
-            for j in range(i + 1, n_frames):
-                found_particle = None
-                next_particles = [
-                    next_particle
-                    for tmp in all_particles[j : min(j + 2, len(all_particles))]
-                    for next_particle in tmp
-                    if not next_particle.in_branch and particle.distance(next_particle) < max_velocity
-                ]
-                # 最短距離のnext particleを探す
-                for next_particle in next_particles:
-                    if found_particle is None or particle.distance(next_particle) < particle.distance(found_particle):
-                        found_particle = next_particle
-
-                if found_particle:
-                    found_particle.in_branch = True
-                    found_particle.branch_no = found_particle.branch_no + [branch_no]
-                    branch.append(found_particle)
-                    particle = found_particle
-                else:
-                    particle.edge = True
-                    break
-
-            if len(branch) >= min_branch_length:
-                branches.append(branch)
-
-    return branches
 
 
 # メイン処理
@@ -237,7 +173,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     # set parameters
-    min_size = 1
+    min_size = 0
     max_size = 999999
     min_branch_length = 3
     max_velocity = 6.0
@@ -250,7 +186,7 @@ if __name__ == "__main__":
     fourcc = cv2.VideoWriter.fourcc("M", "J", "P", "G")  # 動画保存時のfourcc設定、確認のためだけなので圧縮形式
 
     # Video Source
-    dir_path = "/mnt/d/master_thesis_data/experment_data/movie_data/movie_data/data_for_analisis"
+    dir_path = "D:/master_thesis_data/experment_data/movie_data/movie_data/data_for_analisis"
     surfactant_list = os.listdir(dir_path)
     for surafactant in surfactant_list:
         if not surafactant == surfactant_list[0]:
@@ -270,6 +206,8 @@ if __name__ == "__main__":
             video.show_info()
             file_path_tracking = file_path_avi.replace(".avi", "_tracking.avi")  # 保存する動画ファイル名
             file_path_tracking_binary = file_path_avi.replace(".avi", "_tracking_binary.avi")  # 保存する動画ファイル名
+            file_path_tracking_gray = file_path_avi.replace(".avi", "_tracking_gray.avi")  # 保存する動画ファイル名
+            particle_gray_movie = cv2.VideoWriter(file_path_tracking_gray, fourcc, video.fps, (video.Lx, video.Ly), isColor=True)
             tracking_movie = cv2.VideoWriter(file_path_tracking, fourcc, video.fps, (video.Lx, video.Ly), isColor=True)
             binary_movie = cv2.VideoWriter(
                 file_path_tracking_binary, fourcc, video.fps, (video.Lx, video.Ly), isColor=False
@@ -277,7 +215,7 @@ if __name__ == "__main__":
 
             # get particle frames
             print("Start Analize")
-            start_frame, end_frame = video.get_start_end(file_path_dci, 0.25)
+            # start_frame, end_frame = video.get_start_end(file_path_dci, 0.2)
             start_frame = 700
             end_frame = 800
             particle_frames = mk_particl_frames(
@@ -345,3 +283,118 @@ if __name__ == "__main__":
             print("Total time : ", time.time() - start_time)
 
 sys.exit(0)
+
+# def mk_dust_removed_frames(file_path_avi: str, thresh_otsu: float, frame_index: int):
+#     dust = 4
+#     cap = cv2.VideoCapture(file_path_avi)
+#     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+#     ret, frame = cap.read()
+#     # チリの除去＆二値化
+#     black = np.zeros_like(frame, dtype=np.uint8)
+#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     _, binary = cv2.threshold(gray, thresh_otsu, 255, cv2.THRESH_BINARY)
+#     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#     for contour_i in range(len(contours)):
+#         if cv2.contourArea(contours[contour_i]) > dust:
+#             cv2.fillPoly(black, [contours[contour_i]], (255, 255, 255))
+#     dust_removed_gray = cv2.cvtColor(black, cv2.COLOR_BGR2GRAY)
+#     _, dust_removed_binary = cv2.threshold(dust_removed_gray, 127, 255, cv2.THRESH_BINARY)
+
+#     return frame,dust_removed_binary
+
+
+# def mk_particl_frames(
+#     file_path_avi: str, thresh_otsu: float, total_frame: int, start_frame: int, end_frame: int, frame_delta: int
+# ):
+#     particle_frames = []
+#     for frame_i in tqdm(range(start_frame, end_frame), desc="Making Particle Frames"):
+#         before_frame,before_frame_binary = mk_dust_removed_frames(file_path_avi, thresh_otsu, frame_i)
+#         if not frame_i + frame_delta > total_frame:
+#             after_frame,after_frame_binary = mk_dust_removed_frames(file_path_avi, thresh_otsu, frame_i + frame_delta)
+#         else:
+#             after_frame,after_frame_binary = mk_dust_removed_frames(file_path_avi, thresh_otsu, total_frame)
+#         frame_xor = cv2.bitwise_xor(after_frame_binary, before_frame_binary)
+#         frame_diff = cv2.bitwise_and(after_frame_binary, frame_xor)
+#         frame_diff_gray = cv2.subtract(after_frame, before_frame)
+#         binary_movie.write(frame_diff)
+#         particle_gray_movie.write(frame_diff_gray)
+#         particle_frames.append(frame_diff)
+
+#     return particle_frames
+
+# def track_particles(particle_frames, start_frame, min_size, max_size, max_velocity, min_branch_length, last_img):
+#     n_frames = len(particle_frames)
+#     all_particles = []
+#     time = (start_frame + 1) * 10
+
+#     # 各フレームで粒子を検出
+#     for frame_i in range(n_frames):
+#         particles = analyze_frame(particle_frames[frame_i], time, min_size, max_size)
+#         # Plot particles on the frame
+#         for particle in particles:
+#             cv2.circle(last_img, (int(particle.x), int(particle.y)), 2, (0, 255, 0), -1)
+#         tracking_movie.write(last_img)
+#         all_particles.append(particles)
+#         time = time + 10
+
+#     branches = []
+#     edge = []
+#     node = []
+#     branch_no = 0
+
+#     for i in range(n_frames):
+#         for particle in all_particles[i]:
+#             if particle.in_branch:
+#                 continue
+#             branch_no += 1
+#             particle.in_branch = True
+#             particle.branch_no = particle.branch_no + [branch_no]
+#             particle.edge = True
+#             branch = [particle]
+
+#             before_particles = [
+#                 before_particle
+#                 for tmp in all_particles[max(i - 3, 0) : i]
+#                 for before_particle in tmp
+#                 if particle.distance(before_particle) < max_velocity and before_particle.in_branch
+#             ]
+#             found_particle = None
+#             dist_tmp = 1000  # とりあえず大きな値を入れておく
+#             # 3つ前までのフレームに存在する粒子の中で最も近い粒子を探す
+#             for before_particle in before_particles:
+#                 if particle.distance(before_particle) < dist_tmp:
+#                     dist_tmp = particle.distance(before_particle)
+#                     found_particle = before_particle
+#             if found_particle:
+#                 found_particle.in_branch = True
+#                 found_particle.branch_no = found_particle.branch_no + [branch_no]
+#                 found_particle.node = True
+#                 particle.edge = False
+#                 branch.insert(0, found_particle)
+
+#             for j in range(i + 1, n_frames):
+#                 found_particle = None
+#                 next_particles = [
+#                     next_particle
+#                     for tmp in all_particles[j : min(j + 2, len(all_particles))]
+#                     for next_particle in tmp
+#                     if not next_particle.in_branch and particle.distance(next_particle) < max_velocity
+#                 ]
+#                 # 最短距離のnext particleを探す
+#                 for next_particle in next_particles:
+#                     if found_particle is None or particle.distance(next_particle) < particle.distance(found_particle):
+#                         found_particle = next_particle
+
+#                 if found_particle:
+#                     found_particle.in_branch = True
+#                     found_particle.branch_no = found_particle.branch_no + [branch_no]
+#                     branch.append(found_particle)
+#                     particle = found_particle
+#                 else:
+#                     particle.edge = True
+#                     break
+
+#             if len(branch) >= min_branch_length:
+#                 branches.append(branch)
+
+#     return branches
