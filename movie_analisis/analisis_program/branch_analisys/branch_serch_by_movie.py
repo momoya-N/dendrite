@@ -161,12 +161,6 @@ def branch_serch(particle_frames,start_frame,min_size,max_size,max_velositiy,min
         all_particles.append(particles)
         time=time+10
 
-    
-
-
-
-
-
 # メイン処理
 if __name__ == "__main__":
     # time
