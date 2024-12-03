@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.optimize import curve_fit
 import math
+from matplotlib.ticker import ScalarFormatter
 
 class Video:
     def __init__(self, file_path_avi: str):
@@ -174,6 +175,7 @@ def decart_img2polar_img_analisys_plot(file_path,video,cx,cy,r0,polor_range,time
     Theta=[theta for theta in Theta_lim if theta>polor_range.theta_L_0 and theta<polor_range.theta_R_0]
     delta_theta=Theta-min(Theta)#角度の差分,左端を0にする
     R=np.linspace(r_min,r_max,Ly)
+    r_bottom=0.0
     h_mean=[]#界面高さの平均
     h_std=[]#界面高さの標準偏差
     cap=cv2.VideoCapture(file_path)
@@ -199,8 +201,12 @@ def decart_img2polar_img_analisys_plot(file_path,video,cx,cy,r0,polor_range,time
     while True:
         ret,img=cap.read()
         n_frame=int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+        
         if n_frame==time_range:
             break
+        if not n_frame==51:
+            pbar.update()
+            continue
 
         img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         black=np.zeros((Ly,len(Theta)),dtype=np.uint8)
@@ -225,40 +231,62 @@ def decart_img2polar_img_analisys_plot(file_path,video,cx,cy,r0,polor_range,time
         for i,theta in enumerate(Theta):
             R_rev=np.flip(R)
             top=np.nonzero(black_surface[...,i])[0][0]
-            hight=R_rev[top]-r0
+            hight=R_rev[top]
             h.append(hight*scale)
         #相関関数の計算
+        if r_bottom==0.0:
+            r_bottom=min(h)
+        h=np.array(h)-r_bottom
         cor_func=correlation_func(h)
         diff_cor_func=np.diff(cor_func)
         local_max=np.where((diff_cor_func[:-1]>0)&(diff_cor_func[1:]<0))[0]+1
         
         #画像出力
-        if n_frame%10==0:
-            fig,ax=plt.subplots(1, 2, figsize=(18, 9))
-            h_from_r0=np.array(h)+r0*scale
-            ax[0].plot(Theta,h_from_r0)
-            ax[0].set_title("Height Tracking "+r"$t=$"+str(n_frame/video.fps)+" sec")
-            ax[0].set_xlabel(r"$\theta$ rad")
-            ax[0].set_ylabel("Height from center "+r"$r$ cm")
-            ax[0].set_ylim(r0*scale,(r0+50)*scale)
-            ax[0].axhline(y=np.mean(h_from_r0),color='r',ls='--',lw=0.6)
-            ax[0].text(Theta[0], np.mean(h_from_r0), rf"{np.mean(h_from_r0):.2f} cm", color='red', ha='center')
-            
-            ax[1].plot(delta_theta[:int(len(cor_func)/2)],cor_func[:int(len(cor_func)/2)])
-            ax[1].set_title("Correlation Function "+r"$t=$"+str(n_frame/video.fps)+" sec")
-            ax[1].set_xlabel(r"$\delta \theta$ rad")
-            ax[1].set_ylabel("Correlation")
-            ax[1].set_ylim(-1,1)
-            ax[1].scatter(delta_theta[local_max[:3]],cor_func[local_max[:3]],c="r")
-            for i,x0 in enumerate(delta_theta[local_max[:3]]):
-                y0=cor_func[local_max[i]]
-                y_max=float((y0+1)/2)
-                ax[1].axvline(x=x0,c='r',ls='--',lw=0.6,ymax=y_max)
-                exp=int(np.log10(x0))-1
-                mantissa=x0/10**exp
-                ax[1].text(x0, -1.2, rf"${mantissa:.2f} \times 10^{exp}$", color='red', ha='center',rotation=45)
-            plt.savefig(corr_dir_path + "/correlation_{0:04d}.png".format(n_frame))
-            plt.close()
+        # if n_frame==True:
+        fig,ax=plt.subplots(1, 2, figsize=(13.5, 9))
+        h_from_r0=np.array(h)+r0*scale
+        ax[0].plot(Theta,h_from_r0)
+        ax[0].set_title("Height Tracking "+r"$t=$"+str(n_frame/video.fps)+" sec")
+        ax[0].set_xlabel(r"$\theta$ rad")
+        ax[0].set_ylabel("Height from center "+r"$r$ cm")
+        ax[0].set_ylim(r0*scale,(r0+50)*scale)
+        ax[0].axhline(y=np.mean(h_from_r0),color='r',ls='--',lw=0.6)
+        ax[0].text(Theta[0], np.mean(h_from_r0), rf"{np.mean(h_from_r0):.2f} cm", color='red', ha='center')
+        
+        ax[1].plot(delta_theta[:int(len(cor_func)/2)],cor_func[:int(len(cor_func)/2)])
+        ax[1].set_title("Correlation Function "+r"$t=$"+str(n_frame/video.fps)+" sec",pad=30)
+        # ax[1].set_xlabel(r"$\delta \theta$ rad")
+        # ax[1].set_ylabel("Correlation")
+        y_lim_min=0.5
+        y_lim_max=1
+        ax[1].set_ylim(y_lim_min,y_lim_max)
+        ax[1].set_xlim(0,0.03)
+        ax[1].scatter(delta_theta[local_max[:3]],cor_func[local_max[:3]],c="r")
+        ax[1].tick_params(axis='x', labelsize=18)
+        ax[1].tick_params(axis='y', labelsize=18)
+        #指数表記
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)  # 科学的表記を有効にする
+        formatter.set_powerlimits((-1, 1))
+        ax[1].xaxis.set_major_formatter(formatter)
+        # オフセットテキストを取得してフォントサイズを設定
+        offset_text = ax[1].xaxis.get_offset_text()
+        offset_text.set_fontsize(18)  # フォントサイズ設定
+
+        
+        for i,x0 in enumerate(delta_theta[local_max[:3]]):
+            y0=cor_func[local_max[i]]
+            y_max=float((y0-y_lim_min)/(y_lim_max-y_lim_min))
+            y_min=float(i+1)/20
+            ax[1].axvline(x=x0,c='r',ls='--',lw=0.6,ymax=y_max,ymin=y_min)
+            # exp=int(np.log10(x0))
+            exp=-2
+            mantissa=x0/10**exp
+            # ax[1].text(x0,0.5+y_min*0.5,rf"${mantissa:.2f} \times 10^{{\mathrm{{{exp}}}}}$", color='k', ha='left', fontsize=18)
+            ax[1].text(x0,y_lim_min+y_min*(y_lim_max-y_lim_min),rf"${mantissa:.2f}$", color='k', ha='left', fontsize=18)
+        plt.savefig(corr_dir_path + "/correlation_{0:04d}.png".format(n_frame))
+        plt.close()
+
         h_mean.append(np.mean(h))
         h_std.append(np.std(h))
         pbar.update()
