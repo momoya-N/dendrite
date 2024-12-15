@@ -1,0 +1,58 @@
+% 条件式関係
+\usepackage{ifthen}
+
+%参考文献関係
+% \usepackage{biblatex}
+
+% 配置関係
+\usepackage{geometry}
+
+%画像描画関係
+\usepackage{graphicx}
+\usepackage[hang,small,bf]{caption}
+\usepackage[subrefformat=parens]{subcaption}
+\usepackage{here}
+
+%数式関係
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{physics2}
+\usepackage{derivative}
+\usepackage{fixdif}
+\usepackage[version=4]{mhchem}
+\usepackage{bm}
+
+%テキスト関係
+\usepackage{url}
+\usepackage{enumerate} %細かい設定ができるenumerate
+\usepackage{ifdraft}
+\ifdraft{\usepackage{showkeys}}{}
+\usepackage{lipsum}
+
+% 参照関係
+\usepackage{mathtools}
+\mathtoolsset{showonlyrefs=true}
+\usepackage[inline]{showlabels}
+\usepackage{xcolor}
+\ifthenelse{\boolean{luatex}}{\usepackage[unicode,pdfusetitle]{hyperref}}{
+  \usepackage[pdfusetitle,backref=page]{hyperref}
+  \usepackage{pxjahyper}
+  \hypersetup{%
+    setpagesize=false,%
+    bookmarks=true,%
+    bookmarksdepth=tocdepth,%
+    bookmarksnumbered=true,%
+    colorlinks=true,%
+    linkcolor=darkgray,%
+    citecolor=blue,%
+    urlcolor=cyan,%
+    % pdftitle={},%
+    % pdfsubject={},
+    % pdfauthor={},%
+    % pdfkeywords={}
+  }
+}
+
+
+

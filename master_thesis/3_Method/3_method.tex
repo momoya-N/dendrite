@@ -1,0 +1,15 @@
+% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\usepackage{../Preamble/mypackage}
+\usepackage{mathtools}
+\mathtoolsset{showonlyrefs=true}
+\usepackage[inline]{showlabels}
+
+\begin{document}
+
+
+\ifdraft{
+  \bibliographystyle{../Preamble/Physics.bst}
+  \bibliography{../Preamble/reference.bib}
+}{}
+\end{document}

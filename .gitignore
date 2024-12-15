@@ -16,4 +16,6 @@ a.out
 *.bbl
 *.log
 !/memorandum/figure/
+*.dvi
+*.brf
 DLA
