@@ -1,8 +1,15 @@
-% for LuaLaTeX
-\documentclass{article}
-\usepackage{mypackage}
+\documentclass[uplatex]{jsarticle}
+
+\usepackage{biblatex}
+\addbibresource{test.bib}
+
 \begin{document}
-\begin{equation}
-  \ab(\frac{1}{2})
-\end{equation}
+
+私は\cite{elements}を引用する。
+
+%\bibliographystyle{unsrt}
+%\bibliography{sample}
+
+\printbibliography
+
 \end{document}

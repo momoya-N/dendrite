@@ -1,0 +1,15 @@
+% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\usepackage{../../Preamble/mypackage}
+
+\begin{document}
+\part{実験}
+\section{金属樹}
+\section{電界析出}
+\section{界面成長}
+
+\ifdraft{
+  \bibliographystyle{../Preamble/Physics.bst}
+  \bibliography{../Preamble/reference.bib}
+}{}
+\end{document}
