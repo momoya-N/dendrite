@@ -2,12 +2,12 @@
 using namespace std;
 
 int main() {
-    int a;
-    string b;
+    string S;
+    cin >> S;
 
-    cin >> a;
-    b = (string)a;
-
-    cout << b[0] << endl;
-    return 0;
+    if (S.at(S.size() - 1) == 'T') {
+        cout << "YES" << endl;
+    } else {
+        cout << "NO" << endl;
+    }
 }

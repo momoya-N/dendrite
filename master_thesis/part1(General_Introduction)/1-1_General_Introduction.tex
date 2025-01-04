@@ -1,10 +1,70 @@
-% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
-\usepackage{../../Preamble/mypackage}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\usepackage{../Preamble/mypackage}
 
 \begin{document}
-\section{パターン形成の物理学}
-エネルギーの注入や散逸，物質の輸送などが
+\part{Introduction}
+\chapter{パターン形成の物理学}
+自然界では絶えずエネルギーの注入や散逸，物質の輸送などが起こっている。このような系を平衡系と区別して\textbf{非平衡系}と呼ぶ。その中でも，非平衡過程により生じる様々な秩序構造の形成メカニズムや統計的性質に着目する分野を\textbf{パターン形成の物理学}と呼ぶ。パターン形成の物理学は，自然界に広く見られるパターンの形成メカニズムを理解し，生物学や化学などの様々な分野に応用されている。
+\begin{figure}
+  \centering
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figure/part1/BZ_reaction.jpg}
+    \subcaption{BZ反応\url{https://www.isc.meiji.ac.jp/~suematsu/research/pattern.html}}
+    \label{fig:BZ}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figure/part1/reaction_diffusion_angelfish.png}
+    \subcaption{サザナミヤッコ（キンチャクダイの一種）の体表のTuringパターン\cite{kondo1995reaction}}
+    \label{fig:reaction_diffusion_angelfish}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figure/part1/Be’nard_cell.png}
+    \subcaption{\color{red}{ベナール対流\cite{koschmieder1974benard}}}%叉引きしているので注意
+    \label{fig:Be’nard_cell}
+  \end{minipage}
+  \caption{様々な非平衡系でのパターン形成}
+  \label{fig:pattern_formation}
+\end{figure}
+
+\chapter{枝分かれ}
+自然界のパターンの中でも特に，幅広い長さスケールで見られるパターンが\textbf{枝分かれパターン}である。以下の４つの枝分かれ構造は$\mathcal{O}(\SI{e-4}{m})\sim\mathcal{O}(\SI{e5}{m})$という幅広いスケールにおける枝分かれ構造の例である。これらの現象はスケールも形成メカニズムも異なるが，その”かたち”は似通っている。このようにスケールによらず似た形を持つスケール不変な構造を\textbf{フラクタル（自己相似）構造}と呼ぶ。
+\begin{figure}[htbp]
+  \begin{tabular}{cc}
+    \begin{minipage}[t]{0.45\hsize}
+      \centering
+      \includegraphics[keepaspectratio, scale=0.8]{../figure/part1/blood_vessel_nerve.png}
+      \subcaption{血管（左）と神経（右）, Scale Bar: $\SI{100}{\mu m}(\SI{e-4}{m})$\cite{mukouyama2002sensory}}
+      \label{fig:blood_vessel_nerve}
+    \end{minipage} &
+    \begin{minipage}[t]{0.45\hsize}
+      \centering
+      \includegraphics[keepaspectratio, scale=0.8]{../figure/part1/electro_deposition.png}
+      \subcaption{亜鉛の金属樹$\sim\mathcal{O}(\SI{e-2}{m})$}
+      \label{fig:electro_deposition}
+    \end{minipage} \\
+
+    \begin{minipage}[t]{0.45\hsize}
+      \centering
+      \includegraphics[keepaspectratio, scale=0.8]{../figure/part1/thunder.jpg}
+      \subcaption{落雷(Wikipedia)$\sim\mathcal{O}(\SI{e2}{m})$}
+      \label{fig:thunder}
+    \end{minipage}            &
+    \begin{minipage}[t]{0.45\hsize}
+      \centering
+      \includegraphics[keepaspectratio, scale=0.8]{../figure/part1/fjord.jpg}
+      \subcaption{フィヨルド(Wikipedia)$\sim\mathcal{O}(\SI{e5}{m})$}
+      \label{fig:fjord}
+    \end{minipage}
+  \end{tabular}
+  \caption{}
+\end{figure}
+
 
 \ifdraft{
   \bibliographystyle{../Preamble/Physics.bst}

@@ -5,10 +5,7 @@
 \usepackage{geometry}
 
 %画像描画関係
-\usepackage{xcolor}%https://qiita.com/zr_tex8r/items/442b75b452b11bee8049
-%xcolorとgraphicxはドライバを共有しているため，挙動がおかしくなる可能性大。->(x)colorを先に読み込むと動く，後でgraphicのドライバが正しく上書きされているためと思われる。
 \usepackage{graphicx}
-\usepackage{wrapfig}
 \usepackage[hang,small,bf]{caption}
 \usepackage[subrefformat=parens]{subcaption}
 \usepackage{here}
@@ -39,7 +36,7 @@
   \usepackage{pxjahyper}
   \hypersetup{%
     setpagesize=false,%
-    % bookmarks=true,%
+    bookmarks=true,%
     bookmarksdepth=tocdepth,%
     bookmarksnumbered=true,%
     colorlinks=true,%

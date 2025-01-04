@@ -1,0 +1,18 @@
+\documentclass[autodetect-engine,dvipdfmx-if-dvi,a4paper,ja=standard]{bxjsarticle}
+\usepackage{../testtex_preamble/mypackage}
+
+\begin{document}
+\lipsum[1]
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../test_fig/part1/BZ_reaction.jpg}
+  \caption{BZ反応}
+  \label{fig:test}
+\end{figure}
+% \ifdraft{
+%   \bibliographystyle{../testtex_preamble/Physics.bst}
+%   \bibliography{../testtex_preamble/test.bib}
+% }{}
+
+\end{document}

@@ -4,12 +4,36 @@
 
 \begin{document}
 \part{実験}
-\section{金属樹}
-\section{電界析出}
+\chapter{電界析出}
+金属イオンの水溶液に電場を印可することで以下の化学反応が起こる。
+\begin{multline}
+  \textrm{陰極：}\ce{M^{$n+$} + ne^- &-> M}\\
+  \textrm{陽極：}\ce{M &-> M^{$n+$} + ne^-} \label{eq:electro_deposition}
+\end{multline}
+陽極側で金属が電子を放出し，イオンとなって溶液中に溶け出す。一方陰極側では金属イオンが電子を受け取り，金属として析出する。このようにして金属イオンが電極間を移動し，陰極で析出することを\textbf{電界析出}と呼ぶ。
+\chapter{金属樹}
+式\eqref{eq:electro_deposition}の電界析出で生じる金属結晶は，印可する電圧や溶液の温度によってその形態が変化する\cite{suda2003temperature}。その中でも，生じる金属結晶が不規則に枝分かれをして成長していくものを\textbf{金属樹}と呼ぶ。金属樹は，電極間の距離や電圧，溶液の濃度などの条件によって枝分かれの形態や大きさが変化する。金属樹は，その形態がフラクタル構造を持つことが知られている\cite{matsushita1984fractal}。
+\begin{figure}
+  \begin{minipage}
+    {0.65\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2/el_dep_mol.png}
+    \subcaption{電界析出の様々なパラメータによるおおよその形態変化。様々な要因が複合的に作用するため厳密に一致しているとは限らない。}
+    \label{fig:el_dep_mol}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2/dendrite.png}
+    \subcaption{フラクタル構造を持つ亜鉛の金属樹\cite{matsushita1984fractal}。}
+    \label{fig:el_dep_fractal}
+  \end{minipage}
+\end{figure}
 \section{界面成長}
 
+
 \ifdraft{
-  \bibliographystyle{../Preamble/Physics.bst}
-  \bibliography{../Preamble/reference.bib}
+  \bibliographystyle{../../Preamble/Physics.bst}
+  \bibliography{../../Preamble/reference.bib}
 }{}
 \end{document}

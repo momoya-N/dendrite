@@ -1,15 +1,20 @@
-\documentclass[uplatex]{jsarticle}
+\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,a4paper,12pt]{bxjsbook}
 
-\usepackage{biblatex}
-\addbibresource{test.bib}
+\usepackage{graphicx}
 
 \begin{document}
 
-私は\cite{elements}を引用する。
+\part{部の名前}
+\section{節の名前}
+\subsection{小節の名前}
+\subsubsection{小小節の名前}
+\paragraph{段落の名前}
+\subparagraph{小段落の名前}
 
-%\bibliographystyle{unsrt}
-%\bibliography{sample}
-
-\printbibliography
-
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{test_tex/test_fig/part1/BZ_reaction.jpg}
+  \caption{キャプション}
+  \label{fig:test}
+\end{figure}
 \end{document}
