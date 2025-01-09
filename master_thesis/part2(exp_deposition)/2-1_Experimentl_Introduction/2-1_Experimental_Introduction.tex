@@ -1,0 +1,56 @@
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\usepackage{../../Preamble/mypackage}
+
+\begin{document}
+\chapter{実験：金属樹}
+\section{電界析出}
+金属イオンの水溶液に電場を印可することで以下の化学反応が起こる。
+\begin{equation}
+  \begin{split}
+    \textrm{陰極：} & \ce{M^{$n+$} + ne^-  -> M}                                             \\
+    \textrm{陽極：} & \ce{M                -> M^{$n+$} + ne^-} \label{eq:electro_deposition}
+  \end{split}
+\end{equation}
+陽極側で金属が電子を放出し，イオンとなって溶液中に溶け出す。一方陰極側では金属イオンが電子を受け取り，金属として析出する。このようにして金属イオンが電極間を移動し，陰極で析出することを\textbf{電界析出}と呼ぶ。
+\section{金属樹}
+式\eqref{eq:electro_deposition}の電界析出で生じる金属結晶は，印可する電圧や溶液の温度によってその形態が変化する\cite{suda2003temperature}。その中でも，生じる金属結晶が不規則に枝分かれをして成長していくものを\textbf{金属樹}と呼ぶ。金属樹は，電極間の距離や電圧，溶液の濃度などの条件によって枝分かれの形態や大きさが変化する。金属樹は，その形態がフラクタル構造を持つことが知られており\cite{matsushita1984fractal}，印可する電圧を増価させたり\cite{matsushita1984fractal},溶液の温度を上昇させると\cite{suda2003temperature}，相転移的にフラクタル次元が上昇していくことが知られている(\ref{fig:Df_volt},\ref{fig:Df_volt})。
+\begin{figure}[H]
+  \begin{minipage}
+    {0.65\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/el_dep_mol.png}
+    \subcaption{電界析出の様々なパラメータによるおおよその形態変化。様々な要因が複合的に作用するため厳密に一致しているとは限らない。}
+    \label{fig:el_dep_mol}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/dendrite.png}
+    \subcaption{フラクタル構造を持つ亜鉛の金属樹\cite{matsushita1984fractal}。}
+    \label{fig:el_dep_fractal}
+  \end{minipage}
+  \caption{析出結晶の形態変化と亜鉛の金属樹}
+\end{figure}
+\begin{figure}[H]
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/Df_volt.png}
+    \subcaption{電圧によるフラクタル次元の変化\cite{matsushita1984fractal}。}
+    \label{fig:Df_volt}
+  \end{minipage}
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/Df_temp.png}
+    \subcaption{温度によるフラクタル次元の変化\cite{suda2003temperature}。}
+    \label{fig:Df_temp}
+  \end{minipage}
+  \caption{金属樹のフラクタル次元のパラメータによる変化}
+\end{figure}
+
+\ifdraft{
+  \bibliographystyle{../../Preamble/Physics.bst}
+  \bibliography{../../Preamble/reference.bib}
+}{}
+\end{document}

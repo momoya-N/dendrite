@@ -2,10 +2,10 @@
 \usepackage{../Preamble/mypackage}
 
 \begin{document}
-\part{Introduction}
-\chapter{パターン形成の物理学}
+\chapter{Introduction}
+\section{パターン形成の物理学}
 自然界では絶えずエネルギーの注入や散逸，物質の輸送などが起こっている。このような系を平衡系と区別して\textbf{非平衡系}と呼ぶ。その中でも，非平衡過程により生じる様々な秩序構造の形成メカニズムや統計的性質に着目する分野を\textbf{パターン形成の物理学}と呼ぶ。パターン形成の物理学は，自然界に広く見られるパターンの形成メカニズムを理解し，生物学や化学などの様々な分野に応用されている。
-\begin{figure}
+\begin{figure}[H]
   \centering
   \begin{minipage}
     {0.32\textwidth}
@@ -32,9 +32,9 @@
   \label{fig:pattern_formation}
 \end{figure}
 
-\chapter{枝分かれ}
-自然界のパターンの中でも特に，幅広い長さスケールで見られるパターンが\textbf{枝分かれパターン}である。以下の４つの枝分かれ構造は$\mathcal{O}(\SI{e-4}{m})\sim\mathcal{O}(\SI{e5}{m})$という幅広いスケールにおける枝分かれ構造の例である。これらの現象はスケールも形成メカニズムも異なるが，その”かたち”は似通っている。このようにスケールによらず似た形を持つスケール不変な構造を\textbf{フラクタル（自己相似）構造}と呼ぶ。
-\begin{figure}[htbp]
+\section{枝分かれ}
+自然界のパターンの中でも特に，幅広い長さスケールで見られるパターンが\textbf{枝分かれパターン}である。以下の４つの枝分かれ構造は生体内から地形まで，$\mathcal{O}(\SI{e-4}{m})\sim\mathcal{O}(\SI{e5}{m})$という幅広いスケールにおける枝分かれ構造の例である。これらの現象はスケールも形成メカニズムも異なるが，その”かたち”は似通っている。このようにスケールによらず似た形を持つスケール不変な構造を\textbf{フラクタル（自己相似）構造}と呼ぶ。
+\begin{figure}[H]
   \begin{tabular}{cc}
     \begin{minipage}[t]{0.45\hsize}
       \centering
@@ -64,7 +64,21 @@
   \end{tabular}
   \caption{}
 \end{figure}
-
+\section{フラクタル次元}
+フラクタル構造を特徴づける量として\textbf{フラクタル次元}が挙げられる。フラクタル次元の定義は様々であるが，ここでは\textbf{相似次元}を用いる。相似次元は次のように定義される。
+\begin{wrapfigure}{r}[0pt]{0.33\textwidth}
+  \begin{center}
+    \includegraphics[scale=0.5]{../figure/part1/Fractaldimensionexample.png}
+  \end{center}
+  \caption{スケールと個数の関係\cite{}}
+  \label{fig:相似次元の考え方}
+\end{wrapfigure}
+\begin{equation}
+  D=\lim_{\varepsilon \to 0}\frac{\log N(\varepsilon)}{\log \frac{1}{\varepsilon}}
+\end{equation}
+ここで$N(\varepsilon)$は$\varepsilon$で覆われる点の数($\varepsilon$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元を表す。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ性質を示す。このような\textbf{スケール不変性}を持つ系では，べき関数則が成り立つことが知られている。フラクタル次元はこのようなスケール不変性を表す指標である。
+\section{研究の目的}
+枝分かれパターンの形成メカニズムは現象によって異なる。\textcolor{red}{しかし，枝の分岐(Tip Splitting)は成長過程での界面の粗さが影響を与える\cite{}ことが知られており，}界面の粗さの不安定性が最終的な枝分かれ形状に影響を与えると思われる。しかし，成長界面の粗さの不安定性と最終的な枝分かれ形状の関係は十分に理解されていない。本研究では，成長界面の粗さの不安定性と枝分かれ形状の関係を明らかにすることを目的とする。モデル系として，亜鉛イオン水溶液の電界析出で生じる亜鉛の金属樹を用いる。亜鉛の金属樹はフラクタル性を示すことが知られており\cite{matsushita1984fractal}，様々なパラメータでの形態変化が調べられている\cite{suda2003temperature}{matsushita1984fractal}。本研究では電界析出する金属結晶の界面の粗さを平滑化させるLeveling現象を用いて界面粗さの成長速度を変化させ，最終的に生じる枝分かれ形状がどのように変化するかを議論する。また，枝分かれパターンのフラクタル性を再現するモデルである拡散律速凝集(Diffusion Limited Aggregation: DLA)モデル\cite{witten1981diffusion}をベースに，実験を再現するモデルの構築を行う。
 
 \ifdraft{
   \bibliographystyle{../Preamble/Physics.bst}

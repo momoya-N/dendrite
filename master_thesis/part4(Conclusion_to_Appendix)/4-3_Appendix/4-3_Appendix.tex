@@ -1,10 +1,28 @@
 % \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
-
-
+\appendix
+\chapter{Appendix}
+\section{スケールフリー性を持つ関数がべき関数になることの証明}
+スケールフリー関数はスケール$a$のみに依存する関数$g(a)$を用いて以下のように表される。
+\begin{equation}
+  \frac{f(ax)}{f(x)}=g(a) \quad (a>0)
+\end{equation}
+これを両辺$a$で微分し，変形していく。
+\begin{equation}
+  \begin{split}
+    \frac{\d (ax)}{\d a}\frac{\d f(ax)}{\d (ax)}          & =\frac{\d g(a)}{\d a}f(x)                                                       \\
+    \lim_{a\to 1}x\frac{\d f(ax)}{\d (ax)}                & =D_f f(x) \qquad\left(\left.\frac{\d f(ax)}{\d (ax)}\right|_{a\to1}:=D_f\right) \\
+    \frac{1}{f(x)}\frac{\d f(x)}{\d x}                    & =\frac{D_f}{x}                                                                  \\
+    \int_{x_0}^{x} \frac{1}{f(x)}\frac{\d f(x)}{\d x}\d x & =\int_{x_0}^{x} \frac{D_f}{x}\d x                                               \\
+    \log f(x)-\log f(x_0)                                 & =D_f\log x-D_f\log x_0                                                          \\
+    \log \frac{f(x)}{f(x_0)}                              & =D_f\log \frac{x}{x_0}                                                          \\
+    f(x)                                                  & =f(x_0)\left(\frac{x}{x_0}\right)^{D_f}
+  \end{split}
+\end{equation}
+以上よりスケールフリー性を持つ関数はべき関数になることが示された。
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}

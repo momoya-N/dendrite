@@ -21,7 +21,7 @@ class Video:
         self.bool = cap.isOpened()
         self.path = file_path_avi
         self.fname = fname
-        self.scale=1/360 #cm/pix
+        self.scale=5000/((2372.03+2368.01+2368.05)/3) #μm/pix
         self.Lx = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.Ly = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.fps = cap.get(cv2.CAP_PROP_FPS)
@@ -36,6 +36,7 @@ class Video:
         print("File Name : ", self.fname)
         print("Frame Width : ", self.Lx, " pix")
         print("Frame Hight : ", self.Ly, " pix")
+        print("Scale : ", self.scale, " μm/pix")
         print("FPS : ", self.fps, " frame/s")
         print("Frame Count : ", self.total_frames, " frame")
         h = int(self.total_time // 3600)
@@ -56,50 +57,18 @@ class range_value:
         self.theta_R_0=theta_R_0
         self.theta_center=theta_center
 
-def dust_remove(file_path,fps,Lx,Ly,scale):
-    cap = cv2.VideoCapture(file_path)
-    fourcc = cv2.VideoWriter.fourcc("M", "J", "P", "G")  # 動画保存時のfourcc設定、確認のためだけなので圧縮形式
-    file_path_dust_removed_avi = file_path.replace(".avi", "_dust_removed.avi")
-    dust_removed_movie = cv2.VideoWriter(file_path_dust_removed_avi, fourcc, fps, (Lx, Ly), isColor=False)
-    binary_frames = []
-    pbar = tqdm(total=int(cap.get(cv2.CAP_PROP_FRAME_COUNT)), desc="Removing dust")
+def dust_removed(frame):#チリの除去
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # gray scale に変換
+    thresh, frame_binary = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)#Otsuの二値化
+    negative_frame_binary = cv2.bitwise_not(frame_binary)#ネガポジ反転
+    black=np.zeros_like(frame_gray)
 
-    while True:
-        ret, frame = cap.read()  # １枚読み込み
-        
-        if ret == False:
-            break  # 最後になったらループから抜ける
-        
-        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # 色の変換
-        thresh, frame_binary = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)#2値化
-        negative_frame_binary = cv2.bitwise_not(frame_binary)#ネガポジ反転
-        black=np.zeros_like(frame_gray)
-        
-        if cap.get(cv2.CAP_PROP_POS_FRAMES)==1:
-            first_frame=black
+    contour,_=cv2.findContours(negative_frame_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for cont in contour:
+        if cv2.contourArea(cont)>4000*500:#画面に対して1/6以上の領域を解析領域とする
+            cv2.fillPoly(black, [cont], (255,255,255))
 
-        contour,_=cv2.findContours(negative_frame_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        for cont in contour:
-            if cv2.contourArea(cont)>10000:
-                cv2.fillPoly(black, [cont], (255,255,255))
-
-        #overhungの判定，overhungがある場合はreturn
-        for x in range(0,Lx):
-            y_init=first_frame[...,x]
-            y=black[...,x]
-            nonzero=np.where(y!=0)[0]
-            nonzero_init=np.where(y_init!=0)[0]
-            hight=len(nonzero)-len(nonzero_init)
-            if Ly-len(nonzero)!=nonzero[0] and hight*scale>0.07:#初期からの成長高さが0.07cm=700umより大きく，かつoverhungがある場合
-                return binary_frames
-            
-        binary_frames.append(black)
-        dust_removed_movie.write(black)
-        pbar.update()
-    pbar.close()
-    cap.release()
-
-    return binary_frames
+    return black
 
 def circle(X,cx,cy,r):
     return -np.sqrt(np.abs(r**2-(X-cx)**2))+cy
@@ -115,12 +84,9 @@ def get_rth2XY(x0, y0, r, theta):
     Y = y0 + r*math.sin(theta)
     return X, Y
 
-def get_circle(file_path,binary_frames,Lx,Ly):
+def get_circle(img,Lx,Ly):#最初の画像の極板の円の推定
     #estimating circle
-    cap=cv2.VideoCapture(file_path)
-    cap.set(cv2.CAP_PROP_POS_FRAMES,0)
-    ret,img=cap.read()
-    img_binary=binary_frames[0]
+    img_binary=dust_removed(img)
     surface_point=[]
     for x in range(0,Lx):
         if not np.all(img_binary[...,x] == 0):
@@ -145,176 +111,132 @@ def get_circle(file_path,binary_frames,Lx,Ly):
     Y_fit=circle(X,*parms)
     
     for i in range(0,len(X)):
-        cv2.circle(img,(X[i],int(Y_fit[i])),3,(0,255,0),-1)
-    cv2.circle(img,(int(get_rth2XY(cx,cy,r_L_edge,theta_L_edge)[0]),int(get_rth2XY(cx,cy,r_L_edge,theta_L_edge)[1])),3,(0,0,255),-1)
-    cv2.circle(img,(int(get_rth2XY(cx,cy,r_R_edge,theta_R_edge)[0]),int(get_rth2XY(cx,cy,r_R_edge,theta_R_edge)[1])),3,(0,0,255),-1)
+        cv2.circle(img,(X[i],int(Y_fit[i])),4,(0,255,0),-1)
+    cv2.circle(img,(int(get_rth2XY(cx,cy,r_L_edge,theta_L_edge)[0]),int(get_rth2XY(cx,cy,r_L_edge,theta_L_edge)[1])),20,(0,0,255),-1)
+    cv2.circle(img,(int(get_rth2XY(cx,cy,r_R_edge,theta_R_edge)[0]),int(get_rth2XY(cx,cy,r_R_edge,theta_R_edge)[1])),20,(0,0,255),-1)
 
     cv2.imwrite(file_path.replace(".avi", "_circle.png"), img)
-    polor_range=range_value(r_min,theta_center,r_L_max,r_R_max,theta_L_lim,theta_R_lim,theta_L_0,theta_R_0)
+    polar_range=range_value(r_min,theta_center,r_L_max,r_R_max,theta_L_lim,theta_R_lim,theta_L_0,theta_R_0)
 
-    return cx,cy,r0,polor_range
+    return cx,cy,r0,polar_range
 
 def correlation_func(Y):
     Y=np.array(Y)-np.mean(Y)
     N=len(Y)
-    cor=np.zeros(N)
-    for i in range(int(N/2)):
+    cor=np.zeros(N//2)
+    for i in range(N//2):
         cor[i]=np.sum(Y[:N-i]*Y[i:])/np.sum(Y[:N-i]**2)
     return cor
 
-def decart_img2polar_img_analisys_plot(file_path,video,cx,cy,r0,polor_range,time_range):#動画の座標変換
-    #set parameter
+def decart_img2polar_img(img,video,cx,cy,polar_range):#動画の座標変換
+    # set parameter
+    Lx = video.Lx
+    Ly = video.Ly
+    theta_min = polar_range.theta_L_0
+    theta_max = polar_range.theta_R_0
+    r_min = polar_range.r_min
+    r_max = max(polar_range.r_L_max, polar_range.r_R_max)
+    black=np.zeros((Ly,Lx),dtype=np.uint8)
+
+    # Create Theta and R arrays
+    Theta = np.linspace(theta_min, theta_max, Lx)
+    R = np.linspace(r_min, r_max, Ly)
+
+    # Create meshgrid for Theta and R
+    R_grid, Theta_grid = np.meshgrid(R, Theta, indexing='ij')
+
+    # Convert polar coordinates (R, Theta) to Cartesian coordinates (x, y)
+    X = cx + R_grid * np.cos(Theta_grid)
+    Y = cy + R_grid * np.sin(Theta_grid)
+
+    # Clip X and Y to valid image range
+    X_clipped = np.clip(X, 0, Lx - 1).astype(int)
+    Y_clipped = np.clip(Y, 0, Ly - 1).astype(int)
+
+    # Create polar image
+    polar_img = img[Y_clipped, X_clipped]
+    polar_img=np.flipud(polar_img)
+
+    return polar_img
+
+def surface_tracking(img,r_bottom,video,polar_range):#界面高さトラッキング
     Lx=video.Lx
     Ly=video.Ly
     scale=video.scale
-    theta_min=polor_range.theta_L_lim
-    theta_max=polor_range.theta_R_lim
-    r_min=polor_range.r_min
-    r_max=max(polor_range.r_L_max,polor_range.r_R_max)
+    theta_min=polar_range.theta_L_lim
+    theta_max=polar_range.theta_R_lim
+    r_min=polar_range.r_min
+    r_max=max(polar_range.r_L_max,polar_range.r_R_max)
     Theta_lim=np.linspace(theta_min,theta_max,Lx)
-    Theta=[theta for theta in Theta_lim if theta>polor_range.theta_L_0 and theta<polor_range.theta_R_0]
-    delta_theta=Theta-min(Theta)#角度の差分,左端を0にする
+    Theta=[theta for theta in Theta_lim if theta>polar_range.theta_L_0 and theta<polar_range.theta_R_0]
     R=np.linspace(r_min,r_max,Ly)
-    r_bottom=0.0
-    h_mean=[]#界面高さの平均
-    h_std=[]#界面高さの標準偏差
+    h_t=[] #その時間の界面高さ
+    for i,theta in enumerate(Theta):
+        R_rev=np.flip(R)
+        top=np.nonzero(img[...,i])[0][0]
+        hight=R_rev[top]
+        h_t.append(hight*scale)
+    if r_bottom==0.0:
+        r_bottom=min(h_t)
+    #相関関数の計算
+    print(r_bottom)
+    h_t=np.array(h_t)-r_bottom
+    print(h_t)
+    cor_func=correlation_func(h_t)
+    diff_cor_func=np.diff(cor_func)
+    local_max=np.where((diff_cor_func[:-1]>0)&(diff_cor_func[1:]<0))[0]+1
+    return Theta,h_t,cor_func,local_max,r_bottom
+
+def surface_analisis(file_path,video):#動画の解析&データ出力
+    surface_hight_data=pd.DataFrame()
+    cor_func_data=pd.DataFrame()
+    local_max_data=pd.DataFrame()
     cap=cv2.VideoCapture(file_path)
-    fourcc = cv2.VideoWriter.fourcc("M", "J", "P", "G")  # 動画保存時のfourcc設定、確認のためだけなので圧縮形式
-    file_path_polar_avi = file_path.replace(".avi", "_polar.avi")
-    polar_movie = cv2.VideoWriter(file_path_polar_avi, fourcc, video.fps, (len(Theta), Ly), isColor=False)
-    file_path_binary_avi = file_path.replace(".avi", "_binary.avi")
-    binary_polar_movie = cv2.VideoWriter(file_path_binary_avi, fourcc, video.fps, (len(Theta), Ly), isColor=False)
-    dir_path = os.path.dirname(file_path)
-    corr_dir_path = dir_path + "/correlation_data"
+    pbar = tqdm(total=video.total_frames, desc="Analyzing video")
+    r_bottom=0.0
 
-    #make directory
-    if not os.path.exists(corr_dir_path):
-        os.makedirs(corr_dir_path)
-        print("make directory: ", corr_dir_path)
-    else:
-        shutil.rmtree(corr_dir_path)
-        os.makedirs(corr_dir_path)
-        print("remove and make directory: ", corr_dir_path)
-
-    #start analisis
-    pbar = tqdm(total=time_range-1, desc="Polor mapping")
     while True:
         ret,img=cap.read()
-        n_frame=int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-        
-        if n_frame==time_range:
+
+        if not ret:
             break
-        if not n_frame==51:
-            pbar.update()
-            continue
 
-        img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        black=np.zeros((Ly,len(Theta)),dtype=np.uint8)
-        black_surface=np.zeros((Ly,len(Theta)),dtype=np.uint8)
-        for i,theta in enumerate(Theta):
-            for j,r in enumerate(reversed(R)):
-                x,y=get_rth2XY(cx,cy,r,theta)
-                if x>0 and x<Lx and y>0 and y<Ly:
-                    black[j,i]=img_gray[int(y),int(x)]
-        polar_movie.write(black)
-        cv2.imwrite(file_path.replace(".avi", "_polar_tmp.png"), black)
-        _,img_binary=cv2.threshold(black, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        img_negative_binary=cv2.bitwise_not(img_binary)
-        contoures ,_=cv2.findContours(img_negative_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        for cont in contoures:
-            if cv2.contourArea(cont)>40000:
-                cv2.fillPoly(black_surface, [cont], (255,255,255))
-        cv2.imwrite(file_path.replace(".avi", "_polar_tmp_fill.png"), black_surface)
-        binary_polar_movie.write(black_surface)
-        #界面高さトラッキング
-        h=[]#界面高さ
-        for i,theta in enumerate(Theta):
-            R_rev=np.flip(R)
-            top=np.nonzero(black_surface[...,i])[0][0]
-            hight=R_rev[top]
-            h.append(hight*scale)
-        #相関関数の計算
-        if r_bottom==0.0:
-            r_bottom=min(h)
-        h=np.array(h)-r_bottom
-        cor_func=correlation_func(h)
-        diff_cor_func=np.diff(cor_func)
-        local_max=np.where((diff_cor_func[:-1]>0)&(diff_cor_func[1:]<0))[0]+1
-        
-        #画像出力
-        # if n_frame==True:
-        fig,ax=plt.subplots(1, 2, figsize=(13.5, 9))
-        h_from_r0=np.array(h)+r0*scale
-        ax[0].plot(Theta,h_from_r0)
-        ax[0].set_title("Height Tracking "+r"$t=$"+str(n_frame/video.fps)+" sec")
-        ax[0].set_xlabel(r"$\theta$ rad")
-        ax[0].set_ylabel("Height from center "+r"$r$ cm")
-        ax[0].set_ylim(r0*scale,(r0+50)*scale)
-        ax[0].axhline(y=np.mean(h_from_r0),color='r',ls='--',lw=0.6)
-        ax[0].text(Theta[0], np.mean(h_from_r0), rf"{np.mean(h_from_r0):.2f} cm", color='red', ha='center')
-        
-        ax[1].plot(delta_theta[:int(len(cor_func)/2)],cor_func[:int(len(cor_func)/2)])
-        ax[1].set_title("Correlation Function "+r"$t=$"+str(n_frame/video.fps)+" sec",pad=30)
-        # ax[1].set_xlabel(r"$\delta \theta$ rad")
-        # ax[1].set_ylabel("Correlation")
-        y_lim_min=0.5
-        y_lim_max=1
-        ax[1].set_ylim(y_lim_min,y_lim_max)
-        ax[1].set_xlim(0,0.03)
-        ax[1].scatter(delta_theta[local_max[:3]],cor_func[local_max[:3]],c="r")
-        ax[1].tick_params(axis='x', labelsize=18)
-        ax[1].tick_params(axis='y', labelsize=18)
-        #指数表記
-        formatter = ScalarFormatter(useMathText=True)
-        formatter.set_scientific(True)  # 科学的表記を有効にする
-        formatter.set_powerlimits((-1, 1))
-        ax[1].xaxis.set_major_formatter(formatter)
-        # オフセットテキストを取得してフォントサイズを設定
-        offset_text = ax[1].xaxis.get_offset_text()
-        offset_text.set_fontsize(18)  # フォントサイズ設定
+        n_frame=int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
-        
-        for i,x0 in enumerate(delta_theta[local_max[:3]]):
-            y0=cor_func[local_max[i]]
-            y_max=float((y0-y_lim_min)/(y_lim_max-y_lim_min))
-            y_min=float(i+1)/20
-            ax[1].axvline(x=x0,c='r',ls='--',lw=0.6,ymax=y_max,ymin=y_min)
-            # exp=int(np.log10(x0))
-            exp=-2
-            mantissa=x0/10**exp
-            # ax[1].text(x0,0.5+y_min*0.5,rf"${mantissa:.2f} \times 10^{{\mathrm{{{exp}}}}}$", color='k', ha='left', fontsize=18)
-            ax[1].text(x0,y_lim_min+y_min*(y_lim_max-y_lim_min),rf"${mantissa:.2f}$", color='k', ha='left', fontsize=18)
-        plt.savefig(corr_dir_path + "/correlation_{0:04d}.png".format(n_frame))
-        plt.close()
-
-        h_mean.append(np.mean(h))
-        h_std.append(np.std(h))
+        if n_frame==1:
+            cx,cy,r0,polar_range = get_circle(img, video.Lx, video.Ly)
+    
+        binary_img=dust_removed(img)
+        polor_binary_img=decart_img2polar_img(binary_img,video,cx,cy,polar_range)
+        Theta,h_t,cor_func,local_max,r_bottom=surface_tracking(polor_binary_img,r_bottom,video,polar_range)
+        delta_theta=Theta-min(Theta)#相関関数用の角度の差
+        if n_frame==1:#DateFrameの1行目に角度の行を追加
+            cor_func_data=pd.concat([cor_func_data,pd.DataFrame({"delta_theta":list(delta_theta[:len(delta_theta)//2])})],axis=1)
+            surface_hight_data=pd.concat([surface_hight_data,pd.DataFrame({"Theta":list(Theta)})],axis=1)
+            local_max_data=pd.concat([local_max_data,pd.DataFrame({"local_max":list(Theta)})],axis=1)
+        cor_func_data=pd.concat([cor_func_data,pd.DataFrame({str(n_frame/video.fps):list(cor_func)})],axis=1)
+        surface_hight_data=pd.concat([surface_hight_data,pd.DataFrame({str(n_frame/video.fps):list(h_t)})],axis=1)
+        local_max_data=pd.concat([local_max_data,pd.DataFrame({str(n_frame/video.fps):list(local_max[:3])})],axis=1)
         pbar.update()
 
-    #data output
-    csv_file_path = file_path.replace(".avi", "_polar_data.csv")
-    with open(csv_file_path, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Time", "Height_mean (cm)", "Height_Std (cm)"])
-        for frame_i in range(len(h_mean)):
-            writer.writerow([frame_i*video.fps, h_mean[frame_i], h_std[frame_i]])
-    cap.release()
-    return None
+    pbar.close()
+
+    return surface_hight_data,cor_func_data,local_max_data
 
 # メイン処理
 if __name__ == "__main__":
-    # time
-    start_time = time.time()
-
-    # setting for video writer
-    fourcc = cv2.VideoWriter.fourcc("M", "J", "P", "G")  # 動画保存時のfourcc設定、確認のためだけなので圧縮形式
-
-    # Video Source
-    file_path="D:/master_thesis_data/experment_data/movie_data/movie_data/data_for_test/surface_growth/20241105/20241105_NOTWEEN_0.00mM_5V_02/20241105_NOTWEEN_0.00mM_5V_02.avi"
-    # file_path="D:/master_thesis_data/experment_data/movie_data/movie_data/data_for_test/surface_growth/20241105/20241105_TWEEN20_0.005mM_5V_01/20241105_TWEEN20_0.005mM_5V_01.avi"
-    video = Video(file_path)
-    video.show_info()
-    cap = cv2.VideoCapture(file_path)
-    binary_frames = dust_remove(file_path, video.fps, video.Lx, video.Ly, video.scale)#ここでbinary_frameを作って後で極座標に変換しているので２度手間感あるが，一旦このままにしておく(Done is better than perfect.)
-    cx,cy,r0,polor_range = get_circle(file_path,binary_frames, video.Lx, video.Ly)
-    decart_img2polar_img_analisys_plot(file_path, video, cx, cy, r0, polor_range, time_range=len(binary_frames))
+    file_pluronic="D:/master_thesis_data/experiment_data/movie_data/movie_data/data_for_surface_groth/Pluronic-F127/"
+    con_list=os.listdir(file_pluronic)
+    for con in con_list:
+        file_list=os.listdir(file_pluronic+con)
+        for file in file_list:
+            file_path=file_pluronic+con+"/"+file+"/"+file+".avi"
+            video = Video(file_path)
+            video.show_info()
+            print("Start surface groth analisis")
+            surface_hight_data,cor_func_data,local_max_data=surface_analisis(file_path,video)
+            #save data
+            surface_hight_data.to_csv(file_path.replace(".avi", "_surface_hight_data.csv"),float_format='%.5f')
+            cor_func_data.to_csv(file_path.replace(".avi", "_cor_func_data.csv"),float_format='%.5f')
+            local_max_data.to_csv(file_path.replace(".avi", "_local_max_data.csv"),float_format='%.5f')
+            sys.exit(0)

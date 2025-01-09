@@ -1,0 +1,138 @@
+% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\usepackage{../../Preamble/mypackage}
+
+\begin{document}
+\section{金属樹}
+\subsection{実験方法・実験系}
+本研究では亜鉛の金属樹を対称に実験・解析を行った。硫酸亜鉛七水和物\ce{ZnSO_4.7H_2O}(\textcolor{red}{富士フイルムワコー純薬})の$\SI{2}{mol/L}$水溶液を精製し，以下の条件で電界析出を行った。
+\begin{table}[H]
+  \centering
+  \caption{電界析出の条件}
+  \begin{tabular}{c||c}
+    \hline
+    シャーレ直径 & $\phi = 11 \si{\cm}$ \\ \hline
+    電圧     & $5 \si{\V}$          \\ \hline
+    溶液量    & $12 \si{\mL}$        \\
+    \hline
+  \end{tabular}
+\end{table}
+実験系として以下のような実験系を用いた。
+\begin{figure}[H]
+  \begin{minipage}
+    {0.65\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/system_side.png}
+    \subcaption{実験系の模式図（横）}
+    \label{fig:el_dep_mol}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/system_top.png}
+    \subcaption{実験系の模式図（上）}
+    \label{fig:el_dep_fractal}
+  \end{minipage}
+  \caption{実験系の模式図}
+\end{figure}
+実験手順は以下の通りである。
+\begin{enumerate}
+  \item シャーレに\textcolor{red}{プラズマをかけて表面を励起させ，溶液が広がりやすくする。}
+  \item シャーレに硫酸亜鉛七水和物の水溶液を入れる。（溶液厚：$\sim\SI{1.26}{mm}$）
+  \item シャーレの中心に電極を設置し，電極間に電圧を印可する。
+  \item 電界析出していく過程を撮影し形態を観察する。
+\end{enumerate}
+\subsection{解析方法}
+\subsubsection{フラクタル次元}
+金属樹の形態を解析するために，フラクタル次元を求めた。フラクタル次元は\textbf{ボックスカウンティング法}を用いて求めた。ボックスカウンティング法とは与えられたパターンを様々なスケール（大きさ）の正方形で覆い，その正方形の中にパターンが含まれるか否かを数えることでフラクタル次元を求める方法である。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/Great_Britain_Boxcounting.png}
+  \caption{ボックスカウンティング法のイメージ(Wikipedia)}
+  \label{fig:box_counting}
+\end{figure}
+スケールを$\varepsilon$，パターンが少しでも含まれるボックスの個数を$N(\varepsilon)$とすると，フラクタル次元$D_f$は以下のように定義される。
+\begin{equation}
+  D_f = \lim_{\varepsilon \to 0} \frac{\log N(\varepsilon)}{\log \frac{1}{\varepsilon}}
+\end{equation}
+ボックスの大きさ$\varepsilon$を変え，$N(\varepsilon)$を求めることでフラクタル次元を求めた。
+\subsubsection{枝の本数・太さのトラッキング}
+金属樹の形態を特徴づけるために，枝やその太さがどのように変化するかを解析した。枝が中心から等方的に広がっていると仮定し，中心からの距離$r$の円と交差する枝の本数$N(r)$やその太さ$S(r)$を求めた。
+\begin{figure}[H]
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/0.00_circle.png}
+    \subcaption{界面活性剤濃度：0\%(3795\si{s})}
+    \label{fig:0.00_circle}
+  \end{minipage}
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/0.05_circle.png}
+    \subcaption{界面活性剤濃度：0.05\%(821\si{s})}
+    \label{fig:0.05_circle}
+  \end{minipage}
+  \caption{半径$r$の円（図中赤線）と交差する枝の本数と太さを計測}
+\end{figure}
+\subsubsection{枝の長さ・分岐角度の計測}
+金属樹のより細かい構造を解析するために，枝の長さや分岐角度を解析し，界面活性剤濃度による形態変化を定量化した。解析手順は以下の通りである。
+\begin{enumerate}
+  \item 金属樹の中心を原点とし，極座標上で枝の重心位置の半径$r$と角度$\theta$を計測した。
+  \item 外側（$r$が大きい側）から最近接の重心位置を結び，複数の点と最近接となる点を分岐した点とみなして，枝を定義，角度の計測を行った。
+\end{enumerate}
+入力画像に対して，枝の長さや角度の定義は以下のとおりである。
+\begin{figure}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_def.png}
+    \subcaption{枝の長さと角度の定義}
+    \label{fig:branch_def}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/den_input.png}
+    \subcaption{入力画像，スケールバー：\SI{2}{cm}}
+    \label{fig:den_input}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/den_analisys.png}
+    \subcaption{解析画像}
+    \label{fig:den_analisys}
+  \end{minipage}
+  \caption{枝の長さと角度の定義}
+\end{figure}
+今回の解析では枝の角度が$0.9\pi$以上になっている枝の組み合わせを一つの枝として，メインの枝とそこから生えた枝とみなして解析を行った。
+\subsubsection{分布の推定}
+取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定して\textbf{相補累積分布関数}を用いて推定を行った。相補累積分布関数は以下のように定義される。
+\begin{definition}
+  確率密度関数$f(x)$が存在したとき，確率変数$X$がある値$x$以上になる確率を表す関数$\bar{F}(x)$を\textbf{相補累積分布関数}と呼び，以下のように定義される。
+  \begin{equation}
+    \bar{F}(x) = P(X \geq x) = \int_{x}^{\infty} f(x')dx'
+  \end{equation}
+\end{definition}
+\begin{wrapfigure}{r}[0pt]{0.33\textwidth}
+  \begin{center}
+    \includegraphics[scale=0.5]{../../figure/part2(exp_deposition)/fitting_exp.png}
+  \end{center}
+  \caption{冪分布野フィッティングの例}
+  \label{fig:fitting_exp}
+\end{wrapfigure}
+フィッティング関数は定義より以下のようになる。
+\begin{equation}
+  \begin{split}
+    \bar{F}(x) & = \int_{x}^{\infty} ax'^{-b}dx' = \left[ \frac{a}{1-b}x'^{1-b} \right]_{x}^{\infty} \\
+               & = \frac{a}{b-1}x^{1-b}
+  \end{split}
+\end{equation}
+得られたデータのうち，枝の太さ程度($\sim0.15\si{cm}$)以下のものはノイズによるものとして除外し，冪分布のパラメータ$b$を推定し，界面活性剤濃度による分布の変化を調べた。
+
+\ifdraft{
+  \bibliographystyle{../../Preamble/Physics.bst}
+  \bibliography{../../Preamble/reference.bib}
+}{}
+\end{document}
