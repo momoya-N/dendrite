@@ -11,6 +11,7 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import math
 from matplotlib.ticker import ScalarFormatter
+import threading
 
 class Video:
     def __init__(self, file_path_avi: str):
@@ -179,9 +180,7 @@ def surface_tracking(img,r_bottom,video,polar_range):#界面高さトラッキ�
     if r_bottom==0.0:
         r_bottom=min(h_t)
     #相関関数の計算
-    print(r_bottom)
     h_t=np.array(h_t)-r_bottom
-    print(h_t)
     cor_func=correlation_func(h_t)
     diff_cor_func=np.diff(cor_func)
     local_max=np.where((diff_cor_func[:-1]>0)&(diff_cor_func[1:]<0))[0]+1
@@ -192,7 +191,7 @@ def surface_analisis(file_path,video):#動画の解析&データ出力
     cor_func_data=pd.DataFrame()
     local_max_data=pd.DataFrame()
     cap=cv2.VideoCapture(file_path)
-    pbar = tqdm(total=video.total_frames, desc="Analyzing video")
+    # pbar = tqdm(total=video.total_frames, desc="Analyzing video")
     r_bottom=0.0
 
     while True:
@@ -213,30 +212,56 @@ def surface_analisis(file_path,video):#動画の解析&データ出力
         if n_frame==1:#DateFrameの1行目に角度の行を追加
             cor_func_data=pd.concat([cor_func_data,pd.DataFrame({"delta_theta":list(delta_theta[:len(delta_theta)//2])})],axis=1)
             surface_hight_data=pd.concat([surface_hight_data,pd.DataFrame({"Theta":list(Theta)})],axis=1)
-            local_max_data=pd.concat([local_max_data,pd.DataFrame({"local_max":list(Theta)})],axis=1)
+            # local_max_data=pd.concat([local_max_data,pd.DataFrame({"local_max":list(Theta)})],axis=1)#うまく取れていないので無し
         cor_func_data=pd.concat([cor_func_data,pd.DataFrame({str(n_frame/video.fps):list(cor_func)})],axis=1)
         surface_hight_data=pd.concat([surface_hight_data,pd.DataFrame({str(n_frame/video.fps):list(h_t)})],axis=1)
         local_max_data=pd.concat([local_max_data,pd.DataFrame({str(n_frame/video.fps):list(local_max[:3])})],axis=1)
-        pbar.update()
+        # pbar.update()
 
-    pbar.close()
+    # pbar.close()
 
     return surface_hight_data,cor_func_data,local_max_data
+
+def worker(file_path):
+    # file_path=file_pluronic+con+"/"+file+"/"+file+".avi"
+    # video = Video(file_path)
+    # video.show_info()
+    # print("Start surface groth analisis")
+    surface_hight_data,cor_func_data,local_max_data=surface_analisis(file_path,video)
+    #save data
+    surface_hight_data.to_csv(file_path.replace(".avi", "_surface_hight_data.csv"),float_format='%.5f')
+    cor_func_data.to_csv(file_path.replace(".avi", "_cor_func_data.csv"),float_format='%.5f')
+    local_max_data.to_csv(file_path.replace(".avi", "_local_max_data.csv"),float_format='%.5f')
 
 # メイン処理
 if __name__ == "__main__":
     file_pluronic="D:/master_thesis_data/experiment_data/movie_data/movie_data/data_for_surface_groth/Pluronic-F127/"
     con_list=os.listdir(file_pluronic)
+    
     for con in con_list:
+        start=time.time()
         file_list=os.listdir(file_pluronic+con)
-        for file in file_list:
-            file_path=file_pluronic+con+"/"+file+"/"+file+".avi"
+        threads = []
+        for i in range(len(file_list)):# Create 3 threads,mulitple thread processing
+            file_path=file_pluronic+con+"/"+file_list[i]+"/"+file_list[i]+".avi"
             video = Video(file_path)
             video.show_info()
-            print("Start surface groth analisis")
-            surface_hight_data,cor_func_data,local_max_data=surface_analisis(file_path,video)
-            #save data
-            surface_hight_data.to_csv(file_path.replace(".avi", "_surface_hight_data.csv"),float_format='%.5f')
-            cor_func_data.to_csv(file_path.replace(".avi", "_cor_func_data.csv"),float_format='%.5f')
-            local_max_data.to_csv(file_path.replace(".avi", "_local_max_data.csv"),float_format='%.5f')
-            sys.exit(0)
+            print("Start surface groth analisis\n")
+            t = threading.Thread(target=worker, args=(file_path,))
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+            
+        # for file in file_list:
+        #     file_path=file_pluronic+con+"/"+file+"/"+file+".avi"
+        #     video = Video(file_path)
+        #     video.show_info()
+        #     print("Start surface groth analisis")
+        #     surface_hight_data,cor_func_data,local_max_data=surface_analisis(file_path,video)
+        #     #save data
+        #     surface_hight_data.to_csv(file_path.replace(".avi", "_surface_hight_data.csv"),float_format='%.5f')
+        #     cor_func_data.to_csv(file_path.replace(".avi", "_cor_func_data.csv"),float_format='%.5f')
+        #     local_max_data.to_csv(file_path.replace(".avi", "_local_max_data.csv"),float_format='%.5f')
+        print(f"{con} analyses are done. Time:{time.time()-start:.2f} s\n")

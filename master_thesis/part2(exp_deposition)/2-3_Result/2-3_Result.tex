@@ -3,7 +3,38 @@
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
-\lipsum[1]
+\subsection{実験結果}
+\subsubsection{フラクタル次元}
+
+\subsubsection{枝の本数・太さ}
+\begin{figure}[H]
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_num.png}
+    \subcaption{枝の本数}
+    \label{fig:branch_number}
+  \end{minipage}
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_thickness_mean.png}
+    \subcaption{枝の太さ}
+    \label{fig:branch_thickness}
+  \end{minipage}
+  \caption{中心からの距離$r$の円と交わる枝の本数・太さ}
+\end{figure}
+\ref{fig:branch_number}は中心からの距離$r$の円と交わる枝の本数，\ref{fig:branch_thickness}は枝の太さを示している。図中黒破線（20本の線）をおおよそ境にして，
+\begin{enumerate}
+  \item 界面活性剤濃度0.03\%以上：枝の本数は20本を超えない。
+  \item 界面活性剤濃度0.03\%未満：枝の本数は20本を超え，外側に連れて増加していく。
+\end{enumerate}
+という特徴が見られる。また，\ref{fig:branch_thickness}は枝の太さを示している。図中黒破線は太さ約$\SI{0.06}{cm}$を表しており，この線をおおよそ境にして，
+\begin{enumerate}
+  \item 界面活性剤濃度0.03\%以上：枝の太さは緩やかに大きくなり，ばらつきも大きくなる。
+  \item 界面活性剤濃度0.03\%未満：枝の太さはおおむね$\SI{0.06}{cm}$以下であり，太さのばらつきも小さい。
+\end{enumerate}
+\subsubsection{枝の長さ，分岐角度}
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
