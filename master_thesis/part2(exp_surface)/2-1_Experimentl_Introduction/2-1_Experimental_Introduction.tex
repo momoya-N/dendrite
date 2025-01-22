@@ -3,9 +3,50 @@
 
 \begin{document}
 \chapter{実験：界面成長}
-\section{界面成長}
-\textbf{界面成長}とは，異なる相の境界面が時間発展により成長していく現象である。金属樹は液相内に含まれる$\ce{Zn^{2+}}$がすでに成長した$\ce{Zn}$の表面に付着して成長することで成長していく。
-
+\section{概要}
+\subsection{界面成長}
+\textbf{界面成長}とは，異なる相の境界面が時間発展により成長していく現象である。金属樹は液相内に含まれる$\ce{Zn^{2+}}$がすでに成長した$\ce{Zn}$の表面に付着して成長することで成長していく。\textcolor{red}{以下KPZなどの話を書く\cite{wolf1990growth}\cite{schilardi1998evolution},\cite{kardar1987scaling}}
+\subsection{leveling効果}
+工学分野や電気化学分野において，電界析出（メッキ）を行う際に重要なのが"いかに平坦な析出界面を形成するか"である。表面の粗さを抑えるということは成長過程での金属結晶の形成過程での格子欠陥の減少につながり高品質な製品を製造するうえで重要なためである。そのため，成長過程での界面粗さを抑制するため，電解質溶液に添加物を加えることで析出速度や位置を制御している。このように，電界析出における電解質溶液に添加剤を加えることで析出界面の粗さの成長を抑制できる効果のことを\textbf{leveling効果}と呼ぶ。leveling効果を起こす有機物質は様々なものが知られており，levele（leveling剤）と呼ばれる。例えば亜鉛の電界析出においては第４級アンモニウム塩，PEGなどの高分子，界面活性剤，イオン液体塩，有機酸\cite{sorour2017review}などが知られている。以下の図\ref{fig:leveling}はチオ尿素（TU）によるleveling効果の実験結果である\cite{schilardi1998evolution}。
+\begin{figure}[H]
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/el_dep_surface_no_TU_expfig.png}
+    \caption{TU:$\SI{0}{M}$，実験結果}
+    \label{fig:no_leveling_effect}
+  \end{minipage}
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/el_dep_surface_0.025M_TU_expfig.png}
+    \caption{TU:$\SI{0.025}{M}$，実験結果}
+    \label{fig:leveling_effect}
+  \end{minipage}
+  \caption{TUによるleveling効果\cite{schilardi1998evolution}}
+  \label{fig:leveling}
+\end{figure}
+図\ref{fig:leveling}からわかるように，\ref{fig:no_leveling_effect}では早い段階（$<\SI{2400}{s}$）で析出界面が粗くなっているのに対し，\ref{fig:leveling_effect}では長時間（$>\SI{6000}{s}$）経過しても析出界面が平坦になっていることがわかる。また，以下の結果は図\ref{fig:leveling}の成長界面の高さの平均値$<h>$を右軸にその標準偏差$W_L$を左軸に表したものである。
+\begin{figure}[H]
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/el_dep_surface_no_TU_resultfig.png}
+    \caption{TU:$\SI{0}{M}$，解析結果}
+    \label{fig:no_leveling_effect_result}
+  \end{minipage}
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/el_dep_surface_0.025M_TU_resultfig.png}
+    \caption{TU:$\SI{0.025}{M}$，解析結果}
+    \label{fig:leveling_effect_result}
+  \end{minipage}
+  \caption{TUによるleveling効果の解析結果\cite{schilardi1998evolution}}
+  \label{fig:leveling_result}
+\end{figure}
+図\ref{fig:leveling_result}からわかるように，TUを加えることで析出界面の高さの平均値$<h>$の成長速度が遅くなり，標準偏差$W_L$の時間発展も遅くなっていることがわかる。これは，TUによるleveling効果によって析出界面の粗さが抑制されていることを示している。\textcolor{red}{単純に時間スケールが変わっているだけという可能性もあるかも。}\\
+leveling効果のメカニズムは物質によって様々なものがある\cite{めっき添加剤の作用機構と表面形状制御}が，一般的には添加物が界面へ吸着し，成長速度の抑制や金属イオンの析出の阻害などによって臨界核半径以上の析出を抑制することで起こるとされている\cite{oniciu1991some}。
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}

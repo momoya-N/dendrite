@@ -3,6 +3,13 @@
 
 % 配置関係
 \usepackage{geometry}
+% Chapter が勝手に改ページしないようにする 
+\makeatletter
+\renewcommand{\chapter}{%
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \global\@topnum\z@
+  \secdef\@chapter\@schapter}
+\makeatother
 
 %画像描画関係
 \usepackage{xcolor}%https://qiita.com/zr_tex8r/items/442b75b452b11bee8049
@@ -20,6 +27,8 @@
 \usepackage{amssymb}
 \usepackage{siunitx}
 \usepackage{physics2}
+\usephysicsmodule{ab}
+\usephysicsmodule{ab.legacy}
 \usepackage{derivative}
 \usepackage{fixdif}
 \usepackage[version=4]{mhchem}
@@ -35,7 +44,7 @@
 % 参照関係
 \usepackage{mathtools}
 \mathtoolsset{showonlyrefs=true}
-\usepackage[inline]{showlabels}
+\ifdraft{\usepackage[inline]{showlabels}}{}
 \ifthenelse{\boolean{luatex}}{\usepackage[unicode,pdfusetitle]{hyperref}}{
   \usepackage[pdfusetitle,backref=page]{hyperref}
   \usepackage{pxjahyper}

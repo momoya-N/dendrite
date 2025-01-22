@@ -1,10 +1,83 @@
-% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
-\lipsum[1]
-
+\section{実験結果}
+\subsection{TWEEN20を添加した際の実験結果}
+\begin{figure}[H]
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/surface_exp_0mM_51s.png}
+    \subcaption{$\SI{0}{mM}, \SI{51}{s}$の実験結果}
+    \label{fig:surface_exp_0mM_51s}
+  \end{minipage}
+  \begin{minipage}
+    {0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/surface_exp_0.005mM_547s.png}
+    \subcaption{$\SI{0.005}{mM}, \SI{547}{s}$の実験結果}
+    \label{fig:surface_exp_0.005mM_547s}
+  \end{minipage}
+  \caption{TWEEN20を添加した際の実験結果}
+  \label{fig:surface_exp}
+\end{figure}
+図\ref{fig:surface_exp}はTWEEN20を添加した際の円形極板での界面成長の実験結果である。見た目には似ているが，図\ref{fig:surface_exp_0mM_51s}は$\SI{51}{s}$の結果に対して，図\ref{fig:surface_exp_0.005mM_547s}は$\SI{547}{s}$の結果であり，同じような見た目になるまでおおよそ１０倍程度の時間がかかっていることがわかる。
+\subsection{TWEEN20を添加した際の界面粗さの時間発展と特徴波長}
+\begin{figure}[H]
+  \begin{minipage}{0.5\hsize}
+    \centering
+    \includegraphics[width=0.9\linewidth]{../../figure/part2(exp_surface)/surface_roughness_TWEEN20.png}
+    \subcaption{二乗平均粗さ$W(t)$の時間発展}
+    \label{fig:surface_roughness_TWEEN20}
+  \end{minipage}
+  \begin{minipage}{0.5\hsize}
+    \centering
+    \includegraphics[width=0.9\linewidth]{../../figure/part2(exp_surface)/roughness_correlation_function.png}
+    \subcaption{成長高さの自己相関関数$C(\delta\theta,t)$の特徴波長}
+    \label{fig:roughness_correlation_function}
+  \end{minipage}
+  \caption{界面粗さの時間発展と特徴波長}
+  \label{fig:surface_roughness}
+\end{figure}
+\ref{fig:surface_roughness}はTWEEN20を$\SI{0.005}{mM}$加えた際の界面粗さの時間発展と界面の突出部の自己相関関数を表している。図\ref{fig:surface_roughness_TWEEN20}は時刻$t$における二乗平均粗さ$W(t)$の時間発展を示している。赤色の破線は二乗平均粗さ$W(t)=\SI{40}{\mu m}$になった際の各々の時刻を表しており，$\SI{0}{mM}$の時は$\SI{50}{s}$程度に対し，TWEEN20を$\SI{0.005}{mM}$加えた際は$\SI{500}{s}$弱で，界面活性剤を加えた側では界面が粗くなるまでおおよそ10倍程度の時間がかかっていた。\\
+図\ref{fig:roughness_correlation_function}は図\ref{fig:surface_roughness_TWEEN20}の赤色の破線付近の時間の成長高さの自己相関関数$C(\delta\theta,t)$の特徴波長を示している。オレンジ色で示した点は小さい方から３つ分の極大値の位置を表している。ピークの位置は時間が経過してもほぼ同じ値を取っており，$\SI{0}{mM}$の時は$\delta\theta\sim\SI{0.6e-2}{rad}$程度であるのに対し，TWEEN20を$\SI{0.005}{mM}$加えた際は$\delta\theta\sim\SI{1.0e-2}{rad}$程度になっている。$r_0\sim\SI{4}{cm}$程度であり，$r_0$が$h(\theta,t)$に比べて十分大きいため，特徴波長は$\lambda\sim r_0\delta\theta$より$0.2\sim\SI{0.4}{mm}$程度になる。この結果より，界面活性剤の添加によっておおよそ２倍程度の差が生まれている。\\
+\subsection{Pluronic F-127を添加した際の実験結果}
+\begin{figure}[H]
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/0_2695.98s_Pluronic_surface.png}
+    \subcaption{$\SI{0}{vol\%}, \SI{2696}{s}$の実験結果}
+    \label{fig:0_2695.98 s_Pluronic_surface}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/0.01_8147.37s_Pluronic_surface.png}
+    \subcaption{$\SI{0.01}{vol\%}, \SI{8147}{s}$の実験結果}
+    \label{fig:0.01_8147.37 s_Pluronic_surface}
+  \end{minipage}
+  \begin{minipage}
+    {0.32\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/0.05_2645.03s_Pluronic_surface.png}
+    \subcaption{$\SI{0.05}{vol\%}, \SI{2645}{s}$の実験結果}
+    \label{fig:0.03_2695.98 s_Pluronic_surface}
+  \end{minipage}
+  \caption{Pluronic F-127を添加した際の実験結果}
+  \label{fig:Pluronic_surface}
+\end{figure}
+図\ref{fig:Pluronic_surface}はPluronic F-127添加した際の円形極板での界面成長の実験結果である。TWEEN20と同様に，見た目には似ているが，図\ref{fig:0.01_8147.37 s_Pluronic_surface}は他の二つの結果に比べて，おおよそ３倍程度の時間がかかっていることがわかる。
+\subsection{Pluronic F-127を添加した際の界面粗さの時間発展}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../../figure/part2(exp_surface)/Pluronic_surface_roughness.png}
+  \caption{二乗平均粗さ$W(t)$の時間発展}
+  \label{fig:surface_roughness_Pluronic}
+\end{figure}
+図\ref{fig:surface_roughness_Pluronic}はPluronic F-127を添加した際の界面粗さの時間発展を示している。TWEEN20の時とは異なり，界面活性剤の濃度が$0.005\%,0.01\%$の時に二乗平均粗さの時間発展が遅くなり，その後高濃度になると時間発展が早くなることがわかる。
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
