@@ -1,6 +1,7 @@
 % \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft,textwidth=50zw]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
+
 
 \begin{document}
 \appendix
@@ -23,6 +24,60 @@
   \end{split}
 \end{equation}
 以上よりスケールフリー性を持つ関数はべき関数になることが示された。
+\section{フラクタル次元の求め方}
+\section{MS不安定性の詳細な計算}
+\section{ランダムウォーク（RW）からの拡散方程式の導出}
+式\ref{eq:RW}
+\begin{equation}
+  c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
+  \label{eq:RW}
+\end{equation}
+を左辺は一次，右辺は二次までTaylor展開する。
+\begin{equation}
+  \begin{split}
+    \mathrm{（左辺）} & =c(\bm{x},t)+\pdv{c(\bm{x},t)}{t}\Delta t+\mathcal{O}((\Delta t)^2)                                                                                                                 \\
+    \mathrm{（右辺）} & =\sum_{i=1}^{d}\left[\underset{=1/d}{\uwave{(p_i+q_i)}}c(\bm{x},t)-(p_i-q_i)\pdv{c(\bm{x},t)}{x_i}a+\underset{=1/d}{\uwave{(p_i+q_i)}}\pdv[2]{c(\bm{x},t)}{x_i}\frac{a^2}{2}\right] \\
+                  & =c(\bm{x},t)+\sum_{i=1}^{d}\left[-(p_i-q_i)\pdv{c(\bm{x},t)}{x_i}a+\pdv[2]{c(\bm{x},t)}{x_i}\frac{a^2}{2d}\right]+\mathcal{O}(a^3)
+  \end{split}
+  \label{eq:RW_taylor}
+\end{equation}
+以上の結果から，以下の式が成り立つ。
+\begin{equation}
+  \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}(p_i-q_i)\frac{a}{\Delta t}\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\pdv[2]{c(\bm{x},t)}{x_i}
+  \label{eq:RW_diffusion}
+\end{equation}
+
+\section{過減衰Langenvin方程式の二次のモーメント（分散）の詳細な計算}
+運動方程式
+\begin{equation}
+  \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
+\end{equation}
+より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行い，以下のように表される。ただしランダム力は以下の関係式を満たす。
+\begin{equation}
+  \begin{split}
+    \langle\bm{\xi}(t)\rangle                  & =0                                                   \\
+    \langle\bm{\xi}(t)\cdot\bm{\xi}(t')\rangle & =2d\gamma k_B T\delta(t-t') \qquad (d:\mathrm{空間次元})
+  \end{split}
+  \label{eq:random_force}
+\end{equation}
+よって，時刻$t$での位置$\bm{x}(t)$は以下のように表される。
+\begin{equation}
+  \bm{x}(t)=\bm{x}(0)+\mu q\bm{E}t+\mu\int_0^t\bm{\xi}(t')\d t'
+  \label{eq:Langevin_overdamped_integrated}
+\end{equation}
+式(\ref{eq:Langevin_overdamped_integrated})の両辺の二乗を取り，平均を取ると，以下のようになる。ただし，初期位置$\bm{x}(0)=0$とした。
+\begin{equation}
+  \begin{split}
+    \langle\bm{x}(t)^2\rangle & =(\mu q \bm{E} t)^2+2\mu^2 q t\ab\langle\int_{0}^{t}\bm{E}(\bm{x})\cdot\bm{\xi}(t') \d t'\rangle+\mu^2\ab\langle\int_{0}^{t}\int_{0}^{t}\bm{\xi}(t')\cdot
+    \bm{\xi}(t'') \d t' \d t''\rangle                                                                                                                                                                                                                            \\
+                              & =(\mu q \bm{E} t)^2+2\mu^2 q t\ab\int_{0}^{t}\bm{E}(\bm{x})\cdot\underset{=0}{\uwave{\langle\bm{\xi}(t')\rangle}} \d t'+\mu^2\ab\int_{0}^{t}\int_{0}^{t}\underset{=2d\gamma k_B T\delta(t'-t'')}{\uwave{\langle\bm{\xi}(t')\cdot
+    \bm{\xi}(t'')\rangle}} \d t' \d t''                                                                                                                                                                                                                          \\
+                              & =(\mu q \bm{E} t)^2+2d\mu k_B T t                                                                                                                                                                                                \\
+  \end{split}
+  \label{eq:Langevin_overdamped_average}
+\end{equation}
+
+\section{DLAの数値計算の詳細}
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}

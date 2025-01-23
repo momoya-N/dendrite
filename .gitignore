@@ -4,7 +4,7 @@
 *.png
 *.mp4
 *.avi
-a.out
+*.out
 *.pdf
 *.synctex.gz
 *.exe
@@ -20,3 +20,11 @@ a.out
 *.brf
 DLA
 *.jpg
+*.blg
+*.aux
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex
+*.bcf
+*.xml

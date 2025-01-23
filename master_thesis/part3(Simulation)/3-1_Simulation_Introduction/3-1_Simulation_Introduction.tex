@@ -1,16 +1,84 @@
-% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft,textwidth=50zw]{bxjsbook}
+% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
 
 \chapter{数値計算}
-\section{ランダムウォーク（RW）と拡散方程式}
-\subsection{ランダムウォーク}
-溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk:RW)}でモデル化される。例えば空間次元$d=2$の場合，
+\section{概要}
+\subsection{ランダムウォーク（RW）と拡散方程式}
+\label{sec:RW}
+\begin{wrapfigure}{r}{0.4\textwidth}
+  \centering
+  \includegraphics[width=0.4\textwidth]{../../figure/part3/RW_d_dim.png}
+  \caption{ランダムウォークの模式図}
+  \label{fig:random_walk}
+\end{wrapfigure}
+溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk:RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。$d$次元空間内でRWする場合を考える。
+図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i$，負方向に確率$q_i$で推移する粒子の運動を考える。各軸が選ばれる確率は等しいとすると，各軸に対して，$p_i+q_i=1/d$が成り立つ。この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$秒後の濃度は，以下のようにあらわされる。
+\begin{equation}
+  c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
+  \label{eq:RW}
+\end{equation}
+これを左辺は一次，右辺は二次までTaylor展開すると式\ref{eq:RW_taylor}より，以下のようになる。
+\begin{equation}
+  \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}(p_i-q_i)\frac{a}{\Delta t}\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\pdv[2]{c(\bm{x},t)}{x_i}
+  \label{eq:RW_diffusion}
+\end{equation}
+$d$次元のナブラ演算子$\nabla=\sum_{1}^{d}\bm{e}_i\pdv*{}{x_i}$とする。また，粒子に働く平均的な駆動力$\bar{F}_i=(p_i-q_i)\frac{a}{\Delta t}$，拡散係数$D=\frac{a^2}{2d\Delta t}$とすると，以下のように表される。
+\begin{equation}
+  \pdv{c(\bm{x},t)}{t}=-\bm{\bar{F}}\cdot\nabla c(\bm{x},t)+D\nabla^2 c(\bm{x},t)
+  \label{eq:RW_diffusion_result}
+\end{equation}
+ここで，ベクトル演算の恒等式$\nabla\cdot(\psi\bm{a})=\bm{a}\cdot\nabla\psi+\psi\nabla\cdot\bm{a}$より，駆動力$\bar{F}$が，$\nabla\cdot\bar{F}=0$を満たすならば，式\ref{eq:RW_diffusion_result}は,
+\begin{equation}
+  \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\ab\{\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)\}
+  \label{eq:RW_diffusion_result_divergence}
+\end{equation}
+と表される。これは流れを$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
+例として，電界析出における，電解質溶液中を拡散するイオンの運動を考える。外力が電場のみかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，ガウスの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=-\mu q \rho(\bm{x,t})/\varepsilon$が成り立つ。電界析出において初期に急激な電流が流れた後は気体の発生が見られないことより，溶液中では電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{F}=0$を満たす。そのため，電界析出におけるイオンの運動は流れを$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときの\textcolor{red}{イオンの保存則（拡散方程式）（＊等価な表現としてもいいのか？）}
+\begin{equation}
+  \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\bm{J}
+  \label{eq:RW_diffusion_result_divergence_ion}
+\end{equation}
+で表される。以上の内容は文献\cite{フラクタルの物理Ⅱ}\cite{フラクタル科学}を参考にした。
+\subsection{Langevin方程式}
+\label{sec:Langevin}
+ブラウン運動する粒子の運動は，粘性抵抗などによる，速度に比例する減衰項と，外力項，ランダム力の項を含むLangevin方程式で表され，以下のように与えられる。
+\begin{equation}
+  m\odv[2]{\bm{x}}{t}=-\gamma\odv{\bm{x}}{t}+\bm{F}+\bm{\xi}(t)
+  \label{eq:Langevin}
+\end{equation}
+ここで，$m$は粒子の質量，$\gamma$は粘性抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。ランダム力は以下の関係式を満たす。
+\begin{equation}
+  \begin{split}
+    \langle\bm{\xi}(t)\rangle                  & =0                                                   \\
+    \langle\bm{\xi}(t)\cdot\bm{\xi}(t')\rangle & =2d\gamma k_B T\delta(t-t') \qquad (d:\mathrm{空間次元})
+  \end{split}
+  \label{eq:random_force}
+\end{equation}
+ここで，$\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はボルツマン定数，$T$は温度である。過減衰極限として，慣性項を無視し，外力が電場のみである場合を考えると，運動方程式は以下のようになる。
+\begin{equation}
+  \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t) \qquad (\mu=1/\gamma:\mathrm{易動度})
+  \label{eq:Langevin_overdamped}
+\end{equation}
+ここで，$q$は粒子の電荷，$\bm{E}$は電場である。粒子の拡散の時間スケールに対して，電場の時間変化のスケールが十分遅いと仮定して，$\bm{E}=\bm{E}(\bm{x})$（位置のみに依存）とする。初期位置$\bm{x}(0)=0$とすると，その平均と二乗平均は\ref{eq:Langevin_overdamped_average}より，以下のようになる。
 
-\section{Langevin方程式}
-\section{拡散律速凝集(Diffusion-limited aggregation, DLA)モデル}
+\begin{equation}
+  \begin{split}
+    \langle\bm{x}(t)\rangle   & =\mu q\langle\bm{E}\rangle t                    \\
+    \langle\bm{x}(t)^2\rangle & =(\mu q \langle\bm{E}\rangle t)^2+2d\mu k_B T t
+  \end{split}
+  \label{eq:Langevin_overdamped_average}
+\end{equation}
+これより，粒子の位置の分散は以下のように与えられる。
+\begin{equation}
+  \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle=2d \frac{k_B T}{\gamma} t \quad (=2d D t, D=k_B T/\gamma:\mathrm{拡散係数})
+  \label{eq:Langevin_overdamped_variance}
+\end{equation}
+これより，分散は外力（電場）によらない一定値になることがわかる。
+
+\subsection{拡散律速凝集(Diffusion-limited aggregation, DLA)モデル}
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}

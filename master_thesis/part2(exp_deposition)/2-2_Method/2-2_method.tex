@@ -1,5 +1,4 @@
-% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
@@ -60,7 +59,7 @@
 ボックスの大きさ$\varepsilon$を変え，$N(\varepsilon)$を求めることでフラクタル次元を求めた。
 \subsubsection{枝の本数・太さのトラッキング}
 金属樹の形態を特徴づけるために，枝やその太さがどのように変化するかを解析した。枝が中心から等方的に広がっていると仮定し，中心からの距離$r$の円と交差する枝の本数やその太さを求めた。
-\begin{figure}[H]
+\begin{figure}[htbp]
   \begin{minipage}
     {0.5\textwidth}
     \centering
@@ -108,15 +107,16 @@
   \end{minipage}
   \caption{枝の長さと角度の定義}
 \end{figure}
-$\theta_{out}$は分岐点から生えた枝のうち，前の枝との角度が最大となるものとした。また今回の解析では$\theta_{out}$が$0.9\pi$以上になっている枝の組み合わせを一つの枝として，メインの枝とそこから生えた枝とみなして解析を行った。
+$\theta_{\mathrm{out}}$は分岐点から生えた枝のうち，前の枝との角度が最大となるものとした。また今回の解析では$\theta_{\mathrm{out}}$が$0.9\pi$以上になっている枝の組み合わせを一つの枝として，メインの枝とそこから生えた枝とみなして解析を行った。
 \subsubsection{分布の推定}
 取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定して\textbf{相補累積分布関数}を用いて推定を行った。相補累積分布関数は以下のように定義される。
-\begin{definition}
+\begin{defi}
   確率密度関数$f(x)$が存在したとき，確率変数$X$がある値$x$以上になる確率を表す関数$\bar{F}(x)$を\textbf{相補累積分布関数}と呼び，以下のように定義される。
   \begin{equation}
     \bar{F}(x) = P(X \geq x) = \int_{x}^{\infty} f(x')dx'
   \end{equation}
-\end{definition}
+\end{defi}
+
 \begin{wrapfigure}{r}[0pt]{0.33\textwidth}
   \begin{center}
     \includegraphics[scale=0.5]{../../figure/part2(exp_deposition)/fitting_exp.png}
@@ -124,6 +124,7 @@ $\theta_{out}$は分岐点から生えた枝のうち，前の枝との角度が
   \caption{冪分布のフィッティングの例}
   \label{fig:fitting_exp}
 \end{wrapfigure}
+
 フィッティング関数は定義より以下のようになる。
 \begin{equation}
   \begin{split}
@@ -131,6 +132,7 @@ $\theta_{out}$は分岐点から生えた枝のうち，前の枝との角度が
                & = \frac{a}{b-1}x^{1-b}
   \end{split}
 \end{equation}
+
 得られたデータのうち，枝の太さ程度($\sim0.15\si{cm}$)以下のものはノイズによるものとして除外し，冪分布のパラメータ$b$を推定し，界面活性剤濃度による分布の変化を調べた。今回の解析では，冪分布の変化を見たいという点と，フィッティング範囲がデータによって異なり，また一部分のみ（冪関数とみなせる範囲）のフィッティングであることより，パラメータ$a$の値はブレが大きいと考えられるため，パラメータ$b$のみを用いて解析を行った。
 
 \ifdraft{

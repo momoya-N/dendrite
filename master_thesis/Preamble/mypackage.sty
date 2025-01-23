@@ -2,17 +2,13 @@
 \usepackage{ifthen}
 
 % 配置関係
-\usepackage{geometry}
-% Chapter が勝手に改ページしないようにする 
-\makeatletter
-\renewcommand{\chapter}{%
-  \if@openright\cleardoublepage\else\clearpage\fi
-  \global\@topnum\z@
-  \secdef\@chapter\@schapter}
-\makeatother
+% 余白の設定
+\setlength{\textwidth}{\fullwidth}
+\setlength{\evensidemargin}{\oddsidemargin}
 
-%画像描画関係
-\usepackage{xcolor}%https://qiita.com/zr_tex8r/items/442b75b452b11bee8049
+% %画像描画関係
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}%https://qiita.com/zr_tex8r/items/442b75b452b11bee8049
 %xcolorとgraphicxはドライバを共有しているため，挙動がおかしくなる可能性大。->(x)colorを先に読み込むと動く，後でgraphicのドライバが正しく上書きされているためと思われる。
 \usepackage{graphicx}
 \usepackage{wrapfig}
@@ -20,10 +16,9 @@
 \usepackage[subrefformat=parens]{subcaption}
 \usepackage{here}
 
-%数式関係
+% % %数式関係
 \usepackage{amsmath}
 \usepackage{amsthm}
-\newtheorem{definition}{定義}[section]%定義環境の設定
 \usepackage{amssymb}
 \usepackage{siunitx}
 \usepackage{physics2}
@@ -34,12 +29,29 @@
 \usepackage[version=4]{mhchem}
 \usepackage{bm}
 
+%定理環境の設定
+\theoremstyle{definition}
+\newtheorem{prob}{問}[chapter]
+\newtheorem{thm}{定理}[chapter]
+\newtheorem{defi}[thm]{定義}
+\newtheorem{lem}[thm]{補題}
+\newtheorem{rem}[thm]{注意}
+\newtheorem{cor}[thm]{系}
+\newtheorem{eg}[thm]{例}
+\newtheorem{req}[thm]{要請}
+\newtheorem{prop}[thm]{命題}
+\newtheorem{nota}[thm]{記法}
+\newtheorem{supple}[thm]{補足}
+\newtheorem*{policy}{方針}
+\newtheorem{pri}[thm]{公理}
+
 %テキスト関係
 \usepackage{url}
 \usepackage{enumerate} %細かい設定ができるenumerate
 \usepackage{ifdraft}
 \ifdraft{\usepackage{showkeys}}{}
-\usepackage{lipsum}
+\usepackage{lipsum}%ダミー文章
+\usepackage{ulem}%様々な下線
 
 % 参照関係
 \usepackage{mathtools}
