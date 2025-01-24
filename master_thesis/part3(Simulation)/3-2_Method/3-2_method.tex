@@ -4,7 +4,7 @@
 
 \begin{document}
 \section{数値計算のモデル}
-\subsection{ランダムウォークのモデル}
+\subsection{RWの方向の決定方法}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part3/RW_2dim.png}
@@ -88,7 +88,61 @@ $p_i,q_i$を$\alpha E\i$について平方完成すると，$\alpha E_i=\mp1/4$�
   \label{eq:condition2}
 \end{equation}
 となる。これより，上下端の中央の値である$C=3/16$を数値計算に用いる値とした。
-\subsection{固着確率のモデル}
+\subsection{固着確率$P$の定義}
+実験における，界面でのlevelerによるイオンの析出阻害を再現するため，ブラウン運動してきた粒子を\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がすでにある隣のクラスターに来た場合，そのまま新たなクラスターとして取り込むが，今回の数値計算では確率$P$でクラスターとして取り込んだ。取り込まれなかった場合は再びRWを行う。
+\subsection{数値計算方法}
+今回の数値計算では，パターンにより生じる電場と組み合わせてブラウン運動する粒子の移動確率を計算した。まず，計算する系の条件を以下のように設定する。
+\begin{table}[htbp]
+  \centering
+  \caption{数値計算の系の条件　}
+  \begin{tabular}{|c||c|}
+    \hline
+    系の条件                      & 設定値                                                  \\ \hline\hline
+    系のサイズ $L$                 & $\SI{512}{pix}\times\SI{512}{pix}$                   \\ \hline
+    粒子数 $N$                   & 15000                                                \\ \hline
+    中心座標 $\bm{x_c}=(x_c,y_c)$ & $(x_c,y_c)=(L/2,L/2)=(256,256)$                      \\ \hline
+    境界条件                      & $||\bm{r}-\bm{x_c}||>L/2$で電位$V=1.0$，パターンが存在する点で$V=0$ \\ \hline
+    SOR法による電場の収束条件            & 前回との誤差$10^{-5}$未満                                    \\ \hline
+    初期条件                      & $\bm{x_c}$に粒子を一つ置く                                   \\ \hline
+    電場の計算タイミング                & 150粒子毎                                               \\ \hline
+  \end{tabular}
+\end{table}
+
+具体的な計算方法は以下のとおりである。ただし，電場の計算においては，金属樹の電解質溶液の電気的中性が期待されるため，ラプラス方程式$\nabla^2\phi=0$を解いた。
+\begin{enumerate}
+  \item 現在のパターンの内，中心からの距離が最も遠い点を探索する
+  \item その点から30 pix離れた円上にランダムに粒子を一つ置く
+  \item 式\ref{eq:prob3}に従って粒子の移動方向を決定する。電位が1.0の領域（中心からの距離が$L/2$の円よりも外側）に来たらその粒子を棄却し，新たな粒子を2.に従って置く。
+  \item クラスターの隣の位置に来たら，与えた固着確率$P$でクラスターとして取り込むか判定する
+  \item $150$粒子取り込むたびに，SOR法\textcolor{red}{付録にて}を用いて電位のラプラス方程式を解き，電場を計算した。
+  \item 以上を15000粒子分繰り返す
+\end{enumerate}
+この計算を，$\alpha=0.0$から$3.0$まで（$0.0~1.0$まで$0.1$刻み，$1.0~3.0$までは0.2刻み），$P=0.1,0.4,0.7,1.0$の4つの固着確率について，各条件について21個のデータを取り，フラクタル次元を計測した。$\alpha=2.6$では計算が収束しなかったため，$\alpha\leq2.4$までのデータを用いた。原因については不明だが，収束する場合としない場合があったことより，電場の影響が大きくなりすぎ，ランダムな運動よりも電場に従った弾道的な運動になったことで，たまたま中心付近を通るものしかクラスターに取り込まれなくなり，パターンの成長速度が極端に遅くなったためと考えられる。
+\begin{figure}[htbp]
+  \begin{minipage}{0.32\hsize}
+    \subcaption{}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../../figure/part3/DLA_alpha=0_P=1.png}
+    \label{fig:DLA_alpha_0_P_1}
+  \end{minipage}
+  \begin{minipage}{0.32\hsize}
+    \subcaption{}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../../figure/part3/DLA_phi_alpha=0_P=1.png}
+    \label{fig:DLA_phi_alpha_0_P_1}
+  \end{minipage}
+  \begin{minipage}{0.32\hsize}
+    \subcaption{}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../../figure/part3/DLA_phi_alpha=0_P=1.png}
+    \label{fig:DLA_E_alpha_0_P_1}
+  \end{minipage}
+  \caption{$C=3/16$，パラメータ$\alpha=0.0$固着確率$P=1.0$（通常のDLA）の例。\subref{fig:DLA_alpha_0_P_1}はクラスターの形状，\subref{fig:DLA_phi_alpha_0_P_1}は電位分布，\subref{fig:DLA_E_alpha_0_P_1}は電場の強度分布を示す。}
+  \label{fig:DLA_ex}
+\end{figure}
+\subsection{解析方法}
+数値計算は$\alpha$は0.0~3.0（，$P$は0.1,0.4.,0.7,1.0の4つについて計算を行各条件に付き21個のデータについて解析は各固着確率，$\alpha$に対して，フラクタル次元を計測することで行った。フラクタル次元は密度相関関数法で計測した。密度相関関数を計算し，粒子間距離が$2~R_g$以内（$R_g$は回転半径）の範囲でフィッティングを行った。
+
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}

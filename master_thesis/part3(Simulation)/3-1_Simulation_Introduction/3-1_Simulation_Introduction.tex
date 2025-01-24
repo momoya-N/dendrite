@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft,textwidth=50zw]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
 % \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
 \usepackage{../../Preamble/mypackage}
 
@@ -80,6 +80,59 @@ $d$次元のナブラ演算子$\nabla=\sum_{1}^{d}\bm{e}_i\pdv*{}{x_i}$とする
 
 \subsection{拡散律速凝集(Diffusion-limited aggregation, DLA)モデル}
 
+\subsection{DLAパターンの回転半径法よるフラクタル次元の計測}
+DLAパターンのようにランダムな要素を含むパターンの大きさの目安を与えるのが\textbf{回転半径}である（図\ref{fig:DLA_with_R_g}）。回転半径$R_g$は以下のように与えられる。
+\begin{align}
+  R_g & =\sqrt{\frac{1}{N}\sum_{i=1}^{N}(\bm{r}_i-\bm{r}_{\mathrm{c}})} & \ab(\bm{r}_{\mathrm{c}}=\frac{1}{N}\sum_{i=1}^{N}\bm{r}_i : \mathrm{重心})
+  \label{eq:gyration_radius}
+\end{align}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.4\textwidth]{../../figure/part3/DLA_with_R_g.png}
+  \caption{DLAパターンの回転半径。おおよそ$R_g=\SI{108}{pix}$。$R_g$がおおよそのパターンの大きさを与える。}
+  \label{fig:DLA_with_R_g}
+\end{figure}
+パターンの粒子数$N$は大きさに比例するので，回転半径$R_g$の間には次のような関係が成り立つ。
+\begin{equation}
+  N\propto R_g^{D_f}\qquad (D_f:\mathrm{フラクタル次元})
+  \label{eq:gyration_radius_fractal}
+\end{equation}
+パターンの成長過程で，一定ステップごとに粒子数$N$と回転半径$R_g$を計測し，$R_g$と$N$の関係を両対数プロットすることで，その傾きからフラクタル次元$D_f$を求めることができる。この手法を\textbf{回転半径法}といい，平均操作が入っているため精度よく$D_f$を求めることができる。
+\section{密度相関関数法}
+DLAパターンのフラクタル次元の計測法として，回転半径法の他に，密度相関関数法がある。密度相関関数法は，パターンの密度分布を用いて，フラクタル次元を求める方法である。パターンの密度分布を$\rho(\bm{r})$とする。これは，
+\begin{equation}
+  \rho(\bm{r})=
+  \begin{cases}
+    1 & (\mathrm{位置\bm{r}のピクセルがパターン内}) \\
+    0 & (\mathrm{位置\bm{r}のピクセルがパターン外})
+  \end{cases}
+  \label{eq:density_distribution}
+\end{equation}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.4\textwidth]{../../figure/part3/densitiy_func_dim.png}
+  \caption{パターンの密度分布。赤色がパターンに含まれるピクセル。赤色のピクセルでは$\rho(\bm{r}=1)$, それ以外では$\rho(\bm{r}=0)$となる。}
+  \label{fig:density_func_dif}
+\end{figure}
+となる量である。パターンの密度相関関数$C(\bm{r})$は以下のように定義される。
+\begin{equation}
+  C(r)=\frac{1}{\Omega_t}\int \d\Omega \quad \frac{1}{N}\sum_{{\bf{r'}}}\rho({\bf r'+ r})\rho({\bf {r'}})
+  \label{eq:density_correlation}
+\end{equation}
+$\Omega$ は立体角，$\Omega_t$ は全立体角，$N$ は粒子数である。空間次元$d$に対して，
+\begin{equation}
+  \begin{aligned}
+    \Omega   & =\prod^{d-1}_{i=1} (\sin\theta_i)^{d-i-1} \d{\theta_1}...\d{\theta_{n-1}} \qquad(0\leqq \theta_i\leqq \pi\,,\,0\leqq\theta_{d-1}<2\pi) \\
+    \Omega_t & =2^{d-1}\pi
+  \end{aligned}
+  \label{eq:omega}
+\end{equation}
+で与えられる。興味があるのは$N$が$r$に対してどのようにスケーリングされるかなので，以下定数分は除いて考える。$C(r)$はスケールフリー性を持つので，付録\ref{sec:scale_free}より，$C(r)\propto r^{-a}$と表せる。$C(r)$はある粒子から距離$\bm{r}$離れた際に粒子が存在する確率を表しているので，微小範囲の粒子数は$\d N=C(r)\d \bm{r}\propto C(r)r^{d-1}\d r\propto r^{d-a-1} \d r $とスケーリングできる。全範囲にわたって積分すればそのパターンの大きさ，したがって粒子数$N$が導出できる。回転半径程度がパターンのおおよその大きさでそれ以上では$C(r)$はほぼ0といえるため，粒子数$N$は，
+\begin{equation}
+  N\propto \int_{0}^{R_g} r^{d-a-1} \d r\propto r^{d-a}
+  \label{eq:density_correlation_fractal}
+\end{equation}
+と表される。以上の議論より，密度相関関数法の両対数プロットより$a$の値を求められれば，パターンのフラクタル次元$D_f$を求めることができる。式\ref{eq:gyration_radius_fractal}と式\ref{eq:density_correlation_fractal}より，$D_f=d-a$となる。計測法について，文献\cite{フラクタルの物理Ⅰ}を参考にした。
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}

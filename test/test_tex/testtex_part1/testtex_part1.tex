@@ -1,23 +1,15 @@
 \documentclass[autodetect-engine,dvipdfmx-if-dvi,a4paper,ja=standard]{bxjsbook}
 \usepackage{../testtex_preamble/mypackage}
-\setlength{\oddsidemargin}{10mm} % 奇数ページの左余白
-\setlength{\evensidemargin}{10mm} % 偶数ページの左余白
+\addbibresource{../testtex_preamble/test.bib} % biblatex
 
 \begin{document}
-\begin{figure}
+
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{../test_fig/part1/BZ_reaction.jpg}
-  \caption{BZ reaction}
-  \label{fig:BZ}
+  \caption{BZ反応\cite{BZ}\cite{elements}}
 \end{figure}
 
-\begin{equation}
-  \nabla^2c(\bm{r})\equiv \ab[\frac{1}{r^2}\pdv*{\ab(r^2\pdv{}{r})}{r}+\frac{1}{r^2\sin\theta}\pdv*{\ab(\sin\theta\pdv{}{\theta})}{\theta}+\frac{1}{r^2\sin^2\theta}\pdv[2]{}{\phi}]c(\bm{r})=0
-  \label{eq:laplace}
-\end{equation}
-% \ifdraft{
-%   \bibliographystyle{../testtex_preamble/Physics.bst}
-%   \bibliography{../testtex_preamble/test.bib}
-% }{}
+\printbibliography[title=参考文献] % biblatex
 
 \end{document}
