@@ -33,46 +33,47 @@
 \end{figure}
 
 \section{枝分かれと樹枝状パターン}
-非平衡系でのパターンの中でも枝分かれをくりかえし形成される\textbf{樹枝状パターン}は生物組織（図\ref{fig:pattern_formation_dendrite}\subref{fig:blood_vessel_nerve}）や電解析出（図\ref{fig:pattern_formation_dendrite}\subref{fig:electro_deposition}），落雷のような絶縁破壊\ref{fig:pattern_formation_dendrite}\subref{fig:thunder},フィヨルド\ref{fig:pattern_formation_dendrite}\subref{fig:fjord}のように自然界で広くみられるパターンである。$\mathcal{O}(\SI{e-4}{m})\sim\mathcal{O}(\SI{e5}{m})$という幅広いスケールで見られ，スケールも形成メカニズムも異なるが，普遍的に見られるパターンである。このようなパターンは\textbf{フラクタル（自己相似）構造}をもち，パターンの一部を相似拡大・縮小ものが元のパターンと一致するという性質を持っている。
+非平衡系でのパターンの中でも枝分かれをくりかえし形成される\textbf{樹枝状パターン}は生物組織（図\ref{fig:pattern_formation_dendrite}\subref{fig:blood_vessel_nerve}）や電解析出（図\ref{fig:pattern_formation_dendrite}\subref{fig:electro_deposition}），落雷のような絶縁破壊（図\ref{fig:pattern_formation_dendrite}\subref{fig:thunder}）,フィヨルド（図\ref{fig:pattern_formation_dendrite}\subref{fig:fjord}）のように自然界で広くみられるパターンである。$\mathcal{O}(\SI{e-4}{m})$から$\mathcal{O}(\SI{e5}{m})$という幅広いスケールで見られ，スケールも形成メカニズムも異なるが，普遍的に見られるパターンである。このようなパターンは\textbf{フラクタル（自己相似）構造}をもち，パターンの一部を相似拡大・縮小ものが元のパターンと一致するという性質を持っている。
 \begin{figure}[htbp]
   \begin{tabular}{cc}
-    \begin{minipage}[t]{0.45\hsize}
+    \begin{minipage}[t]{0.45\textwidth}
       \subcaption{}
       \centering
       \includegraphics[keepaspectratio, scale=0.8]{../../figure/part1/blood_vessel_nerve.png}
       \label{fig:blood_vessel_nerve}
     \end{minipage} &
-    \begin{minipage}[t]{0.45\hsize}
+    \begin{minipage}[t]{0.45\textwidth}
       \subcaption{}
       \centering
       \includegraphics[keepaspectratio, scale=0.8]{../../figure/part1/electro_deposition.png}
       \label{fig:electro_deposition}
     \end{minipage} \\
 
-    \begin{minipage}[t]{0.45\hsize}
+    \begin{minipage}[t]{0.45\textwidth}
       \subcaption{}
       \centering
       \includegraphics[keepaspectratio, scale=0.8]{../../figure/part1/thunder.jpg}
       \label{fig:thunder}
     \end{minipage}            &
-    \begin{minipage}[t]{0.45\hsize}
+    \begin{minipage}[t]{0.45\textwidth}
       \subcaption{}
       \centering
       \includegraphics[keepaspectratio, scale=0.8]{../../figure/part1/fjord.jpg}
       \label{fig:fjord}
     \end{minipage}
   \end{tabular}
-  \caption{自然界に見られる様々な樹枝状パターン。\subref{fig:blood_vessel_nerve}血管（左）と神経（右）。Scale Bar: $\SI{100}{\mu m}(\SI{e-4}{m})$\cite{mukouyama2002sensory}\subref{fig:electro_deposition}電解析出による亜鉛の金属樹。$\sim\mathcal{O}(\SI{e-2}{m})$\subref{fig:thunder}落雷(Wikipedia)$\sim\mathcal{O}(\SI{e2}{m})$\subref{fig:fjord}フィヨルド(Wikipedia)$\sim\mathcal{O}(\SI{e5}{m})$}
+  \caption{自然界に見られる様々な樹枝状パターン。\subref{fig:blood_vessel_nerve}血管（左）と神経（右）。Scale Bar: $\SI{100}{\mu m}(\SI{e-4}{m})$\cite{mukouyama2002sensory}。\subref{fig:electro_deposition}電解析出による亜鉛の金属樹$\sim\mathcal{O}(\SI{e-2}{m})。$\subref{fig:thunder}落雷(Wikipedia)$\sim\mathcal{O}(\SI{e2}{m})$。\subref{fig:fjord}フィヨルド(Wikipedia)$\sim\mathcal{O}(\SI{e5}{m})$。}
   \label{fig:pattern_formation_dendrite}
 \end{figure}
 \section{フラクタル次元}
+\label{sec:fractal_dimension}
 フラクタル構造を特徴づける量として\textbf{フラクタル次元}が挙げられる。フラクタル次元の定義は様々であるが，ここでは\textbf{相似次元}を用いる。相似次元は次のように定義される。
 \begin{equation}
   D_f=\lim_{\varepsilon \to 0}\frac{\log N(\varepsilon)}{\log \frac{1}{\varepsilon}}
   \label{eq:fractal_dimension_def}
 \end{equation}
 
-ここで$N(\varepsilon)$は$\varepsilon$で覆われる点の数(長さ$\varepsilon$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元を表す。例えば,ユークリッド空間中では，図\ref{fig:fractal_stracture}\subref{fig:相似次元の考え方}のようにスケール(図中では$l$)の長さが$l=1,2,3$と増加すると，パターンの数$N$は増加する。これを式\ref{eq:fractal_dimension_def}で計算すると，空間次元$D=1,2,3$に一致する。\ref{fig:fractal_stracture}\subref{fig:シェルピンスキーのギャスケット}はシェルピンスキーのギャスケットと呼ばれるパターンである。これは三角形のスケール（三角形の一辺の長さ）を半分にして，中央の三角形を取ることで構成される。スケール$\varepsilon$が$\varepsilon=1/2$になると，一辺の長さ$\varepsilon$の三角形の個数$N(\varepsilon)$が3つになる。よって式\ref{eq:fractal_dimension_def}より$D_f=\log 3/\log 2=1.5849\cdots$となる。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ構造（パターン配置など）を持つ。このような\textbf{スケール不変性}を持つ系では，あるスケールで計測できる量（パターンの数，密度等）にべき関数則が成り立つことが知られている。
+ここで$N(\varepsilon)$は$\varepsilon$で覆われる点の数(長さ$\varepsilon$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元を表す。例えば,ユークリッド空間中では，図\ref{fig:fractal_stracture}\subref{fig:相似次元の考え方}のようにスケール(図中では$l$)の長さが$l=1,2,3$と増加すると，パターンの数$N$は増加する。これを式\ref{eq:fractal_dimension_def}で計算すると，空間次元$D=1,2,3$に一致する。図\ref{fig:fractal_stracture}\subref{fig:シェルピンスキーのギャスケット}はシェルピンスキーのギャスケットと呼ばれるパターンである。これは三角形のスケール（三角形の一辺の長さ）を半分にして，中央の三角形を取ることで構成される。スケール$\varepsilon$が$\varepsilon=1/2$になると，一辺の長さ$\varepsilon$の三角形の個数$N(\varepsilon)$が3つになる。よって式\ref{eq:fractal_dimension_def}より$D_f=\log 3/\log 2=1.5849\cdots$となる。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ構造（パターン配置など）を持つ。このような\textbf{スケール不変性}を持つ系では，あるスケールで計測できる量（パターンの数，密度等）にべき関数則が成り立つことが知られている。
 
 \begin{figure}[htbp]
   \begin{minipage}{0.45\textwidth}
@@ -87,7 +88,7 @@
     \includegraphics[scale=0.5]{../../figure/part1/Sierpiński_triangle.png}
     \label{fig:シェルピンスキーのギャスケット}
   \end{minipage}
-  \caption{相似次元の考え方。\subref{fig:相似次元の考え方}各スケール毎のパターンの個数の変化（Wikipedia）\subref{fig:シェルピンスキーのギャスケット}シェルピンスキーのギャスケット（Wikipedia）。相似次元（フラクタル次元）は$D_f=\log 3/\log 2=1.5849\ddots$}
+  \caption{相似次元の考え方。\subref{fig:相似次元の考え方}各スケール毎のパターンの個数の変化（Wikipedia）\subref{fig:シェルピンスキーのギャスケット}シェルピンスキーのギャスケット（Wikipedia）。相似次元（フラクタル次元）は$D_f=\log 3/\log 2=1.5849\ddots$。}
   \label{fig:fractal_stracture}
 \end{figure}
 \section{研究目的}
@@ -97,6 +98,5 @@
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
 }{}
-% \bibliographystyle{../../Preamble/Physics.bst}
-% \bibliography{../../Preamble/reference.bib}
+
 \end{document}

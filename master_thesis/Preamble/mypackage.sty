@@ -56,9 +56,12 @@
 %引用関係
 % \usepackage[backend=biber]{biblatex} % biblatex
 
+%Appendix関係
+\usepackage{appendix}
+
 % 参照関係
 \usepackage{mathtools}
-\mathtoolsset{showonlyrefs=true}
+% \mathtoolsset{showonlyrefs=true}
 \ifdraft{\usepackage[inline]{showlabels}}{}
 \ifthenelse{\boolean{luatex}}{\usepackage[unicode,pdfusetitle]{hyperref}}{
   \usepackage[pdfusetitle,backref=page]{hyperref}

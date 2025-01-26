@@ -1,5 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
-% \documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsarticle}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
@@ -8,14 +7,14 @@
 \section{概要}
 \subsection{ランダムウォーク（RW）と拡散方程式}
 \label{sec:RW}
-\begin{wrapfigure}{r}{0.4\textwidth}
+溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk:RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。
+\begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.4\textwidth]{../../figure/part3/RW_d_dim.png}
-  \caption{ランダムウォークの模式図}
+  \includegraphics[width=0.5\textwidth]{../../figure/part3/RW_d_dif.png}
+  \caption{ランダムウォークの模式図\textcolor{red}{大きすぎる気がする。wrapfigureを使うか，小さくするか？}}
   \label{fig:random_walk}
-\end{wrapfigure}
-溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk:RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。$d$次元空間内でRWする場合を考える。
-図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i$，負方向に確率$q_i$で推移する粒子の運動を考える。各軸が選ばれる確率は等しいとすると，各軸に対して，$p_i+q_i=1/d$が成り立つ。この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$秒後の濃度は，以下のようにあらわされる。
+\end{figure}
+図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i$，負方向に確率$q_i$で遷移する粒子の運動を考える。各軸が選ばれる確率は等しいとすると，各軸に対して，$p_i+q_i=1/d$が成り立つ。この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$秒後の濃度は，以下のようにあらわされる。
 \begin{equation}
   c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
   \label{eq:RW}
@@ -36,7 +35,8 @@ $d$次元のナブラ演算子$\nabla=\sum_{1}^{d}\bm{e}_i\pdv*{}{x_i}$とする
   \label{eq:RW_diffusion_result_divergence}
 \end{equation}
 と表される。これは流れを$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
-例として，電界析出における，電解質溶液中を拡散するイオンの運動を考える。外力が電場のみかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，ガウスの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=-\mu q \rho(\bm{x,t})/\varepsilon$が成り立つ。電界析出において初期に急激な電流が流れた後は気体の発生が見られないことより，溶液中では電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{F}=0$を満たす。そのため，電界析出におけるイオンの運動は流れを$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときの\textcolor{red}{イオンの保存則（拡散方程式）（＊等価な表現としてもいいのか？）}
+
+例として，電界析出における，電解質溶液中を拡散するイオンの運動を考える。外力が電場のみかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，ガウスの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=-\mu q \rho(\bm{x,t})/\varepsilon$が成り立つ。電界析出において初期に急激な電流が流れた後は気体の発生が見られないことより，溶液中では電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{F}=0$を満たす。そのため，電界析出におけるイオンの運動は流れを$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときの\textcolor{red}{イオンの保存則（拡散方程式）（＊等価な表現としてもいいのか？）}に等しくなる。
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\bm{J}
   \label{eq:RW_diffusion_result_divergence_ion}
@@ -49,7 +49,7 @@ $d$次元のナブラ演算子$\nabla=\sum_{1}^{d}\bm{e}_i\pdv*{}{x_i}$とする
   m\odv[2]{\bm{x}}{t}=-\gamma\odv{\bm{x}}{t}+\bm{F}+\bm{\xi}(t)
   \label{eq:Langevin}
 \end{equation}
-ここで，$m$は粒子の質量，$\gamma$は粘性抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。ランダム力は以下の関係式を満たす。
+$m$は粒子の質量，$\gamma$は粘性抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。ランダム力は以下の関係式を満たす。
 \begin{equation}
   \begin{split}
     \langle\bm{\xi}(t)\rangle                  & =0                                                   \\
@@ -57,12 +57,12 @@ $d$次元のナブラ演算子$\nabla=\sum_{1}^{d}\bm{e}_i\pdv*{}{x_i}$とする
   \end{split}
   \label{eq:random_force}
 \end{equation}
-ここで，$\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はボルツマン定数，$T$は温度である。過減衰極限として，慣性項を無視し，外力が電場のみである場合を考えると，運動方程式は以下のようになる。
+$\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はボルツマン定数，$T$は絶対温度である。過減衰極限として，慣性項を無視し，外力が電場のみである場合を考えると，運動方程式は以下のようになる。
 \begin{equation}
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t) \qquad (\mu=1/\gamma:\mathrm{易動度})
   \label{eq:Langevin_overdamped}
 \end{equation}
-ここで，$q$は粒子の電荷，$\bm{E}$は電場である。粒子の拡散の時間スケールに対して，電場の時間変化のスケールが十分遅いと仮定して，$\bm{E}=\bm{E}(\bm{x})$（位置のみに依存）とする。初期位置$\bm{x}(0)=0$とすると，その平均と二乗平均は\ref{eq:Langevin_overdamped_average}より，以下のようになる。
+$q$は粒子の電荷，$\bm{E}$は電場である。粒子の拡散の時間スケールに対して，電場の時間変化のスケールが十分遅いと仮定して，$\bm{E}=\bm{E}(\bm{x})$（位置のみに依存）とする。初期位置$\bm{x}(0)=0$とすると，その平均と二乗平均は\ref{eq:Langevin_overdamped_average}より，以下のようになる。
 
 \begin{equation}
   \begin{split}
@@ -78,7 +78,60 @@ $d$次元のナブラ演算子$\nabla=\sum_{1}^{d}\bm{e}_i\pdv*{}{x_i}$とする
 \end{equation}
 これより，分散は外力（電場）によらない一定値になることがわかる。
 
-\subsection{拡散律速凝集(Diffusion-limited aggregation, DLA)モデル}
+\subsection{樹枝状パターンを再現するモデル}
+樹枝状パターンを再現するモデルは様々なものが提案されている。図\ref{fig:dendrite_model}はいくつかのモデルによる樹枝状パターンの例である。計算方法として図\ref{fig:dendrite_model}\subref{fig:phase_field_dendrite}のように，変数が連続的な値を取り，移動境界に関する偏微分方程式を解くモデル，図\ref{fig:dendrite_model}\subref{fig:DBM}\subref{fig:DLA}\subref{fig:NS_model}のように，離散化した場や粒子を用いるものがある。また，離散化したモデルの中にも，図\ref{fig:dendrite_model}\subref{fig:DBM}のように現状のパターンから成長させていくモデルと，図\ref{fig:dendrite_model}\subref{fig:DLA}\subref{fig:NS_model}のように外部から飛んでくる粒子のRWがパターン形成を支配するモデルなどがある。\textcolor{red}{(変微分方程式を解くときも離散化するので，離散化の有無による区分は微妙か？)}
+\begin{figure}[htbp]
+  \begin{tabular}{cc}
+    \begin{minipage}{0.45\textwidth}
+      \subcaption{}
+      \centering
+      \includegraphics[keepaspectratio, width=0.9\linewidth]{../../figure/part3/phase_field_dendrite.png}
+      \label{fig:phase_field_dendrite}
+    \end{minipage} &
+    \begin{minipage}{0.45\textwidth}
+      \subcaption{}
+      \centering
+      \includegraphics[keepaspectratio, width=0.9\linewidth]{../../figure/part3/DBM.png}
+      \label{fig:DBM}
+    \end{minipage}                  \\
+
+    \begin{minipage}{0.45\textwidth}
+      \subcaption{}
+      \centering
+      \includegraphics[keepaspectratio, width=0.9\linewidth]{../../figure/part3/DLA.png}
+      \label{fig:DLA}
+    \end{minipage}                  &
+    \begin{minipage}{0.45\textwidth}
+      \subcaption{}
+      \centering
+      \includegraphics[keepaspectratio, width=0.9\linewidth]{../../figure/part3/NS_model.png}
+      \label{fig:NS_model}
+    \end{minipage}
+  \end{tabular}
+  \caption{樹枝状パターンを再現する様々なモデル。\subref{fig:phase_field_dendrite}Phase-field法による樹枝状パターン\cite{kobayashi1993modeling}。界面に幅を持たせ，偏微分方程式による界面計算を簡便にしている。\subref{fig:DBM}Dielectric Breakdown Model(DBM)\cite{niemeyer1984fractal}。電場中での絶縁体の破壊現象を再現するモデル。\subref{fig:DLA}Diffusion Limited Aggregation(DLA)モデル\cite{witten1981diffusion}。拡散が支配的なパターン形成モデル。\subref{fig:NS_model}Nittmann Stanley (NS) モデル\cite{nittmann1986tip}。界面の局所異方性の効果を取り入れたモデル。DLAの拡張版。}
+  \label{fig:dendrite_model}
+\end{figure}
+
+その中でも，図\ref{fig:dendrite_model}\subref{fig:DLA}の\textbf{Diffusion Limited Aggregation(DLA)}モデル\cite{witten1981diffusion}は，粒子の拡散がパターン形成において支配的な場合のモデルとして知られている。DLAの計算方法は次のとおりである（参考：図\ref{fig:DLA_explanation}\cite{松下貢1987dla}）。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.4\textwidth]{../../figure/part3/DLA_explanation.png}
+  \caption{DLAパターンの生成過程。中央に粒子を置き，十分離れた円周上に粒子を発生させRWさせる。粒子がパターンに接触したら，その粒子をパターンに取り込む。}
+  \label{fig:DLA_explanation}
+\end{figure}
+
+\begin{enumerate}
+  \item 計算領域の中央に粒子を一つ置く
+  \item 十分離れた円周上に粒子を発生させRWさせる。十分遠い円周上で発生したRWする粒子がパターン近傍の円周上のある点に到達する確率はどの点でも等しくなるため，実際の数値計算では現在のパターンの中で中心から最も遠い点$r_\mathrm{max}$よりもわずかに遠い円周上に粒子を発生させるだけで十分である。（図\ref{fig:DLA_explanation}では$r_{\mathrm{max}}+5$）
+  \item パターンに含まれる粒子とRWしてきた粒子が接触したら，RWしてきた粒子をパターンに取り込む。
+  \item 粒子が一定以上の距離 (kiling circle:図\ref{fig:DLA_explanation}では$3r_{\mathrm{max}}$) 以上離れたら，その粒子を棄却し，新たに粒子を発生させる。
+  \item 2から4を繰り返す。
+  \item パターンの大きさが一定以上になったら計算を終了する。
+\end{enumerate}
+
+DLAの性質として，\ref{sec:fractal_dimension}で定義したフラクタル次元がおおよそ$D_f=1.71$であることが知られている\cite{太田正之輔2009dla}。\textcolor{red}{また，主に５本の枝を形成することが知られている(元論文が見つからない)。}また，平均場近似を用いた理論計算より，フラクタル次元が$D_f=(d^2+1)/(d+1)$（$d$は空間次元）で与えられる\cite{muthukumar1983mean}\textcolor{red}{\cite{tokuyama1984fractal}（大学では論文が見られないため孫引きになっている）}ことが示されている。実際に金属樹の実験\cite{matsushita1984fractal}では，$D_f=1.66\pm0.03$と与えられており，理論値とよく一致している。
+
 
 \subsection{DLAパターンの回転半径法よるフラクタル次元の計測}
 DLAパターンのようにランダムな要素を含むパターンの大きさの目安を与えるのが\textbf{回転半径}である（図\ref{fig:DLA_with_R_g}）。回転半径$R_g$は以下のように与えられる。
@@ -98,8 +151,9 @@ DLAパターンのようにランダムな要素を含むパターンの大き�
   \label{eq:gyration_radius_fractal}
 \end{equation}
 パターンの成長過程で，一定ステップごとに粒子数$N$と回転半径$R_g$を計測し，$R_g$と$N$の関係を両対数プロットすることで，その傾きからフラクタル次元$D_f$を求めることができる。この手法を\textbf{回転半径法}といい，平均操作が入っているため精度よく$D_f$を求めることができる。
-\section{密度相関関数法}
-DLAパターンのフラクタル次元の計測法として，回転半径法の他に，密度相関関数法がある。密度相関関数法は，パターンの密度分布を用いて，フラクタル次元を求める方法である。パターンの密度分布を$\rho(\bm{r})$とする。これは，
+\subsection{密度相関関数法}
+\label{sec:density_correlation}
+DLAパターンのフラクタル次元の計測法として，回転半径法の他に，密度相関関数法がある。密度相関関数法は，パターンの密度分布を用いて，フラクタル次元を求める方法である。パターンの密度分布を$\rho(\bm{r})$とする。これは図\ref{fig:density_func_dif}のように，
 \begin{equation}
   \rho(\bm{r})=
   \begin{cases}
@@ -108,10 +162,10 @@ DLAパターンのフラクタル次元の計測法として，回転半径法�
   \end{cases}
   \label{eq:density_distribution}
 \end{equation}
-\begin{figure}
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.4\textwidth]{../../figure/part3/densitiy_func_dim.png}
-  \caption{パターンの密度分布。赤色がパターンに含まれるピクセル。赤色のピクセルでは$\rho(\bm{r}=1)$, それ以外では$\rho(\bm{r}=0)$となる。}
+  \caption{パターンの密度分布。赤色がパターンに含まれるピクセル。赤色のピクセルでは$\rho(\bm{r})=1$, それ以外では$\rho(\bm{r})=0$となる。}
   \label{fig:density_func_dif}
 \end{figure}
 となる量である。パターンの密度相関関数$C(\bm{r})$は以下のように定義される。
@@ -132,7 +186,9 @@ $\Omega$ は立体角，$\Omega_t$ は全立体角，$N$ は粒子数である�
   N\propto \int_{0}^{R_g} r^{d-a-1} \d r\propto r^{d-a}
   \label{eq:density_correlation_fractal}
 \end{equation}
-と表される。以上の議論より，密度相関関数法の両対数プロットより$a$の値を求められれば，パターンのフラクタル次元$D_f$を求めることができる。式\ref{eq:gyration_radius_fractal}と式\ref{eq:density_correlation_fractal}より，$D_f=d-a$となる。計測法について，文献\cite{フラクタルの物理Ⅰ}を参考にした。
+と表される。
+
+以上の議論より，密度相関関数法の両対数プロットより$a$の値を求められれば，パターンのフラクタル次元$D_f$を求めることができる。式\ref{eq:gyration_radius_fractal}と式\ref{eq:density_correlation_fractal}より，$D_f=d-a$となる。計測法については，文献\cite{フラクタルの物理Ⅰ}を参考にした。
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
