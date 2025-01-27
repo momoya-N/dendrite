@@ -2,12 +2,13 @@
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
+\chapter{数値計算}
 \section{数値計算のモデル}
 \subsection{RWの方向の決定方法}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part3/RW_2dim.png}
-  \caption{各方向へ移動する確率$p_i,q_i$と動かない確率$r_i$，電場$E_i$の模式図}
+  \caption{各方向へ移動する確率$p_i,q_i$と動かない確率$r_i$，電場$E_i$の模式図。}
   \label{fig:RW_2dim}
 \end{figure}
 
@@ -15,26 +16,26 @@
 \begin{equation}
   \bar{F}_i=\mu q E_i=(p_i-q_i)\frac{a}{\Delta t}
   \label{eq:force}
-\end{equation}が成り立つので，$p_i-q_i=\mu q E_i\Delta t/a$となる。また，拡散係数$D=a^2/2d\Delta t$より，$a^2=2dD\Delta t$となる。次に，式\ref{eq:Langevin_overdamped_average},\ref{eq:Langevin_overdamped_variance}を離散化する。格子間隔$a$，$\Delta t$を用いると，以下のように離散化できる。
+\end{equation}が成り立つので，$p_i-q_i=\mu q E_i\Delta t/a$となる。また，拡散係数$D=a^2/2d\Delta t$より，$a^2=2dD\Delta t$となる。次に，式\eqref{eq:Langevin_overdamped_average}を離散化する。格子間隔$a$，$\Delta t$を用いると，以下のように離散化できる。
 \begin{equation}
   \begin{split}
     \bm{x} & =a\bm{X}, \qquad t=n\Delta t, \qquad (n\in\mathbb{N},\bm{X}\in\mathbb{Z}^d,a,\Delta t \in \mathbb{R}) \\
     \label{eq:discretization}
   \end{split}
 \end{equation}
-1ステップの時間発展を考えると，式\ref{eq:discretization}で$n=1,X_i=\pm1$とすればよい。$\langle\cdot\rangle$を確率分布に関する平均とすれば，$\langle X_i\rangle=(+1)p_i+(-1)q_i=\mu q E_i\Delta t/a$，$\langle X_i^2\rangle=(+1)^2p_i+(-1)^2q_i=1/d$より以下が成り立つ。ただし，電場の平均操作については，1ステップの時間・空間スケールではほぼ一定であるとして，動く前での電場を用いている。
+1ステップの時間発展を考えると，式\eqref{eq:discretization}で$n=1,X_i=\pm1$とすればよい。$\langle\cdot\rangle$を確率分布に関する平均とすれば，$\langle X_i\rangle=(+1)p_i+(-1)q_i=\mu q E_i\Delta t/a$，$\langle X_i^2\rangle=(+1)^2p_i+(-1)^2q_i=1/d$より以下が成り立つ。ただし，電場の平均操作については，1ステップの時間・空間スケールではほぼ一定であるとして，動く前での電場を用いている。
 \begin{equation}
   \begin{aligned}
-    \langle\bm{x}\rangle & =a\langle\bm{X}\rangle                    & \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\langle(\bm{X}-\langle\bm{X}\rangle)^2\rangle                        \\
-                         & =a\sum_{i=1}^{d}\bm{e}_i(p_i-q_i)         &                                                     & =a^2\{\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2\}                    \\
-                         & =\mu q \Delta t\sum_{i=1}{d} \bm{e}_i E_i &                                                     & =a^2\sum_{i=1}^{d}\ab\{\frac{1}{d}-\frac{(\mu q \Delta t)^2}{a^2}E_i^2\} \\
-                         & =\mu q \Delta t\bm{E}                     &                                                     & =a^2\ab\{1-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\}                      \\
+    \langle\bm{x}\rangle & =a\langle\bm{X}\rangle                     & \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\langle(\bm{X}-\langle\bm{X}\rangle)^2\rangle                        \\
+                         & =a\sum_{i=1}^{d}\bm{e}_i(p_i-q_i)          &                                                     & =a^2\{\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2\}                    \\
+                         & =\mu q \Delta t\sum_{i=1}^{d} \bm{e}_i E_i &                                                     & =a^2\sum_{i=1}^{d}\ab\{\frac{1}{d}-\frac{(\mu q \Delta t)^2}{a^2}E_i^2\} \\
+                         & =\mu q \Delta t\bm{E}                      &                                                     & =a^2\ab\{1-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\}                      \\
   \end{aligned}
   \label{eq:discrete_average_variance}
 \end{equation}
 式\ref{eq:discrete_average_variance}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散の方は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しないという結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なるという物理的に不可解な状況になってしまう。
 
-そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均と，分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/2a$であり電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
+そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均と，分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
 \begin{equation}
   \begin{split}
     \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\ab\{(1-r)-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\} \\
@@ -46,9 +47,9 @@
 \end{equation}
 式\ref{eq:discrete_variance}より，$C=D\Delta t/a^2$，$r=1-2dC-4\alpha^2\bm{E}^2$となる。
 
-ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$とならなければならない点である。$a^2=2dD\Delta t$のままであれば，$C=1/2d$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで$r>0$を確保することができる。
+ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$とならなければならない点である。$a^2=2dD\Delta t$のままであれば，$C=1/(2d)$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで$r>0$を確保することができる。
 
-以上の議論をまとめると，RWにおいて電場の影響を打ち消す確率$r$を導入することで，Langevin方程式の分散が外力に依存しないという結果を再現することができる。しかし，$r>0$を担保するため，時間間隔$\Delta t$を変化させなければならない。これはパラメータである$\alpha=\mu q\Delta t/2a,C=D\Delta t/a^2$を変えることに他ならない。今回の数値計算では分散$C$を固定して，$\alpha$を変化させて形状変化を調べた。
+以上の議論をまとめると，RWにおいて電場の影響を打ち消す確率$r$を導入することで，Langevin方程式の分散が外力に依存しないという結果を再現することができる。しかし，$r>0$を担保するため，時間間隔$\Delta t$を変化させなければならない。これはパラメータである$\alpha=\mu q\Delta t/(2a),C=D\Delta t/a^2$を変えることに他ならない。今回の数値計算では分散$C$を固定して，$\alpha$を変化させて形状変化を調べた。
 
 $C$の値は以下のように決めた。まず，各$i$成分の確率は以下の式を満たす。
 
@@ -146,7 +147,7 @@ $p_i,q_i$を$\alpha E\i$について平方完成すると，$\alpha E_i=\mp1/4$�
   \begin{minipage}{0.32\hsize}
     \subcaption{}
     \centering
-    \includegraphics[width=0.8\textwidth]{../../figure/part3/DLA_phi_alpha=0_P=1.png}
+    \includegraphics[width=0.8\textwidth]{../../figure/part3/DLA_E^2_alpha=0_P=1.png}
     \label{fig:DLA_E_alpha_0_P_1}
   \end{minipage}
   \caption{$C=3/16$，パラメータ$\alpha=0.0$固着確率$P=1.0$（通常のDLA）の例。\subref{fig:DLA_alpha_0_P_1}DLAパターンの形状\subref{fig:DLA_phi_alpha_0_P_1}電位分布\subref{fig:DLA_E_alpha_0_P_1}電場の強度分布}

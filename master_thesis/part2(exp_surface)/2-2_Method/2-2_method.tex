@@ -2,77 +2,118 @@
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
+\chapter{実験：界面成長}
 \section{実験・解析方法}
 \subsection{界面成長の実験方法・実験系}
-金属樹のパターン形成への界面への影響を調べるために，硫酸亜鉛七水和物\ce{ZnSO_4.7H_2O}(富士フイルム和光純薬)の$\SI{2}{mol/L}$水溶液を精製し，そこに界面活性剤TWEEN20（東京化成工業）を加えて，以下の条件で電界析出を行い，解析を行った。
-\begin{table}[H]
-  \begin{minipage}{0.5\hsize}
+金属樹のパターン形成と析出界面の関係を調べるために，硫酸亜鉛七水和物\ce{ZnSO_4.7H_2O}(富士フイルム和光純薬)の$\SI{2}{mol/L}$水溶液を調整し，そこに非イオン性界面活性剤TWEEN20（東京化成工業）やPluronic F-127（フナコシ）を加えて電界析出を行った。実験系に用いた器具については表\ref{tab:exp_condition}，実験系のセットアップについては図\ref{fig:surface_exp_system}，\ref{fig:surface_exp_system_condition}を参照\textcolor{red}{（解析には直接関わらないがライトボード情報も必要か？）}。全体のセットアップは\ref{fig:system_exp_whole}と同じである。
+
+\begin{table}[htbp]
+  \centering
+  \caption{実験系に用いた器具の情報}
+  \begin{tabular}{|c||c|}
+    \hline
+    シャーレ直径     & $\SI{110}{mm}$                                                                               \\ \hline
+    シャーレ素材     & ガラス                                                                                          \\ \hline
+    陰極         &
+    \begin{tabular}{c}
+      直径 約$\SI{63}{mm}$の半円部分と約$\SI{63}{mm}\times \SI{25}{mm}$の四角形部分とからなる \ce{Zn}板 \\
+      （半円の部分で折り曲げて使用）
+    \end{tabular} \\ \hline
+    陽極         & \ce{Zn}板 約$\SI{15}{mm}\times$約$\SI{30}{mm}$（$\SI{15}{mm}$幅の方を溶液に設置）                          \\ \hline
+    表面処理装置     & Electro-Technic Products BD-20A                                                              \\ \hline
+    電源装置       & \textcolor{red}{KENWOOD (生産終了している)} PA18-5B                                                  \\ \hline
+    デジタルマルチメータ & ADCMT 7352A/E                                                                                \\
+    \hline
+    USBカメラ     &
+    \begin{tabular}{c}
+      オムロンセンテック STC-MBS43U3V                                                \\
+      画素数 $720 \times \SI{540}{px}$, 時間分解能 $\SI{527.1}{fps}$ (TWEEM20撮影に使用) \\
+      オムロンセンテック STC-MBS1242U3V                                              \\
+      画素数 $4000 \times \SI{3000}{px}$,時間分解能 $\SI{31.2}{fps}$ (Pluronic F-127撮影に使用)
+    \end{tabular}
+    \\ \hline
+    レンズ        &
+    \begin{tabular}{c}
+      Pixco PL2514 焦点距離$\SI{25}{mm}$ \\
+      (ただし，撮影範囲拡大のためマウント変換用の         \\
+      リングを複数個用いてカメラとの距離を伸ばしたため，      \\
+      スペックの性能が出ていない可能性がある。)
+    \end{tabular}                                                                  \\
+    \hline
+  \end{tabular}
+  \label{tab:surface_exp_condition}
+\end{table}
+
+\begin{figure}[htbp]
+  \begin{minipage}
+    {0.55\textwidth}
+    \subcaption{}
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/sys_side_surface.png}
+    \label{fig:sys_side_surface}
+  \end{minipage}
+  \begin{minipage}{0.4\hsize}
+    \subcaption{}
     \centering
     \includegraphics[width=\linewidth]{../../figure/part2(exp_surface)/surface_exp_system.png}
-    \caption{実験系の模式図}
-    \label{fig:surface_exp_system}
+    \label{fig:sys_top_surface}
   \end{minipage}
-  \begin{minipage}{0.5\hsize}
-    \centering
-    \caption{界面成長の実験条件}
-    \begin{tabular}{c||c}
-      \hline
-      シャーレ直径     & $\phi = 11 \si{\cm}$ \\ \hline
-      電圧         & $5 \si{\V}$          \\ \hline
-      溶液量        & $12 \si{\mL}$        \\
-      極板表面と電極の距離 & 約$\SI{3}{cm}$        \\
-      \hline
-    \end{tabular}
-    \label{tab:surface_exp_condition}
-  \end{minipage}
-  \label{fig:surface_exp_system_condition}
-\end{table}
+  \caption{実験系の模式図。\subref{fig:sys_side_surface}横から見た模式図。\subref{fig:sys_top_surface}上から見た模式図。}
+  \label{fig:surface_exp_system}
+\end{figure}
+
 実験手順は以下の通りである。
 \begin{enumerate}
-  \item シャーレに\textcolor{red}{プラズマをかけて表面を励起させ，溶液が広がりやすくする。}
-  \item シャーレに硫酸亜鉛七水和物の水溶液を入れる。（溶液厚：$\sim\SI{1.26}{mm}$）
-  \item 界面活性剤(TWEEN20，Pluronic F-127)を加える。界面活性剤の濃度は，TWEEN20は$\SI{0.005}{mM}$，Pluronic F-127は体積\%で，0\%,0.005\%,0.01\%,0.03\%,0.05\%の5つの濃度について実験を行った。
-  \item シャーレの中心と側面にに電極を設置し，電極間に電圧を印可する。
+  \item 表\ref{tab:surface_exp_condition}の表面処理装置を用いてガラスシャーレの表面を励起させ，溶液を広がりやすくした。
+  \item  \ce{ZnSO_4.7H_2O} $\SI{2}{mM}$水溶液に界面活性剤を加えた溶液を$\SI{12}{ml}$作成した。TWEEN20の濃度は$\SI{0.005}{mM}$，Pluronic F-127の濃度は$\SI{0}{\mathrm{vol}\%}, \SI{0.005}{\mathrm{vol}\%}, \SI{0.01}{\mathrm{vol}\%}, \SI{0.03}{\mathrm{vol}\%}, \SI{0.05}{\mathrm{vol}\%}$とした。
+  \item ガラスシャーレに硫酸亜鉛七水和物の水溶液を入れる。（溶液厚：$\sim\SI{1.26}{mm}$）
+  \item 表\ref{tab:exp_condition}にある半円形極板と長方形極板を，二つの距離がおおよそ$\SI{30}{mm}$程度になるように設置した。半円形の極板はシリコンゴムをガラスシャーレの中央付近に差し渡し，目玉クリップで固定し，長方形極板は目玉クリップとガラスシャーレではさんで固定した。
+  \item 表\ref{tab:exp_condition}の電源装置を用いて，電極間に$\SI{5}{V}$の電圧を印加した。室温は$\SI{22}{\degreeCelsius}$から$\SI{25}{\degreeCelsius}$程度だった。
   \item 電界析出していく過程を撮影し形態を観察する。
 \end{enumerate}
-界面成長の実験系においては，バルク中での平坦な界面の成長を見るものが多い（例えば\cite{schilardi1998evolution}）。しかし，今回の実験では金属樹の析出実験と条件を合わせるため，気液界面における界面成長を観察した。また，極板を四角形のような角のある形状にすると，極板の角で電場が強くなりイオンが集中し，十分に界面成長する前に樹枝状結晶が発生してしまった。そのため，図\ref{fig:surface_exp_system}の用に円形極板にすることで，角からの急速な樹枝状結晶の成長を抑制し，また，陽極の位置を狭めることで，界面の成長範囲を制御した。
+界面成長の実験系においては，バルク水溶液中での平坦な界面の成長を見るものが多い\cite{schilardi1998evolution}。しかし，今回の実験では金属樹の析出実験と条件を合わせるため，気液界面における界面成長を観察した。
+
+また，極板を四角形のような角のある形状にすると，極板の角で電場が強くなりイオンが集中し，十分に界面成長する前に樹枝状結晶が発生してしまった。そのため，図\ref{fig:surface_exp_system}\subref{fig:sys_top_surface}の様に円形極板にすることで，角からの急速な樹枝状結晶の成長を抑制し，また，陽極の位置を狭めることで，界面の成長範囲を制御した。
 \subsection{解析方法}
 \begin{figure}[H]
   \begin{minipage}
     {0.64\textwidth}
+    \subcaption{}
     \centering
-    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/surface_hight_def.png}
-    \caption{円形極板における，成長高さの定義と，曲座標$\theta$の定義}
+    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/polor_dif.png}
     \label{fig:surface_hight_def}
   \end{minipage}
   \begin{minipage}
     {0.32\textwidth}
+    \subcaption{}
     \centering
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_surface)/polor_changed.png}
-    \caption{極座標へ変換後のデータ(界面成長中の変換画像)}
     \label{fig:polor_changed}
   \end{minipage}
-  \caption{成長高さの定義と極座標への変換後の例}
+  \caption{成長高さの定義と極座標への変換後の例。緑色の線内の角度（青矢印）を座標変換し，解析に用いた。\subref{fig:surface_hight_def}円形極板における，極座標$r,\theta$の定義と界面高さ$h(\theta,t)$の定義。\subref{fig:polor_changed}極座標へ変換した界面の二値化画像。}
   \label{fig:surface_hight_def_polor_changed}
 \end{figure}
-実験で撮影した実験データは円形極板での成長なので，そのままでは歪みが生じてしまう。歪みの除去のため，まず初期画像の円形極板を円の一部と仮定して黒色領域と白色領域の境界をPythonのOpenCVライブラリを用いて抽出し，$y=-\sqrt{|r_0^2-(x-x_c)^2|}+y_c$でフィッティングを行い，極板の中心座標$(x_c,y_c)$，および極板半径$r_0$を取得した。それをもとに，極板の中心を原点とし，極板の中心からの距離$r=r(\theta,t)$を求め，成長高さ$h=h(\theta,t)$を初期界面からの高さ$h(\theta,t)=r(\theta,t)-\min{\{r(\theta,0)\}}$と定義し解析を行った。ここで，基準半径を$r_0$ではなく，$r(\theta,0)$としたのは，$r_0$は初期界面の平均値として得られるため，$h(\theta,0)<0$となる場合があったことと，$r_0$と$\min{\{r(\theta,0)\}}$に大きな差がなかったためである。\\
+実験において，界面はほぼ円の動径方向に成長していく。そのため，デカルト座標のままでは極板形状による歪みが生じてしまう。歪みの除去のため，まず初期画像の円形極板を円の一部と仮定して，図\ref{fig:surface_hight_def_polor_changed}\subref{fig:surface_hight_def}のような実験画像から，黒色領域と白色領域の境界をPythonのOpenCVライブラリを用いて抽出し，$y=-\sqrt{|r_0^2-(x-x_c)^2|}+y_c$でフィッティングを行い，極板の中心座標$(x_c,y_c)$，および極板半径$r_0$を取得した。それをもとに，極板の中心を原点とし，極板の中心からの距離$r=r(\theta,t)$を求めた。変換後は\ref{fig:surface_hight_def_polor_changed}\subref{fig:polor_changed}のようになる。
+
+そして，時刻$t=0$における$r(\theta,0)$の最小値$r_{0\mathrm{min}}$を初期界面と定義した（図\ref{fig:surface_hight_def_polor_changed}\subref{fig:surface_hight_def}の赤色破線）。成長高さ$h=h(\theta,t)$を初期界面からの高さ$h(\theta,t)=r(\theta,t)-r_{0\mathrm{min}}$と定義し解析を行った。ここで，基準半径を$r_0$ではなく，$r_{0\mathrm{min}}$としたのは，$r_0$は初期界面の平均値として得られるため，$h(\theta,0)<0$となる場合があったことと，$r_0$と$\min{\{r(\theta,0)\}}$に大きな差がなかったためである。
+
 取得した各時刻の成長高さのデータ$h(\theta,t)$に対して，以下で定義される二乗平均粗さ$W(t)$と成長高さの自己相関関数$C(\delta\theta,t)$を計算した。
-\begin{defi}
-  成長高さ$h(\theta,t)$に対する二乗平均粗さ$W(t)$は，$\langle\cdot\rangle$を$\cdot$に対する$\theta$による平均として，以下のように定義される。
-  \begin{equation}
-    W(t) = \ab\langle[h(\theta,t)-\langle h(\theta,t)\rangle]^2\rangle^{1/2}
-  \end{equation}
-  \label{def:W}
-\end{defi}
-\begin{defi}
-  成長高さ$h(\theta,t)$に対する界面高さの自己相関関数$C(\delta\theta,t)$は，$\delta \theta$を角度のずれとして，以下のように定義される。
-  \begin{equation}
-    C(\delta\theta,t) = \frac{\int \d \theta h(\theta,t)h(\theta+\delta\theta,t)}{\int \d \theta h(\theta,t)^2}
-  \end{equation}
-  \label{def:C}
-\end{defi}
-自己相関関数を計測することで，そのピークが界面の突出部の波長，あるいは突出部の幅をある程度知ることができると思われる。\\
-以上の二乗平均粗さや自己相関関数を用いて，界面の粗さの時間発展や突出部の幅を推定することで，leveler（界面活性剤）を加えたことによる金属樹の枝の分岐頻度や分岐角度，枝の太さの変化の原因を解明することを目的に実験を行った。
+
+成長高さ$h(\theta,t)$に対する二乗平均粗さ$W(t)$は，$\langle\cdot\rangle$を$\cdot$に対する$\theta$による平均として，以下のように定義される。
+\begin{equation}
+  W(t) = \ab\langle[h(\theta,t)-\langle h(\theta,t)\rangle]^2\rangle^{1/2}
+  \label{eq:W}
+\end{equation}
+
+成長高さ$h(\theta,t)$に対する界面高さの自己相関関数$C(\delta\theta,t)$は，$\delta \theta$を角度のずれとして，以下のように定義される。
+\begin{equation}
+  C(\delta\theta,t) = \frac{\int \d \theta h(\theta,t)h(\theta+\delta\theta,t)}{\int \d \theta h(\theta,t)^2}
+  \label{eq:C}
+\end{equation}
+
+自己相関関数を計測することで，そのピークとなる$\delta \theta$を得ることができる。この$\delta \theta$によって，界面の突出部の波長，あるいは突出部の幅をある程度知ることができると思われる。
+
+式\eqref{def:W}で与えられる二乗平均粗さや，式\eqref{eq:C}で与えられる自己相関関数を用いると，界面の粗さの時間発展や突出部の幅を推定することができる。そのため，leveler（界面活性剤）を加えたことによる界面の粗さの時間発展の変化を盗聴づけることができ，金属樹の枝の分岐頻度や分岐角度，枝の太さの変化の原因を明らかにすることができると考えられる。
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
