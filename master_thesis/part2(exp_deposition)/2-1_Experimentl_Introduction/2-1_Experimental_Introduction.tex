@@ -8,15 +8,16 @@
 金属イオンの水溶液に電場を印加することで以下の化学反応が起こる。
 \begin{equation}
   \begin{split}
-    \textrm{陽極：} & \ce{M                -> M^{$n+$} + $n$e^-} \\
-    \textrm{陰極：} & \ce{M^{$n+$} + $n$e^-  -> M}
+    \textrm{陽極：} & \ce{M                -> M^{$z+$} + $z$e^-} \\
+    \textrm{陰極：} & \ce{M^{$z+$} + $z$e^-  -> M}
     \label{eq:electro_deposition}
   \end{split}
 \end{equation}
-Mは金属原子,M$^{n+}$は金属イオン，$n$はイオンの価数を表す。陽極側で金属が電子を放出し，イオンとなって溶液中に溶け出す。一方陰極側では溶液中の金属イオンが電子を受け取り，金属として析出する。このようにして金属イオンが陰極で析出することを\textbf{電解析出}と呼ぶ。
+Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオンの価数を表す。陽極側で金属が電子を放出し，イオンとなって溶液中に溶け出す。一方陰極側では溶液中の金属イオンが電子を受け取り，金属として析出する。このようにして金属イオンが陰極で析出することを\textbf{電解析出}と呼ぶ。
 
-電解析出では，析出表面において反対符号のイオンの再配置が起こり，図\ref{fig:debye_layer}のように，電極表面の極薄い層と近傍の反対符号のイオン濃度が高い層が形成される。これを\textbf{電気二重層}という。反対符号のイオンが電極表面の電場を遮蔽するため，溶液中に入り込む電場が減少し，結果的に大部分の溶液中では電場が存在しない状態が生じる。
-\begin{figure}
+電解析出では，電極表面において反対符号のイオンの再配置が起こり，図\ref{fig:debye_layer}のように，電極表面の極薄い層と近傍の反対符号のイオン濃度が高い層が形成される。これを\textbf{電気二重層}という。反対符号のイオンが電極表面の電場を遮蔽するため，溶液中に入り込む電場が減少し，結果的に大部分の溶液中では電場が存在しない状態が生じる。
+
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/electric_double_layer.png}
   \caption{電気二重層の模式図。電極内の電荷と反対符号のイオンが集まって形成される。電極表面の極薄い層と，近傍の溶液中にバルクよりも高い濃度で集まった層に分けられる\cite{足立泰久2013電気二重層とコロイド分散系の凝集}。}
@@ -30,12 +31,12 @@ Mは金属原子,M$^{n+}$は金属イオン，$n$はイオンの価数を表す�
   n_i(\bm{x}) = n_{i\infty}\exp(-\frac{ez_i\psi(x)}{k_BT})
   \label{eq:boltzmann}
 \end{equation}
-に従うと仮定する。ただし，$k_B$はボルツマン定数，$T$は絶対温度，$e$は電気素量，$z_i$はイオンの価数\textcolor{red}{（正の価数を持つイオンの場合）＊価数の定義として，使い方があっているか，このボルツマン分布は$z_i>0$の場合のみ成り立つ。}，$\psi(\bm{x})$は静電ポテンシャル，$n_{i\infty}$はイオンの数密度の平衡分布である。
+に従うと仮定する。ただし，$k_B$はボルツマン定数，$T$は絶対温度，$e$は電気素量，$z_i$は陽イオンの価数，$\psi(\bm{x})$は静電ポテンシャル，$n_{i\infty}$はイオンの数密度の平衡分布である。
 
-数密度は温度が十分高ければ（$T\to\infty$）平衡分布になり，また，電位によるエネルギー($ez_i\psi(x)$)の増加によって急激に減少することがわかる。
+数密度は温度が十分高ければ（$T\to\infty$）平衡分布になり，また，電位によるエネルギー($ez_i\psi(\bm{x})$)の増加によって急激に減少することがわかる。
 例えば，正に帯電した極板に対する陽イオンの数密度分布を考えると，極板から離れて電位が低い点では平衡分布に近く，電位の高い極板付近では急激に減少することがわかる。
 
-溶液中の電荷密度$\rho(\bm{x})$は，各イオンの数密度分布を用いて，$\rho(\bm{x})=\sum_{i}ez_in_i(\bm{x})$と表される。これをPoiiasson方程式$\nabla^2\psi(\bm{x})=-\rho(\bm{x})/\varepsilon$に代入すると，\textbf{Poisson-Boltzmann方程式}
+溶液中の電荷密度$\rho(\bm{x})$は，各イオンの数密度分布を用いて，$\rho(\bm{x})=\sum_{i}ez_in_i(\bm{x})$と表される。これをPoisson方程式$\nabla^2\psi(\bm{x})=-\rho(\bm{x})/\varepsilon$に代入すると，\textbf{Poisson-Boltzmann方程式}
 \begin{equation}
   \nabla^2\psi(\bm{x}) = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp(-\frac{ez_i\psi(\bm{x})}{k_BT})
   \label{eq:PB}
@@ -52,17 +53,18 @@ Mは金属原子,M$^{n+}$は金属イオン，$n$はイオンの価数を表す�
   \lambda_D = \sqrt{\frac{\varepsilon_r\varepsilon_0 k_BT}{e^2\sum_{i}n_{i\infty}z_i^2}}\label{eq:debye_length}
 \end{equation}
 
-例として，$\ce{ZnSO_4}$($\SI{2}{mol/L}$)の場合の電気二重層の厚さを求める。
+例として，$\ce{ZnSO_4}$ ($\SI{2}{M}$)の場合の電気二重層の厚さを求めると，
 \begin{itemize}
-  \item $\varepsilon_r$ : 比誘電率 $80.4$ (\ce{H_2O})
-  \item $T$ : 絶対温度 $\SI{298}{K}$
-  \item $n_{i\infty}$ : イオン（$\ce{Zn^{2+},SO_4^{2-}}$）の数密度 $\SI{1.20e27}{m^{-3}}$
-  \item $z$ : イオンの価数 $2$
+  \item $\varepsilon_r$ : 比誘電率，$80.4$ (\ce{H_2O})
+  \item $T$ : 絶対温度，$\SI{298}{K}$
+  \item $n_{i\infty}$ : イオン（$\ce{Zn^{2+},SO_4^{2-}}$）の数密度，$\SI{1.20e27}{m^{-3}}$
+  \item $z$ : イオンの価数，$2$
 \end{itemize}
+より，
 \begin{equation}
   \lambda_D\approx \SI{1.09e-1}{nm}
 \end{equation}
-以上より，デバイ遮蔽長は約$\SI{0.1}{nm}$である。そのため，バルク中ではほとんど電場が遮蔽され，イオンの移動は拡散が支配的となる。
+となり，電気二重層の厚さは約$\SI{0.1}{nm}$である。そのため，バルク水溶液中では電場がほとんど遮蔽され，イオンの移動は拡散が支配的となる。
 \subsection{金属樹}
 式\eqref{eq:electro_deposition}の電解析出で生じる金属結晶は，図\ref{fig:el_dep_mol}のように，印可する電圧や溶液の温度によってその形態が変化する\cite{suda2003temperature}。その中でも，生じる金属結晶が不規則に枝分かれをして成長していくものを\textbf{金属樹}（図\ref{fig:fractal_dimension}\subref{fig:el_dep_fractal}）と呼ぶ。
 
@@ -70,7 +72,7 @@ Mは金属原子,M$^{n+}$は金属イオン，$n$はイオンの価数を表す�
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/el_dep_mol.png}
-  \caption{電解析出の様々なパラメータによるおおよその形態変化。様々な要因が複合的に作用するため厳密に一致しているとは限らない。}
+  \caption{電解析出の様々なパラメータによるおおよその形態変化。様々な要因が複合的に作用するため厳密に一致しているとは限らない\cite{suda2003temperature}。}
   \label{fig:el_dep_mol}
 \end{figure}
 
@@ -95,22 +97,20 @@ Mは金属原子,M$^{n+}$は金属イオン，$n$はイオンの価数を表す�
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/Df_temp.png}
     \label{fig:Df_temp}
   \end{minipage}
-  \caption{過去の文献における，亜鉛の金属樹の実験結果とフラクタル次元のパラメータによる変化の報告\subref{fig:el_dep_fractal}フラクタル構造を持つ亜鉛の金属樹\cite{matsushita1984fractal}。\subref{fig:Df_volt}電圧によるフラクタル次元の変化\cite{matsushita1984fractal}。\subref{fig:Df_temp}温度によるフラクタル次元の変化\cite{suda2003temperature}。}
+  \caption{過去の文献における，亜鉛の金属樹の実験結果とフラクタル次元のパラメータによる変化の報告。\subref{fig:el_dep_fractal}フラクタル構造を持つ亜鉛の金属樹\cite{matsushita1984fractal}。\subref{fig:Df_volt}電圧によるフラクタル次元の変化\cite{matsushita1984fractal}。\subref{fig:Df_temp}温度によるフラクタル次元の変化\cite{suda2003temperature}。}
   \label{fig:fractal_dimension}
 \end{figure}
 
-\subsection{Tip-splitting（先端分岐）とMullins-Sekerka(MS)不安定性}
+\subsection{先端分岐（Tip-splitting）とMullins-Sekerka(MS)不安定性}
 \label{sec:tip_splitting}
-樹枝状パターンの成長過程で，成長界面が何らかの摂動を受けて枝分かれすることを\textbf{先端分岐:Tip-splitting}といい，金属樹の枝分かれ構造の形成要因となっている。特に，金属樹を含む結晶界面が成長していく際，成長界面が平らであっても摂動が加わることで界面が不安定化し，突出部が自然に形成・成長していく。このような不安定性を発見者の名前から\textbf{Mullins-Sekerka(MS)不安定性}と呼ぶ。
+樹枝状パターンの成長過程で，成長界面が何らかの摂動を受けて枝分かれすることを\textbf{先端分岐（Tip-splitting）}といい，金属樹の枝分かれ構造の形成要因となっている。金属樹に限らず，結晶界面が成長していく際，成長界面が平らであっても摂動が加わることで界面が不安定化し，突出部が自然に形成・成長していく。このような不安定性を発見者の名前から\textbf{Mullins-Sekerka(MS)不安定性}と呼ぶ。
 
-MS不安定性の仕組みを以下に詳しく述べる。
-
-簡単のため，結晶の異方性を無視して，物質拡散のみの無限に広い溶液中における，球形(半径$R$)の固体の表面が不安定化するメカニズムを考える\cite{フラクタル科学}\cite{mullins1963morphological}\textcolor{red}{MSの原論文を引くべきか->原論文を図書館で見ることができたので引用，ジャクソンは球面調和関数の計算の確認程度なので除外}。3次元空間の溶液中での分子運動は，粒子の濃度場$c(\bm{r},t)$,拡散係数$D$とすると，拡散方程式
+簡単のため，結晶の異方性を無視して，物質拡散のみの無限に広い溶液中における，球形(半径$R$)の固体の表面が不安定化するメカニズムを考える\cite{フラクタル科学}\cite{mullins1963morphological}。3次元空間の溶液中での分子運動は，粒子の濃度場$c(\bm{r},t)$,拡散係数$D$とすると，拡散方程式
 \begin{equation}
   \frac{\partial c(\bm{r},t)}{\partial t} = D\nabla^2c
   \label{eq:diffusion}
 \end{equation}
-で表される。ここで固体の表面の成長速度が十分遅いとして，準定常的な状態を考える。この時，界面の成長は静止しているとみなせるため，$c(\bf{r},t)$について，３次元極座標$(r,\theta,\phi)$のラプラス方程式
+で表される。ここで固体の表面の成長速度が十分遅いとして，準定常的な状態を考える。この時，界面の成長は静止しているとみなせるため，$c(\bf{r},t)$について，３次元極座標$(r,\theta,\phi)$のLaplace方程式
 \begin{equation}
   \nabla^2c(\bm{r})\equiv \ab[\frac{1}{r^2}\pdv*{\ab(r^2\pdv{}{r})}{r}+\frac{1}{r^2\sin\theta}\pdv*{\ab(\sin\theta\pdv{}{\theta})}{\theta}+\frac{1}{r^2\sin^2\theta}\pdv[2]{}{\phi}]c(\bm{r})=0
   \label{eq:laplace}
@@ -120,13 +120,13 @@ MS不安定性の仕組みを以下に詳しく述べる。
   c(r\rightarrow \infty)  = c_{\infty}, \qquad c(r=R)= c_s
   \label{eq:boundary}
 \end{equation}
-とする。ここで，３次元のラプラス方程式の解は，$r\to\infty$で発散しないことより，球面調和関数$Y_{lm}(\theta,\phi)$を用いて以下のように表される。($l=0$の時の定数項は$c_\infty$となるので分離した。)
+とする。ここで，3次元のLaplace方程式の解は，$r\to\infty$で発散しないことより，球面調和関数$Y_{lm}(\theta,\phi)$を用いて以下のように表される。($l=0$の時の定数項は$c_\infty$となるので分離した。)
 \begin{equation}
-  c(\bm{r}) = c_{\infty} + \sum_{l=1}^{\infty}\sum_{m=-l}^{l}A_{lm}r^{-(l+1)}Y_{l}^{m}(\theta,\phi)
+  c(\bm{r}) = c_{\infty} + \sum_{l=0}^{\infty}\sum_{m=-l}^{l}A_{lm}r^{-(l+1)}Y_{l}^{m}(\theta,\phi)
   \label{eq:spherical}
 \end{equation}
 
-界面の成長において，フィックの法則$\bm{J}_c(\bm{r})=-D\nabla c(\bm{r})$に従う粒子の球面に対する法線方向成分（流れ込んだ量）と，微小時に取り込まれた分子数$\lim_{\Delta t\to 0} (c_0-c_s)\Delta R(t)/\Delta t$（$c_0$は固体内の分子の濃度）は等しい。よって，半径$R=R(t)$の時間発展は，
+流束$\bm{J}_c(\bm{r})$が，Fickの法則$\bm{J}_c(\bm{r})=-D\nabla c(\bm{r})$に従うとすると，界面の成長における，粒子の球面に対する法線方向成分（流れ込んだ量）と，微小時間に取り込まれた分子数$\lim_{\Delta t\to 0} (c_0-c_s)\Delta R(t)/\Delta t$（$c_0$は固体内の分子の濃度）は等しい。よって，半径$R=R(t)$の時間発展は，
 \begin{equation}
   \begin{split}
     \eval{D\pdv{c(\bm{r})}{r}}_{r=R} & = -\bm{e}_r\cdot\bm{J}_c = (c_0-c_s)\odv{R(t)}{t} \\
@@ -134,27 +134,39 @@ MS不安定性の仕組みを以下に詳しく述べる。
   \end{split}
   \label{eq:R}
 \end{equation}
-となる。一般に，$c_s\ll c_0$なので，$c_0$で近似した。平均曲率$\kappa$\textcolor{red}{（原論文でも2で割らない定義になっている）}の界面での平衡濃度は平面界面の平衡濃度$c_e$とは一致しない。曲率のある界面の平衡濃度はギブス・トムソンの関係式より，以下のように表される。
+となる。一般に，$c_s\ll c_0$なので，$c_0$で近似した。平均曲率$\kappa$の界面での平衡濃度は平面界面の平衡濃度$c_e$とは一致しない。曲率のある界面の平衡濃度はGibbs-Thomsonの関係式より，以下のように表される。
 \begin{equation}
-  c_s = c_e(1+\Gamma_c \kappa), \qquad \Gamma_c = \frac{\gamma \omega_0}{k_BT}
+  c_s = c_e(1+\Gamma_c \kappa)
   \label{eq:Gibbs-Thomson}
 \end{equation}
-ここで，$\gamma$は界面エネルギー密度，$\omega_0$は一分子当たりの体積である。$\Gamma_c$は大雑把には界面エネルギーと分子運動によるエネルギーの比を表し，長さの次元を持つ。
+ここで，$\gamma$は界面エネルギー密度，$\omega_0$は一分子当たりの体積である。$\Gamma_c$は，
+\begin{equation}
+  \Gamma_c = \frac{\gamma \omega_0}{k_BT}
+\end{equation}
+で与えられ，大雑把には界面エネルギーと分子運動によるエネルギーの比を表し，長さの次元を持つ。
 
 まず，$l=m=0$のモードである，半径$R=R(t)$の球形の固相の時間発展について考える。式\eqref{eq:spherical}と境界条件\eqref{eq:boundary}を用いると，解は以下のようになる。
+
 \begin{equation}
   c(r) = c_{\infty} + \frac{c_s-c_{\infty}}{r}R
   \label{eq:sphere}
 \end{equation}
+
 これより，成長速度は，式\eqref{eq:R}に代入かつ平均曲率$\kappa=2/R$より，以下のように与えられる。
 \begin{equation}
   \begin{split}
     D\frac{c_\infty-c_s}{R} & =c_0\odv{R}{t}                                                 \\
     \odv{R}{t}              & = \frac{D}{Rc_0}\ab\{c_\infty-c_e\ab(1+\frac{2\Gamma_C}{R})\}  \\
-                            & = \frac{2c_e\Gamma_c D}{c_0 R}\ab\{\frac{1}{R_e}-\frac{1}{R}\} \\
-    R_e                     & =\frac{2c_e \Gamma_c }{c_\infty-c_e}
+                            & = \frac{D}{R c_0}\ab\{(c_\infty-c_e)-\frac{2c_e\Gamma_c}{R}\}  \\
+                            & = \frac{2c_e\Gamma_c D}{c_0 R}\ab\{\frac{1}{R_e}-\frac{1}{R}\}
   \end{split}
   \label{eq:Rt}
+\end{equation}
+
+ただし，
+\begin{equation}
+  R_e = \frac{2c_e \Gamma_c }{c_\infty-c_e}
+  \label{eq:Re}
 \end{equation}
 式\eqref{eq:Rt}の二行目より，$c_\infty-c_e$の項は過飽和度による駆動力を表し，$2\Gamma_c/R$は表面張力による抑制効果を表す。
 
@@ -165,15 +177,15 @@ MS不安定性の仕組みを以下に詳しく述べる。
   r(\theta,\phi,t) = R(t) + \sum_{l,m} \lambda_{lm}(t)Y_{lm}(\theta,\phi)
   \label{eq:perturbation}
 \end{equation}
-と変化したときの安定性を以下で求める。ただし，線形近似の範囲では各摂動を分離して考えられるのであるモード$(l,m)$について考える。
-式\eqref{eq:laplace}と界面形状である式\eqref{eq:perturbation}が境界条件を満たす解は，以下のように与えられる。（\textcolor{red}{詳しい計算は付録\ref{}}）
+と変化したときの安定性を求める。ただし，線形近似の範囲では各摂動を分離して考えられるので，あるモード$(l,m)$について考える。
+式\eqref{eq:laplace}と界面形状の式\eqref{eq:perturbation}が境界条件を満たすような解は，
 \begin{equation}
   \begin{split}
     c(\bm{r})=c_{\infty}-\ab(c_{\infty}-c_s)\frac{R}{r}-\ab\{c_\infty-c_e-\frac{l(l+1)c_e\Gamma_c}{R}\}\frac{R^l}{r^{l+1}}\lambda_{lm}(t)Y_{l}^{m}(\theta,\phi)
   \end{split}
   \label{eq:perturbation_sol}
 \end{equation}
-ここで平均曲率$\kappa$が，
+と与えられる。ここで平均曲率$\kappa$が，
 \begin{equation}
   \kappa = \frac{2}{R}+\frac{l(l+1)\lambda_{lm}(t)Y_l^m(\theta,\phi)}{R^2}
   \label{eq:perturbation_curvature}
@@ -183,7 +195,7 @@ MS不安定性の仕組みを以下に詳しく述べる。
   \frac{\dot{\lambda_{lm}}}{\lambda_{lm}} =(l-1)\frac{D}{c_0R^2}\ab\{(c_\infty-c_e)-(l^2+3l+4)\frac{c_e\Gamma_c}{R}\}
   \label{eq:delta_t}
 \end{equation}
-となる。$l=0$は平面，$l=1$は一次まででは0になってしまうため除いて考える。$l\geq2$において，\eqref{eq:delta_t}の右辺が正の時摂動が増幅され，界面は不安定となる。式\eqref{eq:delta_t}のカッコ内の第一項は過飽和度による摂動の助長，二項目は$\Gamma_c\propto$界面張力による界面の安定化と半径$R$の増大による不安定化を示している。また，$l$を含む項は，どのモードが一番大きく不安定化するかを示している。例えば，以下のように式変形を行うとわかりやすい。
+となる。$l=0$は平面，$l=1$は一次まででは0になってしまうため除いて考える。$l\geq2$において，式\eqref{eq:delta_t}の右辺が正の時摂動が増幅され，界面は不安定となる。式\eqref{eq:delta_t}のカッコ内の一項目は過飽和度による摂動の助長，二項目は$\Gamma_c\propto$（界面張力）による界面の安定化と，半径$R$の増大による不安定化を示している。また$l$を含む項は，どのモードが一番大きく不安定化するかを示している。例えば，以下のように式変形を行うとわかりやすい。
 \begin{equation}
   \begin{split}
     \frac{\dot{\lambda_{lm}}}{\lambda_{lm}} & =(l-1)\ab\{\frac{D(c_\infty-c_e)}{c_0R^2}-(l^2+3l+4)\frac{D c_e\Gamma_c}{c_0 R^3}\} \\
@@ -191,17 +203,19 @@ MS不安定性の仕組みを以下に詳しく述べる。
   \end{split}
   \label{eq:delta_t_simple}
 \end{equation}
-ただし，$\alpha=D(c_\infty-c_e)/c_0R^2,\beta=D c_e\Gamma_c/c_0 R^3$である。
+ただし，$\alpha=D(c_\infty-c_e)/(c_0R^2),\beta=D c_e\Gamma_c/(c_0 R^3)$である。
 
-図\ref{fig:MS_instability_ex}は，式\ref{eq:delta_t_simple}の値を，$\beta=0.01$に固定し，$l$を横軸にしてプロットしたものである。$\alpha,\beta$の比を変えると，最大値を取る$l$の値が変化する。これより$\alpha$の増加（過飽和度）が増加すれば，それに伴って最も増幅される$l$の値も増加し，より細かい波長が最初に不安定化する。
+図\ref{fig:MS_instability_ex}は，式\eqref{eq:delta_t_simple}の値を，$\beta=0.01$に固定し，$l$を横軸にしてプロットしたものである。$\alpha,\beta$の比を変えると，最大値を取る$l$の値が変化する。これより$\alpha$の増加（過飽和度）が増加すれば，それに伴って最も増幅される$l$の値も増加し，より細かい波長が最初に不安定化する。
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/MS_instability_ex.png}
-  \caption{$\beta=0.01$の時の各$\alpha$の値毎の変化}
+  \caption{$\beta=0.01$の時の各$\alpha$の値毎の変化。式\eqref{eq:delta_t_simple}の$l$に対する値をプロットした。}
   \label{fig:MS_instability_ex}
 \end{figure}
 
-以上がMS不安定性の理論的な概要である。また，実際の平らな界面でのMS不安定性はおおよそ以下のように進行する（文献\cite{結晶成長}の図を参考に作成）。
+以上がMS不安定性の理論的な概要である。また，実際の平らな界面でのMS不安定性はおおよそ以下のように進行する（図\ref{fig:MS}は文献\cite{結晶成長}を参考に作成）。
+
 \begin{figure}[htbp]
   \begin{minipage}
     {0.5\textwidth}
@@ -220,16 +234,21 @@ MS不安定性の仕組みを以下に詳しく述べる。
   \caption{MS不安定性の模式図。\subref{fig:MS_side}界面とイオン濃度の分布。\subref{fig:MS_top}界面の不安定性の時間発展。}
   \label{fig:MS}
 \end{figure}
+
 \begin{enumerate}
-  \item 図\ref{fig:MS}\subref{fig:MS_side}に示すように，界面付近のイオン濃度が析出により低下し，イオンの流れが生じて，界面付近にイオンが集まる。
+  \item 図\ref{fig:MS}\subref{fig:MS_side}に示すように，界面付近のイオン濃度が析出により低下し，イオン流束が生じて，界面付近にイオンが集まる。
   \item 溶液中のイオンを取り込み，平らな界面が図\ref{fig:MS}\subref{fig:MS_top}のように成長していく。
   \item 微小な摂動により界面にわずかな凹凸が生じる。
-  \item 突出部付近に集中するようなイオン勾配が発生し，先端部により多くのイオンが取り込まれる。
+  \item 突出部付近に集中するようなイオン流束が発生し，先端部により多くのイオンが取り込まれる。
   \item 突出部がより成長していく。
 \end{enumerate}
-平面からの成長と式\eqref{eq:delta_t}で対象とした球形結晶界面の不安定化は必ずしも一致するとは限らないが，定性的には突出部にイオンが集まることで，式\eqref{eq:delta_t}の一項目の過飽和度が増加したためと考えられる。\textcolor{red}{理論の話は結晶への摂動メインだが，以下の図はイオン勾配による流れがメインになっており，一緒としていいのか？理論の結果からは尖りすぎる(先端の曲率半径Rが小さくなりすぎる)と二項目の負の項が大きくなるため止まるが，以下のイオン流の説明だと停止の機構について触れられていない気がする。-> 過飽和度の増加と対応付けた。}
+平面からの成長と式\eqref{eq:delta_t}で対象とした球形結晶界面の不安定化は必ずしも一致するとは限らないが，定性的には突出部へのイオン流束の増加は，式\eqref{eq:delta_t}の一項目の過飽和度の増加に対応すると考えらえる。
+
+また，溶液中に添加物が加わると，結晶表面において添加物の吸着・脱着や表面拡散が生じる。そのため，イオンの過飽和度が減少したり，界面エネルギーが上昇するなどにより，MS不安定性が抑制されると思われる。
+
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
 }{}
+
 \end{document}

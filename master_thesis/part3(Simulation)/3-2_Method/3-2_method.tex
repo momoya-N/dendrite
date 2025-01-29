@@ -12,11 +12,11 @@
   \label{fig:RW_2dim}
 \end{figure}
 
-数値計算は二次元DLA（$d=2$）をベースに，電場によるドリフトと界面活性剤による界面への固着の影響を取り込んだモデルを作成した。\ref{sec:RW}節と\ref{sec:Langevin}節の内容をもとに，RWとLangevin方程式の対応を考える。\ref{sec:RW}節より，外力（電場）について，
+金属樹のパターン形成における界面の影響や電場の影響を評価し，実験結果を再現するため，数値計算を行った。数値計算は二次元DLA（$d=2$）をベースに，電場によるドリフトと界面活性剤による界面への固着の影響を取り込んだモデルを作成した。\ref{sec:RW}節と\ref{sec:Langevin}節の内容をもとに，RWとLangevin方程式の対応を考える。\ref{sec:RW}節より，外力（電場）について，
 \begin{equation}
   \bar{F}_i=\mu q E_i=(p_i-q_i)\frac{a}{\Delta t}
   \label{eq:force}
-\end{equation}が成り立つので，$p_i-q_i=\mu q E_i\Delta t/a$となる。また，拡散係数$D=a^2/2d\Delta t$より，$a^2=2dD\Delta t$となる。次に，式\eqref{eq:Langevin_overdamped_average}を離散化する。格子間隔$a$，$\Delta t$を用いると，以下のように離散化できる。
+\end{equation}が成り立つので，$p_i-q_i=\mu q E_i\Delta t/a$となる。また，拡散係数$D=a^2/(2d\Delta t)$より，$a^2=2dD\Delta t$となる。次に，式\eqref{eq:Langevin_overdamped_average}を離散化する。格子間隔$a$，$\Delta t$を用いると，以下のように離散化できる。
 \begin{equation}
   \begin{split}
     \bm{x} & =a\bm{X}, \qquad t=n\Delta t, \qquad (n\in\mathbb{N},\bm{X}\in\mathbb{Z}^d,a,\Delta t \in \mathbb{R}) \\
@@ -35,7 +35,7 @@
 \end{equation}
 式\ref{eq:discrete_average_variance}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散の方は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しないという結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なるという物理的に不可解な状況になってしまう。
 
-そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均と，分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
+そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均・分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
 \begin{equation}
   \begin{split}
     \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\ab\{(1-r)-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\} \\
@@ -51,29 +51,27 @@
 
 以上の議論をまとめると，RWにおいて電場の影響を打ち消す確率$r$を導入することで，Langevin方程式の分散が外力に依存しないという結果を再現することができる。しかし，$r>0$を担保するため，時間間隔$\Delta t$を変化させなければならない。これはパラメータである$\alpha=\mu q\Delta t/(2a),C=D\Delta t/a^2$を変えることに他ならない。今回の数値計算では分散$C$を固定して，$\alpha$を変化させて形状変化を調べた。
 
-$C$の値は以下のように決めた。まず，各$i$成分の確率は以下の式を満たす。
+$C$の値は以下のように決めた。まず，各$i$成分の確率は
 
 \begin{equation}
   \left\{
   \begin{aligned}
-    p_i+q_i & =2C+\frac{4\alpha^2}{d}\bm{E}^2 \\
+    p_i+q_i & =2C+4\alpha^2E_i^2 \\
     p_i-q_i & =2\alpha E_i
   \end{aligned}
   \right.
   \label{eq:prob}
 \end{equation}
-これより，各確率$p_i,q_i,r$は，
+を満たす。これは，式\eqref{eq:discrete_average_variance}の分散に関して，総和を取る前の関係式を用いると$\langle X_i^2\rangle-\langle X_i\rangle^2=2C$となることより，
 \begin{equation}
-  \left\{
-  \begin{aligned}
-    p_i & =C+\alpha E_i+\frac{2\alpha^2}{d}\bm{E}^2 \\
-    q_i & =C-\alpha E_i+\frac{2\alpha^2}{d}\bm{E}^2 \\
-    r   & =1-2dC-4\alpha^2\bm{E}^2
-  \end{aligned}
-  \right.
-  \label{eq:prob2}
+  \begin{split}
+    \langle X_i^2\rangle-\langle X_i\rangle^2 & =\left\{\frac{1-r}{d}-\frac{(\mu q \Delta t)^2}{a^2}E_i^2\right\} \\
+                                              & =(p_i+q_i)-4\alpha^2E_i^2                                         \\
+                                              & =2C
+  \end{split}
+  \label{eq:prob_middle}
 \end{equation}
-\textcolor{red}{$\bm{E}^2/d$を平均的な電場の強さとして，各方向に分割すると，（＊総和を取る前の値で計算すれば$E_i$のまま出てくるが，$\bm{E}^2$で書いてしまったため，方位に関してすべて足しあげてしまい，その情報が落ちている。素直に方位のまま書くべきか？）}
+となることを用いた。これより，各確率$p_i,q_i,r$は，
 \begin{equation}
   \left\{
   \begin{aligned}
@@ -84,7 +82,9 @@ $C$の値は以下のように決めた。まず，各$i$成分の確率は以�
   \right.
   \label{eq:prob3}
 \end{equation}
-$p_i,q_i$を$\alpha E\i$について平方完成すると，$\alpha E_i=\mp1/4$で最小値$C-1/8$を取る。また，$r$は$\alpha E_i=0$で最大値$1-2dC$を取る。これら二つの値が0と1の間に入るという条件は$d=2$の時，
+で与えられる。
+
+$p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$で最小値$C-1/8$を取る。また，$r$は$\alpha E_i=0$で最大値$1-2dC$を取る。これら二つの値が0と1の間に入るという条件は$d=2$の時，
 \begin{align}
   0<C-\frac{1}{8}<1 &  & \Leftrightarrow &  & \frac{1}{8}<C<\frac{9}{8} \\
   0<1-4C<1          &  & \Leftrightarrow &  & 0<C<\frac{1}{4}
@@ -97,16 +97,16 @@ $p_i,q_i$を$\alpha E\i$について平方完成すると，$\alpha E_i=\mp1/4$�
 \end{equation}
 となる。これより，上下端の中央の値である$C=3/16$を数値計算に用いる値とした。
 \subsection{固着確率$P$の定義}
-実験における，界面でのlevelerによるイオンの析出阻害を再現するため，ブラウン運動してきた粒子を\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がすでにある隣のクラスターに来た場合，そのまま新たなクラスターとして取り込むが，今回の数値計算では確率$P$でクラスターとして取り込んだ。取り込まれなかった場合は再びRWを行う。
+実験における，界面でのlevelerによるイオンの析出阻害を再現するため，Brown運動してきた粒子を\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がすでにある隣のクラスターに来た場合，そのまま新たなクラスターとして取り込むが，今回の数値計算では確率$P$でクラスターとして取り込んだ。取り込まれなかった場合は再びRWを行う。
 \subsection{数値計算方法}
-今回の数値計算では，パターンにより生じる電場と組み合わせてブラウン運動する粒子の遷移確率を計算した。まず，計算する系の条件を表\ref{tab:condition}ように設定する。
+今回の数値計算では，パターンにより生じる電場と組み合わせてBrown運動する粒子の遷移確率を計算した。まず，計算する系の条件を表\ref{tab:condition}ように設定する。
 \begin{table}[htbp]
   \centering
   \caption{数値計算の系の条件　}
   \begin{tabular}{|c||c|}
     \hline
     系の条件                      & 設定値                                                  \\ \hline\hline
-    系のサイズ $L$                 & $\SI{512}{pix}\times\SI{512}{pix}$                   \\ \hline
+    系のサイズ $L$                 & $\SI{512}{px}\times\SI{512}{px}$                     \\ \hline
     粒子数 $N$                   & 15000                                                \\ \hline
     中心座標 $\bm{x_c}=(x_c,y_c)$ & $(x_c,y_c)=(L/2,L/2)=(256,256)$                      \\ \hline
     境界条件                      & $||\bm{r}-\bm{x_c}||>L/2$で電位$V=1.0$，パターンが存在する点で$V=0$ \\ \hline
@@ -117,20 +117,21 @@ $p_i,q_i$を$\alpha E\i$について平方完成すると，$\alpha E_i=\mp1/4$�
   \label{tab:condition}
 \end{table}
 
-具体的な計算方法は以下のとおりである。ただし，電場の計算においては，金属樹の電解質溶液の電気的中性が期待されるため，ラプラス方程式$\nabla^2\phi=0$を解いた。
+具体的な計算方法は以下のとおりである。ただし，電場の計算においては，金属樹の電解質溶液の電気的中性が期待されるため，Laplace方程式$\nabla^2\phi=0$を解いた。
 \begin{samepage}
   \begin{enumerate}
     \item 現在のパターンの内，中心からの距離が最も遠い点を探索する
-    \item その点から30 pix離れた円上にランダムに粒子を一つ置く
+    \item その点から30 px離れた円上にランダムに粒子を一つ置く
     \item 式\ref{eq:prob3}に従って粒子の移動方向を決定する。電位が1.0の領域（中心からの距離が$L/2$の円よりも外側）に来たらその粒子を棄却し，新たな粒子を2.に従って置く。
     \item クラスターの隣の位置に来たら，与えた固着確率$P$でクラスターとして取り込むか判定する
-    \item $150$粒子取り込むたびに，SOR法（付録\ref{sec:SOR}）を用いて電位のラプラス方程式を解き，電場を計算した（図\ref{fig:DLA_ex}）。
+    \item $150$粒子取り込むたびに，SOR法（詳しくは付録\ref{sec:SOR}参照）を用いて電位のLaplace方程式を解き，電場を計算した（図\ref{fig:DLA_ex}）。
     \item 以上を15000粒子分繰り返す
   \end{enumerate}
 \end{samepage}
 
 
 この計算を，$\alpha=0.0$から$3.0$まで（0.0から1.0まで0.1刻み，1.0から3.0までは0.2刻み），$P=0.1,0.4,0.7,1.0$の4つの固着確率について，各条件について21回行った。
+
 \begin{figure}[htbp]
   \begin{minipage}{0.32\hsize}
     \subcaption{}
@@ -150,9 +151,10 @@ $p_i,q_i$を$\alpha E\i$について平方完成すると，$\alpha E_i=\mp1/4$�
     \includegraphics[width=0.8\textwidth]{../../figure/part3/DLA_E^2_alpha=0_P=1.png}
     \label{fig:DLA_E_alpha_0_P_1}
   \end{minipage}
-  \caption{$C=3/16$，パラメータ$\alpha=0.0$固着確率$P=1.0$（通常のDLA）の例。\subref{fig:DLA_alpha_0_P_1}DLAパターンの形状\subref{fig:DLA_phi_alpha_0_P_1}電位分布\subref{fig:DLA_E_alpha_0_P_1}電場の強度分布}
+  \caption{$C=3/16$，パラメータ$\alpha=0.0$固着確率$P=1.0$（通常のDLA）の例。\subref{fig:DLA_alpha_0_P_1}DLAパターンの形状。\subref{fig:DLA_phi_alpha_0_P_1}電位分布。\subref{fig:DLA_E_alpha_0_P_1}電場の強度分布。}
   \label{fig:DLA_ex}
 \end{figure}
+
 \subsection{解析方法}
 各条件につき21個のデータについて最終形状の回転半径$R_g$とフラクタル次元を計測した。フラクタル次元の計測には密度相関関数法を用いた。まず密度相関関数$C(r)$を計算し，粒子間距離$2\leq r\leq R_g$以内の範囲でフィッティングを行い，\ref{sec:density_correlation}節に従いフラクタル次元を計測した。
 $\alpha=2.6$では計算が収束しなかったため，解析には$\alpha\leq2.4$までのデータを用いた。

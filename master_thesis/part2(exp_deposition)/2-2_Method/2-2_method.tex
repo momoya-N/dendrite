@@ -1,40 +1,22 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
 \chapter{実験：金属樹}
 \section{実験・解析方法}
 \subsection{金属樹析出の実験方法・実験系}
-本研究では亜鉛の金属樹を対象に実験・解析を行った。硫酸亜鉛七水和物\ce{ZnSO_4.7H_2O}(富士フイルム和光純薬)の$\SI{2}{mol/L}$水溶液を作成し，そこに非イオン性界面活性剤であるPluronic F-127（フナコシ）を加え，濃度を変えて電解析出を行った。実験器具については表\ref{tab:exp_condition}，実験系のセットアップについては図\ref{fig:system_exp}，\ref{fig:system_exp_whole}を参照\textcolor{red}{（解析には直接関わらないがライトボード，ジャッキ情報も必要か？）}。
-\begin{table}[htbp]
-  \centering
-  \caption{実験系に用いた器具の情報}
-  \begin{tabular}{|c||c|}
-    \hline
-    シャーレ直径     & $\SI{110}{mm}$                                                        \\ \hline
-    シャーレ素材     & ガラス                                                                   \\ \hline
-    陰極         & 直径$\SI{0.5}{mm}$ \ce{Zn}線                                             \\ \hline
-    陽極         & \ce{Zn}板 約$\SI{20}{mm}\times$約$\SI{100}{mm}$                          \\ \hline
-    表面処理装置     & Electro-Technic Products BD-20A                                       \\ \hline
-    電源装置       & \textcolor{red}{KENWOOD (生産終了している)} PA18-5B                           \\ \hline
-    デジタルマルチメータ & ADCMT 7352A/E                                                         \\
-    \hline
-    USBカメラ     & オムロンセンテック STC-MBS43U3V 画素数 $720 \times 540 \si{pix}, \SI{527.1}{fps}$ \\ \hline
-    レンズ        & HOZAN L-600-12, 焦点距離$\SI{12}{mm}$                                     \\
-    \hline
-  \end{tabular}
-  \label{tab:exp_condition}
-\end{table}
+硫酸亜鉛七水和物\ce{ZnSO_4.7H_2O}(富士フイルム和光純薬)の$\SI{2}{M}$水溶液を作成し，そこにlevelerとされる非イオン性界面活性剤のPluronic F-127（フナコシ）を加え，その濃度を変えて電解析出を行った。実験系のセットアップについては図\ref{fig:system_exp}，\ref{fig:system_exp_whole}を参照。
+
 \begin{figure}[htbp]
   \begin{minipage}
-    {0.65\textwidth}
+    {0.55\textwidth}
     \subcaption{}
     \centering
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/system_side.png}
     \label{fig:system_side}
   \end{minipage}
   \begin{minipage}
-    {0.32\textwidth}
+    {0.43\textwidth}
     \subcaption{}
     \centering
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/system_top.png}
@@ -43,49 +25,44 @@
   \caption{実験系の模式図。\subref{fig:system_side}横から見た模式図。\subref{fig:system_top}上から見た模式図。}
   \label{fig:system_exp}
 \end{figure}
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/exp_sys_whole.png}
   \caption{周辺機器も含めた実験系の外観}
   \label{fig:system_exp_whole}
 \end{figure}
+
 実験手順は以下の通りである。
 
 \begin{enumerate}
-  \item 表\ref{tab:exp_condition}の表面処理装置を用いてガラスシャーレの表面を励起させ，溶液を広がりやすくした。
-  \item \ce{ZnSO_4.7H_2O} $\SI{2}{mM}$水溶液にPluronic F-127を加えた溶液を$\SI{15}{ml}$作成した。この時Pluronic F-127の濃度は$\SI{0}{\mathrm{vol}\%}, \SI{0.005}{\mathrm{vol}\%}, \SI{0.01}{\mathrm{vol}\%}, \SI{0.03}{\mathrm{vol}\%}, \SI{0.05}{\mathrm{vol}\%}$になるように調整した。
-  \item $\SI{15}{ml}$の溶液のうち，$\SI{3}{ml}$用いてガラスシャーレの表面を洗浄した。
-  \item 陽極として表\ref{tab:exp_condition}の\ce{Zn}板を3枚用意し，ガラスシャーレの側面に沿うように湾曲させて設置した。この時，極板が元の形状に戻るためにしなるため，3枚の極板を重ねて設置し，ガラスシャーレ側面に互いに押し付け合うように極板を設置，固定した。
+  \item 表面処理装置（Electro-Technic Products BD-20A）を用いてガラスシャーレ（直径$\SI{110}{mm}$）の表面を励起させ，溶液を広がりやすくした。
+  \item \ce{ZnSO_4.7H_2O} $\SI{2}{M}$水溶液に非イオン性界面活性剤であるPluronic F-127を加えた溶液を$\SI{15}{ml}$作成した。この時界面活性剤濃度は$\SI{0}{\mathrm{vol}\%}, \SI{0.005}{\mathrm{vol}\%}, \SI{0.01}{\mathrm{vol}\%}, \SI{0.03}{\mathrm{vol}\%}, \SI{0.05}{\mathrm{vol}\%}$になるように調整した。
+  \item $\SI{15}{ml}$の溶液のうち，$\SI{3}{ml}$を用いてガラスシャーレの表面を洗浄した。
+  \item 陽極として\ce{Zn}極板（約$\SI{20}{mm}\times$約$\SI{100}{mm}$）を3枚用意し，ガラスシャーレの側面に沿うように湾曲させて設置した。この時，極板が元の形状に戻るようにしなるため，3枚の極板を重ねて設置し，ガラスシャーレ側面に互いに押し付け合うように極板を設置，固定した。
   \item ガラスシャーレに残りの溶液$\SI{12}{ml}$を入れた。（溶液厚：$\sim\SI{1.26}{mm}$）
-  \item 陰極の先が液面に触れるまでジャッキでライトプレートを上昇させ，ガラスシャーレの中心に電極を設置した。
-  \item 表\ref{tab:exp_condition}の電源装置を用いて，電極間に$\SI{5}{V}$の電圧を印加した。室温は$\SI{21}{\degreeCelsius}$から$\SI{23}{\degreeCelsius}$程度だった。
-  \item 電界析出していく過程を表\ref{tab:exp_condition}のUSBカメラで$\SI{10}{fps}$で撮影した。
+  \item 陰極である\ce{Zn}線（直径$\SI{0.5}{mm}$,長さ約$\SI{350}{mm}$）を穴をあけたアクリル板に通して固定し，陰極の先が溶液に接しないようにアクリル板をガラスシャーレの上に固定した。
+  \item 陰極の先が液面に触れるまでジャッキでライトプレート（HAKUBA ライトビュアー 7000PRO）を上昇させ，ガラスシャーレの中心に電極を設置した。
+  \item 電極と電源装置（KENWOOD PA18-5B），デジタルマルチメータ（ADCMT 7352A/E）を繋ぎ，電極間に$\SI{5}{V}$の電圧を印加した。室温は$\SI{21}{\degreeCelsius}$から$\SI{23}{\degreeCelsius}$程度だった。
+  \item 電解析出していく過程を，USBカメラ（オムロンセンテック STC-MBS43U3V 画素数 $\SI{720}{px} \times \SI{540}{px}$, 時間分解能$\SI{527.1}{fps}$）にレンズ（HOZAN L-600-12, 焦点距離$\SI{12}{mm}$）を取り付け$\SI{10}{fps}$で撮影した。
 \end{enumerate}
 
 \subsection{解析方法}
-\subsubsection{データの2値化処理}
+\subsubsection{データの二値化処理}
 取得したデータは以下の手順で二値化した。
 \begin{enumerate}
-  \item 動画データをImageJ(Fiji)のMake Substack機能を用いて$\SI{2}{s}$(20 フレーム)毎に取り出し，動画化した。
-  \item 初期フレーム($\SI{0.10}{s}$)を全体から Difference 機能で引き算をし，背景画像を消去した。
+  \item 動画データをImageJ (Fiji)のMake Substack機能を用いて$\SI{2}{s}$ (20 フレーム)毎に取り出し，動画化した。
+  \item 全フレームに対して，初期フレーム($\SI{0.10}{s}$)を Difference機能で引き算し，背景画像を消去した。
   \item 金属樹の部分のみをCrop機能で切り出し，金属樹以外の影はClear 機能で消去した。
   \item 編集した動画を$\SI{30}{s}$ (15 フレーム)毎に取り出し，輝度値の閾値を30として二値化した。
-  \item 輝度値が0でないピクセルが初めて現れた時刻を$t=0$とした。そのフレームで輝度値を持つピクセルの重心を求め，その座標を中心（陰極線の位置）とした。
+  \item 二値化画像で値が0でないピクセルが初めて現れたフレーム時刻$t$を$t=0$とした。そのフレームで値を持つピクセルの重心を求め，その座標を中心（陰極線の位置）とした。
 \end{enumerate}
-
+以降の金属樹の解析ではこの二値化データを用いた。
 \subsubsection{金属樹の外観・フラクタル次元}
-界面活性剤濃度による形態変化を定量化するために，金属樹の最終形状のフラクタル次元を求めた。フラクタル次元は\textbf{ボックスカウンティング法}を用いて求めた。ボックスカウンティング法とは与えられたパターンを様々なスケール（大きさ）の正方形で覆い，その正方形の中にパターンが含まれるか否かを数えることでフラクタル次元を求める方法である。
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/boxcounting.png}
-  \caption{ボックスカウンティング法の模式図\cite{表面粗さ曲線のフラクタル解析}}
-  \label{fig:box_counting}
-\end{figure}
-スケールを$\varepsilon$，パターンが少しでも含まれるボックスの個数を$N(\varepsilon)$とすると，フラクタル次元$D_f$とボックスの数の関係ははおおよそ$N(\varepsilon)\propto\varepsilon^{D_f}$となる。
-
-ボックスの大きさ$\varepsilon$を変え，$N(\varepsilon)$を求め，両対数プロットすることでフラクタル次元を求めた。
+界面活性剤濃度によるパターン変化を定量化するために，最終フレームの画像に対してボックスカウンティング法を行い，金属樹のフラクタル次元を求めた。
 \subsubsection{枝の本数・太さのトラッキング}
-金属樹の形態を特徴づけるために，枝やその太さがどのように変化するかを解析した。枝は陰極である\ce{Zn}線から等方的に広がっていると仮定し，最終形状について中心からの距離$r$の円と交差する枝の本数やその太さを求めた。
+金属樹の形態を特徴づけるために，枝やその太さがどのように変化するかを解析した。枝は陰極である\ce{Zn}線から等方的に広がっていると仮定し，最終フレームの画像について，図\ref{fig:circle}のように，中心からの距離$r$の円と交差する枝の本数やその太さを求めた。陰極線の位置を極座標の原点とし，適当な半径$r$に対して角度方向に走査した。二値化画像のピクセルの値が$0\rightarrow1\rightarrow0$となった時の1の部分を一本の枝とし，1の個数を枝の太さとした。
+
 \begin{figure}[htbp]
   \begin{minipage}
     {0.5\textwidth}
@@ -101,14 +78,17 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/0.05_circle.png}
     \label{fig:0.05_circle}
   \end{minipage}
-  \caption{計測に用いた半径$r$の円（図中赤線）。交差する枝の本数と太さを計測した。\subref{fig:0.00_circle}界面活性剤濃度 0\%($\SI{3795}{s}$)の実験画像。\subref{fig:0.05_circle}界面活性剤濃度 0.05\%($\SI{821}{s}$)の実験画像}
+  \caption{計測に用いた半径$r$の円（図中赤線）。交差する枝の本数と太さを計測した。\subref{fig:0.00_circle}界面活性剤濃度 $\SI{0}{\mathrm{vol}\%}$, $\SI{3787}{s}$の実験画像。\subref{fig:0.05_circle}界面活性剤濃度$\SI{0.05}{\mathrm{vol}\%}$, $\SI{821}{s}$の実験画像。}
+  \label{fig:circle}
 \end{figure}
+
 \subsubsection{枝の長さ・分岐角度の計測}
-フラクタル次元で定量化できる全体形状の特徴よりもよりも細かい金属樹の構造を解析するために，最終形状について枝の長さや分岐角度を解析し，界面活性剤濃度による形態変化を定量化した。解析手順は以下の通りである。
+全体形状の特徴はフラクタル次元で定量化できる。しかし全体形状以下の構造の特徴は隠れてしまう。そこで，より細かい金属樹の構造を解析するために，最終フレームの画像について枝の長さや分岐角度を解析し，界面活性剤濃度による形態変化を定量化した。解析手順は以下の通りである。
 \begin{enumerate}
-  \item 陰極線の位置を原点とし，適当な半径$r$に対して動径方向に走査し，輝度値が$0\rightarrow1\rightarrow0$となる部分の値1の部分を一本の枝の太さとした。取得したピクセル位置の重心の曲座標上での半径$r$と角度$\theta$を計測した。
-  \item $r$が大きい側から最近接の重心位置を結び，複数の点と最近接となる点を分岐した点とみなした。図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される角度$\theta_{\mathrm{in}}$,$\theta_{\mathrm{out}}$と，分岐点をつなぐ枝（以降"ピンク色の枝"とする）の長さ，$\theta_{\mathrm{out}}\geq 0.9\pi$となる枝（以降"緑色の枝"とする）どうしをつないだ枝の長さを計測し，分岐角度を求めた。
+  \item 陰極線の位置を極座標の原点とし，適当な半径$r$に対して角度方向に走査した。二値化画像のピクセルの値が$0\rightarrow1\rightarrow0$となった時の1の部分を一本の枝とし，値が1のピクセルの重心の極座標半径$r$と角度$\theta$を計測した。一本の枝が終わったら，角度方向に走査を繰り返し，これを$r=\SI{2}{px}$から，データ内のピクセルで原点から最も遠い位置にあるピクセルの半径$r_{\mathrm{max}}$まで走査を行った。
+  \item $r$が大きい側から最近接の重心位置を結び，複数の点と最近接となる点を分岐した点とみなした。図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される角度$\theta_{\mathrm{in}}$,$\theta_{\mathrm{out}}$と，分岐点と分岐点や分岐点と端点をつなぐ枝（ピンク色の枝）の長さ，$\theta_{\mathrm{out}}\geq 0.9\pi$となる枝どうしをつないだ枝（緑色の枝）の長さを計測し，分岐角度を求めた。
 \end{enumerate}
+
 \begin{figure}
   \begin{minipage}
     {0.32\textwidth}
@@ -131,14 +111,15 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/den_analisys.png}
     \label{fig:den_analisys}
   \end{minipage}
-  \label{fig:branch_def_input}
   \caption{枝の長さと角度の解析方法。\subref{fig:branch_def}枝の長さと角度の定義。\subref{fig:den_input}入力画像。\subref{fig:den_analisys}解析画像。オレンジ色の点が枝の分岐点，青色の点が端点になっている。}
+  \label{fig:branch_def_input}
 \end{figure}
-入力画像\ref{fig:branch_def_input}\ref{fig:den_input}に対して，解析結果は図\ref{fig:branch_def_input}\ref{fig:den_analisys}のように得られる。
 
-$\theta_{\mathrm{out}}$の定義は，分岐点から生えた枝のうち，前の枝との角度が最大となるものとした。$\theta_{\mathrm{out}}$が$0.9\pi$以上になっている枝どうしを一本の枝とみなす定義は，一本の幹のような枝から複数の細かい枝が生える場合の特徴づけ，計測を目的としている。
-\subsubsection{分布の推定}
-取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定して\textbf{相補累積分布関数}を用いて推定を行った。
+入力画像\ref{fig:branch_def_input}\subref{fig:den_input}に対して，処理結果は図\ref{fig:branch_def_input}\subref{fig:den_analisys}のように得られる。
+
+$\theta_{\mathrm{out}}$の定義は，分岐点から生えた枝のうち，前の枝と成す角度が最大となるものとした。$\theta_{\mathrm{out}}$が$0.9\pi$以上になっている枝どうしを一本の枝とみなす定義は，一本の幹のような枝から複数の細かい枝が生える場合の特徴づけ，計測を目的としている。
+\subsubsection{フィッティングによる分布の計測}
+取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定して\textbf{相補累積分布関数}を用いて図\ref{fig:fitting_exp}のようにフィッティングを行った。
 
 確率密度関数$f(x)$が存在するとき，確率変数$X$がある値$x$以上になる確率を表す関数$\bar{F}(x)$を\textbf{相補累積分布関数}と呼び，
 \begin{equation}
@@ -146,14 +127,6 @@ $\theta_{\mathrm{out}}$の定義は，分岐点から生えた枝のうち，前
   \label{eq:complementary_cdf}
 \end{equation}
 と定義される。
-
-\begin{wrapfigure}{r}[0pt]{0.33\textwidth}
-  \begin{center}
-    \includegraphics[scale=0.5]{../../figure/part2(exp_deposition)/fitting_exp.png}
-  \end{center}
-  \caption{冪分布のフィッティングの例（緑とピンク色の枝，0.05 \%）}
-  \label{fig:fitting_exp}
-\end{wrapfigure}
 
 フィッティング関数は式\eqref{eq:complementary_cdf}より以下のようになる。
 \begin{equation}
@@ -163,10 +136,21 @@ $\theta_{\mathrm{out}}$の定義は，分岐点から生えた枝のうち，前
   \end{split}
 \end{equation}
 
-得られたデータのうち，枝の太さ程度(おおよそ$\SI{10}{pix}\approx\SI{1.6}{mm}$)以下のものはノイズによるものとして除外し，冪分布のパラメータ$b$を測定し，界面活性剤濃度による分布の変化を調べた。今回の解析では，冪分布の変化を見たいという点より，パラメータ$a$の値はブレが大きいと考えられるため，パラメータ$b$のみを用いて解析を行った。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/fitting_exp.png}
+  \caption{冪分布のフィッティングの例。$\SI{0.05}{\mathrm{vol}\%}$の時の，図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される緑とピンク色の枝の分布を表している。矢印で表した範囲($\SI{10}{px}\approx\SI{1.6}{mm}$以上)でフィッティングを行った。}
+  \label{fig:fitting_exp}
+\end{figure}
+
+
+枝の太さの結果\ref{fig:branch}\subref{fig:branch_number}より，枝の太さは太くても，おおむね$\SI{10}{px}\approx\SI{1.6}{mm}$であることがわかる。そのため，枝の長さが$\SI{1.6}{mm}$に満たないものはノイズ（例えるならば，幹に生えたコブ）によるものとして除外した。
+% （＊説明として適切か？先の結果を手順の段階で参照してもいいのか？）
+残った枝について冪分布の指数$b$を測定し，界面活性剤濃度による分布の変化を調べた。今回の解析では，冪分布の変化を見たいという点と，指数$a$の値はブレが大きいと考えられる点より，指数$b$のみを用いて解析を行った。
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
 }{}
+
 \end{document}

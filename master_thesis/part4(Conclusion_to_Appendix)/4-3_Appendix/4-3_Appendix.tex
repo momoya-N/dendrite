@@ -6,25 +6,39 @@
 \appendix
 \chapter{スケールフリー性を持つ関数がべき関数になることの証明}
 \label{sec:scale_free}
-スケールフリー関数はスケール$a$のみに依存する関数$g(a)$を用いて以下のように表される。
+スケールフリー関数$f(x)$はスケール$a$のみに依存する関数$g(a)$を用いて以下のように表される。
 \begin{equation}
   \frac{f(ax)}{f(x)}=g(a) \quad (a>0)
 \end{equation}
-これを両辺$a$で微分し，変形していく。
+これを両辺$a$で微分し，変形する。連鎖律より，
+\begin{equation}
+  \frac{\d (ax)}{\d a}\frac{\d f(ax)}{\d (ax)}          =\frac{\d g(a)}{\d a}f(x)
+\end{equation}
+となる。$a$を1に近づけると
+\begin{equation}
+  \lim_{a\to 1}x\frac{\d f(ax)}{\d (ax)}                 =D_f f(x)
+\end{equation}
+となる。ただし，
+\begin{equation}
+  D_f=\eval{\frac{\d g(a)}{\d a}}_{a=1}
+\end{equation}
+である。$x>0$かつ$f(x)>0$の範囲で，
+\begin{equation}
+  \frac{1}{f(x)}\frac{\d f(x)}{\d x}                    =\frac{D_f}{x}
+\end{equation}
+と変形できる。この式を$x_0$から$x$まで積分すると，
 \begin{equation}
   \begin{split}
-    \frac{\d (ax)}{\d a}\frac{\d f(ax)}{\d (ax)}          & =\frac{\d g(a)}{\d a}f(x)                                                       \\
-    \lim_{a\to 1}x\frac{\d f(ax)}{\d (ax)}                & =D_f f(x) \qquad\left(\left.\frac{\d f(ax)}{\d (ax)}\right|_{a\to1}:=D_f\right) \\
-    \frac{1}{f(x)}\frac{\d f(x)}{\d x}                    & =\frac{D_f}{x}                                                                  \\
-    \int_{x_0}^{x} \frac{1}{f(x)}\frac{\d f(x)}{\d x}\d x & =\int_{x_0}^{x} \frac{D_f}{x}\d x                                               \\
-    \log f(x)-\log f(x_0)                                 & =D_f\log x-D_f\log x_0                                                          \\
-    \log \frac{f(x)}{f(x_0)}                              & =D_f\log \frac{x}{x_0}                                                          \\
+    \int_{x_0}^{x} \frac{1}{f(x)}\frac{\d f(x)}{\d x}\d x & =\int_{x_0}^{x} \frac{D_f}{x}\d x       \\
+    \log f(x)-\log f(x_0)                                 & =D_f\log x-D_f\log x_0                  \\
+    \log \frac{f(x)}{f(x_0)}                              & =D_f\log \frac{x}{x_0}                  \\
     f(x)                                                  & =f(x_0)\left(\frac{x}{x_0}\right)^{D_f}
   \end{split}
 \end{equation}
-以上よりスケールフリー性を持つ関数はべき関数になることが示された。
-\chapter{ブラウン運動に関する理論計算}
+以上よりスケールフリー性を持つ関数は冪関数になることが示された。
+\chapter{Brown運動に関する理論計算}
 \section{ランダムウォーク（RW）からの拡散方程式の導出}
+\label{sec:RW_cal}
 1ステップ後の粒子の濃度についての式
 \begin{equation}
   c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
@@ -46,6 +60,7 @@
 \end{equation}
 
 \section{過減衰Langenvin方程式の分散の詳細な計算}
+\label{sec:Langevin_cal}
 運動方程式
 \begin{equation}
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
@@ -83,7 +98,7 @@
   \nabla^2\phi(\bm{x})=-\rho(\bm{x})
   \label{eq:poisson}
 \end{equation}
-を数値的に解くために，離散化した方程式を考える。ここで，$\bm{x}=(x,y)$は二次元空間内の位置ベクトル，$\phi(\bm{x})$はポテンシャル，$\rho(\bm{x})$は適当な関数である。二次元空間を格子点で離散化し，格子点$(i,j)$におけるLaplasianは以下のように導かれる。格子間隔$\Delta x=\Delta y=h$とすると，
+を数値的に解くために，離散化した方程式を考える。ここで，$\bm{x}=(x,y)$は二次元空間内の位置ベクトル，$\phi(\bm{x})$はポテンシャル，$\rho(\bm{x})$は適当な関数である。二次元空間を格子点で離散化する。格子点$(i,j)$におけるLaplasianは以下のように導かれる。格子間隔$\Delta x=\Delta y=h$とすると，
 \begin{equation}
   \left\{
   \begin{aligned}
@@ -107,7 +122,7 @@
   \phi_{i,j}^{n+1}=\frac{1}{4}\left(\phi_{i+1,j}^{n}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^{n}+\phi_{i,j-1}^{n+1}+h^2\rho_{i,j}\right)
   \label{eq:Gauss-Seidel}
 \end{equation}
-式\ref{eq:Gauss-Seidel}のようなラプラス方程式の計算方法を\textbf{Gauss-Seidel法}という。ここに加速パラメータ$r$を導入し，以下のように更新式を変更する。
+式\ref{eq:Gauss-Seidel}のようなLaplace方程式の計算方法を\textbf{Gauss-Seidel法}という。ここに加速パラメータ$r$を導入し，以下のように更新式を変更する。
 \begin{equation}
   \phi_{i,j}^{n+1}=(1-r)\phi_{i,j}^{n}+\frac{r}{4}\left(\phi_{i+1,j}^{n}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^{n}+\phi_{i,j-1}^{n+1}+h^2\rho_{i,j}\right)
   \label{eq:SOR}

@@ -1,10 +1,11 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
 \section{実験結果}
 \subsection{金属樹の概観・フラクタル次元}
-\begin{figure}[H]
+
+\begin{figure}[htbp]
   \begin{minipage}
     {0.32\textwidth}
     \subcaption{}
@@ -41,20 +42,24 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/814s_0.05sur.png}
     \label{fig:0.05_surfactant}
   \end{minipage}
-  \caption{界面活性剤濃度による金属樹の形態変化\subref{fig:non_surfactant}界面活性剤濃度$\SI{0}{\mathrm{vol}\%}$,$\SI{3620}{s}$，\subref{fig:0.005_surfactant}界面活性剤濃度$\SI{0.005}{\mathrm{vol}\%}$，$\SI{3092}{s}$\subref{fig:0.01_surfactant}界面活性剤濃度$\SI{0.01}{\mathrm{vol}\%}$，$\SI{3548}{s}$，\subref{fig:0.03_surfactant}界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$，$\SI{3126}{s}$，\subref{fig:0.05_surfactant}界面活性剤濃度$\SI{0.05}{\mathrm{vol}\%}$，$\SI{814}{s}$}
+  \caption{界面活性剤濃度による金属樹の形態変化\subref{fig:non_surfactant}界面活性剤濃度$\SI{0}{\mathrm{vol}\%}$,$\SI{3620}{s}$，\subref{fig:0.005_surfactant}界面活性剤濃度$\SI{0.005}{\mathrm{vol}\%}$，$\SI{3092}{s}$\subref{fig:0.01_surfactant}界面活性剤濃度$\SI{0.01}{\mathrm{vol}\%}$，$\SI{3548}{s}$，\subref{fig:0.03_surfactant}界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$，$\SI{3126}{s}$，\subref{fig:0.05_surfactant}界面活性剤濃度$\SI{0.05}{\mathrm{vol}\%}$，$\SI{814}{s}$。}
   \label{fig:surfactant}
 \end{figure}
+
 図\ref{fig:surfactant}は界面活性剤を加えた際の，各濃度ごとにおける金属樹の最終形状の結果である。界面活性剤濃度が高くなるほど定性的には枝分かれが減少していく。これらのフラクタル次元をボックスカウンティング法を用いて計測したものが図\ref{fig:fractal_dim}である。
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/fractal_dim_result.png}
   \caption{界面活性剤濃度によるフラクタル次元の変化}
   \label{fig:fractal_dim}
 \end{figure}
+
 図\ref{fig:fractal_dim}より，界面活性剤濃度が高くなるほどフラクタル次元が小さくなることがわかった。また，界面活性剤濃度が0.03\%以上の条件ではフラクタル次元が減少していることも分かった。また，界面活性剤濃度が高くなれほどばらつきが大きくなっていた。
 
 \subsection{枝の本数・太さ}
-\begin{figure}[H]
+
+\begin{figure}[htbp]
   \begin{minipage}
     {0.45\textwidth}
     \subcaption{}
@@ -69,23 +74,26 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_thickness_mean.png}
     \label{fig:branch_thickness}
   \end{minipage}
-  \caption{中心からの距離$r$の円と交わる枝の本数・太さの結果\subref{fig:branch_number}枝の本数\subref{fig:branch_thickness}枝の太さ}
+  \caption{中心からの距離$r$の円と交わる枝の本数・太さの結果。\subref{fig:branch_number}枝の本数。\subref{fig:branch_thickness}枝の太さ。}
   \label{fig:branch}
 \end{figure}
-図\ref{fig:branch}\subref{fig:branch_number}は中心からの距離$r$の円と交わる枝の本数，図\ref{fig:branch}\subref{fig:branch_thickness}は枝の太さを示している。まず，枝の本数について，界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$未満では$r$の増加と共に本数も増加していく。一方，$\SI{0.03}{\mathrm{vol}\%}$以上では枝の本数は$r$によらず同じ程度である。
+
+図\ref{fig:branch}\subref{fig:branch_number}は中心からの距離$r$の円と交わる枝の本数，図\ref{fig:branch}\subref{fig:branch_thickness}は枝の太さを示している。枝の太さは半径$r$の円と重なった枝の太さの平均値を表している。まず，枝の本数について，界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$未満では$r$の増加と共に本数も増加していく。一方，$\SI{0.03}{\mathrm{vol}\%}$以上では枝の本数は$r$によらず同じ程度である。
 
 図\ref{fig:branch}\subref{fig:branch_number}の黒破線は例として枝の本数20本を表している。低濃度側ではこの線を超えることが多い。一方で高濃度側ではこの線を超えないことが多いことからも，高濃度側においては，枝の本数は$r$が増加してもあまり増加しないことが分かる。
 
-また，図\ref{fig:branch}\subref{fig:branch_thickness}は枝の太さを示している。界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$未満では，枝の太さがおおむね$\SI{0.06}{cm}$以下であり，太さのばらつきも小さい。一方，界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$以上では，枝の太さが緩やかに大きくなり，ばらつきも大きくなる。
+また，図\ref{fig:branch}\subref{fig:branch_thickness}は枝の太さを示しており，界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$未満では，$r$によらず枝の太さは比較的小さく一定で，ばらつきも小さい。一方，界面活性剤濃度$\SI{0.03}{\mathrm{vol}\%}$以上では，枝の太さが$r$とともに緩やかに大きくなり，ばらつきも大きくなる。
 
-図中黒破線は例として太さ約$\SI{0.06}{cm}$を表している。低濃度側ではこの線を超えることが多い。一方で，高濃度側ではこの線を超えないことが多いことからも，高濃度側においては，枝が細いものが多いことが分かる。
+図中黒破線は例として太さ約$\SI{0.6}{mm}$を表している。
+高濃度側では$\SI{0.6}{mm}$を超えることが多い一方で，低濃度側では$\SI{0.6}{mm}$を超えないことが多いことからも，濃度による枝の太さの違いが見て取れる。
 
 $r$の増加と時間経過はおおむね比例することより，界面活性剤濃度が$\SI{0.03}{\mathrm{vol}\%}$未満では金属樹は頻繁に細い枝が発生，枝分かれをする。一方で$\SI{0.03}{\mathrm{vol}\%}$以上では枝分かれが抑制され，太い枝として成長していくことが分かった。
 
 \subsection{分岐角度}
+
 \begin{figure}[htbp]
   \begin{minipage}
-    {0.45\textwidth}
+    {0.5\textwidth}
     \subcaption{}
     \centering
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/angle_in_result.png}
@@ -98,10 +106,11 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/angle_out_result.png}
     \label{fig:angle_out}
   \end{minipage}
-  \caption{分岐角度の濃度による分布の変化。ビン幅は$0.1\pi$。\subref{fig:angle_in}枝の内側の分岐角度$\theta_{\mathrm{in}}$の分布。\subref{fig:angle_out}枝の外側の分岐角度$\theta_{\mathrm{out}}$の分布。}
+  \caption{分岐角度の界面活性剤濃度による分布の変化。ビン幅は$0.1\pi$。\subref{fig:angle_in}枝の内側の分岐角度$\theta_{\mathrm{in}}$の分布。\subref{fig:angle_out}枝の外側の分岐角度$\theta_{\mathrm{out}}$の分布。}
   \label{fig:angle}
 \end{figure}
-\begin{wrapfigure}{r}{0.32\textwidth}
+
+\begin{table}
   \centering
   \caption{界面活性剤濃度による$\theta_{\mathrm{in}}$の平均値}
   \begin{tabular}{|c|c|}
@@ -116,11 +125,13 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
     \hline
   \end{tabular}
   \label{tab:angle_average}
-\end{wrapfigure}
-図\ref{fig:angle}は枝の分岐角度の分布である。図\ref{fig:angle}\subref{fig:angle_in}は枝の内側の分岐角度の分布で，表\ref{tab:angle_average}は各濃度における$\theta_{\mathrm{in}}$の平均値である。分岐角度の分布はフラクタル次元とほど明らかな変化は見られず，界面活性剤の濃度によらずほぼ同じような分布となっている。内側の分岐角度の平均値はおおよそ$2\pi/5$ radになっていた。
+\end{table}
 
-図\ref{fig:angle}\ref{fig:angle_out}は枝の外側の分岐角度の分布である。これも濃度によらずほぼ同じような分布となっている。$\theta_{\mathrm{out}}$の値は8割以上が$0.8\pi$ 以上であり，真横に曲がるなどの分岐は少ないことが分かった。
+図\ref{fig:angle}は枝の分岐角度の分布である。図\ref{fig:angle}\subref{fig:angle_in}は枝の内側の分岐角度の分布で，表\ref{tab:angle_average}は各濃度における$\theta_{\mathrm{in}}$の平均値である。分岐角度の分布はフラクタル次元ほど明らかな変化は見られず，界面活性剤の濃度によらずほぼ同じような分布となっている。内側の分岐角度の平均値はおおよそ$2\pi/5$ radになっていた。
+
+図\ref{fig:angle}\subref{fig:angle_out}は枝の外側の分岐角度の分布である。これも濃度によらずほぼ同じような分布となっている。$\theta_{\mathrm{out}}$の値は8割以上が$0.8\pi$ 以上であり，真横に曲がるなどの分岐は少ないことが分かった。
 \subsection{枝の長さ}
+
 \begin{figure}[htbp]
   \begin{minipage}
     {0.45\textwidth}
@@ -139,7 +150,9 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
   \caption{枝の長さ分布。\subref{fig:branch_length_absolute}絶対度数表示。\subref{fig:branch_length_relativ}相対度数表示。}
   \label{fig:branch_length}
 \end{figure}
-図\ref{fig:branch_length}は枝の分岐点から次の分岐点までの枝（図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクの枝）の長さ分布を，解像度（$\SI{1}{px}=11/681 \si{cm}\approx \SI{0.16}{mm}$）未満を除いて示している。\ref{fig:branch_length}\subref{fig:branch_length_relativ}は相対度数で表しており，図\ref{fig:branch_length}\ref{fig:branch_length_absolute}は絶対度数で表している。\ref{fig:branch_length}\subref{fig:branch_length_relativ}で示したように，界面活性剤濃度が高くなるほど長い枝の割合が増加していることが分かった（図中赤丸）。また，極端に長いものが低濃度(0\%と0.005\%)でわずかな割合見られることが分かった（図中青丸）。これは図\ref{fig:branch_length}\ref{fig:branch_length_absolute}からわかるように，一本だけ存在する長い枝の影響である。
+
+図\ref{fig:branch_length}は枝の分岐点から次の分岐点までの枝（図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクの枝）の長さ分布を，カメラの解像度（$\SI{1}{px}=11/\SI{681}{cm}\approx \SI{0.16}{mm}$）未満を除いて示している。図\ref{fig:branch_length}\subref{fig:branch_length_relativ}は相対度数で表しており，図\ref{fig:branch_length}\subref{fig:branch_length_absolute}は絶対度数で表している。\ref{fig:branch_length}\subref{fig:branch_length_relativ}で示したように，界面活性剤濃度が高くなるほど長い枝の割合が増加していることが分かった（図中赤丸）。また，極端に長いものが低濃度($\SI{0}{\mathrm{vol}\%}$と$\SI{0.005}{\mathrm{vol}\%}$)でわずかな割合見られることが分かった（図中青丸）。これは図\ref{fig:branch_length}\subref{fig:branch_length_absolute}からわかるように，一本だけ存在する長い枝の影響である。
+
 \begin{figure}[htbp]
   \begin{minipage}
     {0.45\textwidth}
@@ -158,29 +171,32 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
   \caption{再構成後の枝の長さの分布。\subref{fig:branch_length_absolute_edited}絶対度数表示。\subref{fig:branch_length_relativ_edited}相対度数表示。}
   \label{fig:branch_length_edited}
 \end{figure}
-図\ref{fig:branch_length_edited}は$\theta_{\mathrm{out}}$が$0.9\pi$ 以上になる枝の組み合わせを一本の枝とした際の枝と，組になっていない枝（図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクの枝と緑の枝）の長さの分布を解像度（$\SI{1}{px}=11/681 \si{cm}\approx \SI{0.16}{mm}$）未満を除いて示している。図\ref{fig:branch_length_edited}\ref{fig:branch_length_absolute_edited}は絶対度数で表しており，図\ref{fig:branch_length_edited}\subref{fig:branch_length_relativ_edited}は相対度数で表している。図\ref{fig:branch_length}に比べて，高濃度における長い枝の割合が増加していた。また，極端に長いものも同様に低濃度側で見られた。これは図\ref{fig:branch_length}と同様に，一本だけ存在する長い枝の影響である。
+
+図\ref{fig:branch_length_edited}は$\theta_{\mathrm{out}}$が$0.9\pi$ 以上になる枝の組み合わせを一本の枝としたものと，それ以外の組になっていない枝（図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクの枝と緑の枝）の長さの分布を解像度（$\SI{1}{px}=11/681 \si{cm}\approx \SI{0.16}{mm}$）未満を除いて示している。図\ref{fig:branch_length_edited}\subref{fig:branch_length_absolute_edited}は絶対度数で表しており，図\ref{fig:branch_length_edited}\subref{fig:branch_length_relativ_edited}は相対度数で表している。図\ref{fig:branch_length}に比べて，高濃度における長い枝の割合が増加していた。また，極端に長いものも同様に低濃度側で見られた。これは図\ref{fig:branch_length}と同様に，一本だけ存在する長い枝の影響である。
+
 \begin{figure}[htbp]
   \begin{minipage}
-    {0.55\textwidth}
+    {0.59\textwidth}
     \subcaption{}
     \centering
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/exp_b_branch_len.png}
     \label{fig:exp_b_branch_len}
   \end{minipage}
   \begin{minipage}
-    {0.43\textwidth}
+    {0.39\textwidth}
     \subcaption{}
     \centering
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/exp_b_branch_edited_len.png}
     \label{fig:exp_b_branch_edited_len}
   \end{minipage}
-  \caption{枝の長さの冪分布のパラメータ$b$の測定結果。\subref{fig:exp_b_branch_len}ピンクの枝のパラメータ$b$。\subref{fig:exp_b_branch_edited_len}ピンクと緑の枝のパラメータ$b$。}
+  \caption{枝の長さの冪分布の指数$b$の測定結果。\subref{fig:exp_b_branch_len}図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクの枝の指数$b$。\subref{fig:exp_b_branch_edited_len}図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクと緑の枝の指数$b$。}
   \label{fig:branch_length_exp}
 \end{figure}
+
 \begin{table}[htbp]
   \begin{minipage}{0.45\textwidth}
     \centering
-    \caption{界面活性剤濃度によるピンク色の枝の分布の指数$b$の平均値}
+    \caption{界面活性剤濃度による図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンク色の枝の分布の指数$b$の平均値}
     \begin{tabular}{|c|c|}
       \hline
       濃度      & 指数$b$の平均値 \\ \hline\hline
@@ -196,7 +212,7 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
   \hfill
   \begin{minipage}{0.45\textwidth}
     \centering
-    \caption{界面活性剤濃度によるピンクと緑色の枝の分布の指数$b$の平均値}
+    \caption{界面活性剤濃度による図\ref{fig:branch_def_input}\subref{fig:branch_def}のピンクと緑色の枝の分布の指数$b$の平均値}
     \begin{tabular}{|c|c|}
       \hline
       濃度      & 指数$b$の平均値 \\ \hline\hline
@@ -210,9 +226,10 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
     \label{tab:branch_len_exp_edited}
   \end{minipage}
 \end{table}
-図\ref{fig:branch_length_exp}は界面活性剤ごとの枝の長さの分布の指数$b$を示している。図\ref{fig:branch_length_exp}\ref{fig:exp_b_branch_len}はピンクの枝の分布の指数$b$であり，図\ref{fig:branch_length_exp}\ref{fig:exp_b_branch_edited_len}はピンクと緑の枝の分布の指数$b$である。表\ref{tab:brnch_len_exp}はピンクの枝の分布の指数$b$の平均値であり，表\ref{tab:branch_len_exp_edited}はピンクと緑の枝の分布の指数$b$の平均値である。
 
-図\ref{fig:branch_length_exp}\ref{fig:exp_b_branch_len}より，ピンクの枝のパラメータ$b$の値は，
+図\ref{fig:branch_length_exp}は界面活性剤ごとの枝の長さの分布の指数$b$を示している。図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_len}は図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義されるピンクの枝の分布の指数$b$であり，図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_edited_len}は図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義されるピンクと緑の枝の分布の指数$b$である。表\ref{tab:brnch_len_exp}はピンクの枝の分布の指数$b$の平均値であり，表\ref{tab:branch_len_exp_edited}はピンクと緑の枝の分布の指数$b$の平均値である。
+
+図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_len}より，ピンクの枝の指数$b$の値は，
 \begin{itemize}
   \item $\SI{0}{\mathrm{vol}\%}$,$\SI{0.01}{\mathrm{vol}\%}$では相対的に大きな値($b>4.00$)
   \item $\SI{0.03}{\mathrm{vol}\%}$以上では相対的に小さな値($b<4.00$)
@@ -220,7 +237,7 @@ $r$の増加と時間経過はおおむね比例することより，界面活�
 \end{itemize}
 となることがわかった。$\SI{0.005}{\mathrm{vol}\%}$が低い値を取っているのは，図\ref{fig:branch_length},\ref{fig:branch_length_edited}で言及した，低濃度側で見られる極端に長い枝の影響だと思われる。
 
-図\ref{fig:branch_length_exp}\ref{fig:exp_b_branch_edited_len}より，ピンクと緑の枝の分布は，
+図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_edited_len}より，ピンクと緑の枝の分布は，
 \begin{itemize}
   \item 0.03\%以下では相対的に大きな値($b>3.20$)
   \item 0.05\%では相対的に小さな値($b<3.20$)
