@@ -22,7 +22,8 @@ class Video:
         self.bool = cap.isOpened()
         self.path = file_path_avi
         self.fname = fname
-        self.scale=5000/((2372.03+2368.01+2368.05)/3) #μm/pix
+        # self.scale=5000/((2372.03+2368.01+2368.05)/3) #μm/px,pluronic
+        self.scale=1/360 #cm/px,tween
         self.Lx = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.Ly = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.fps = cap.get(cv2.CAP_PROP_FPS)
@@ -66,7 +67,8 @@ def dust_removed(frame):#チリの除去
 
     contour,_=cv2.findContours(negative_frame_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for cont in contour:
-        if cv2.contourArea(cont)>4000*500:#画面に対して1/6以上の領域を解析領域とする
+        # if cv2.contourArea(cont)>4000*500:#画面に対して1/6以上の領域を解析領域とする
+        if cv2.contourArea(cont)>40000:#TWEEN用
             cv2.fillPoly(black, [cont], (255,255,255))
 
     return black
@@ -138,29 +140,40 @@ def decart_img2polar_img(img,video,cx,cy,polar_range):#動画の座標変換
     r_min = polar_range.r_min
     r_max = max(polar_range.r_L_max, polar_range.r_R_max)
     black=np.zeros((Ly,Lx),dtype=np.uint8)
+# ここからテスト
+    Theta_lim=np.linspace(theta_min,theta_max,Lx)
+    Theta=[theta for theta in Theta_lim if theta>polar_range.theta_L_0 and theta<polar_range.theta_R_0]
+    R=np.linspace(r_min,r_max,Ly)
+    
+    for i,theta in enumerate(Theta):
+        for j,r in enumerate(reversed(R)):
+            x,y=get_rth2XY(cx,cy,r,theta)
+            if x>0 and x<Lx and y>0 and y<Ly:
+                black[j,i]=img[int(y),int(x)]
+#テストここまで
 
-    # Create Theta and R arrays
-    Theta = np.linspace(theta_min, theta_max, Lx)
-    R = np.linspace(r_min, r_max, Ly)
+    # # Create Theta and R arrays
+    # Theta = np.linspace(theta_min, theta_max, Lx)
+    # R = np.linspace(r_min, r_max, Ly)
 
-    # Create meshgrid for Theta and R
-    R_grid, Theta_grid = np.meshgrid(R, Theta, indexing='ij')
+    # # Create meshgrid for Theta and R
+    # R_grid, Theta_grid = np.meshgrid(R, Theta, indexing='ij')
 
-    # Convert polar coordinates (R, Theta) to Cartesian coordinates (x, y)
-    X = cx + R_grid * np.cos(Theta_grid)
-    Y = cy + R_grid * np.sin(Theta_grid)
+    # # Convert polar coordinates (R, Theta) to Cartesian coordinates (x, y)
+    # X = cx + R_grid * np.cos(Theta_grid)
+    # Y = cy + R_grid * np.sin(Theta_grid)
 
-    # Clip X and Y to valid image range
-    X_clipped = np.clip(X, 0, Lx - 1).astype(int)
-    Y_clipped = np.clip(Y, 0, Ly - 1).astype(int)
+    # # Clip X and Y to valid image range
+    # X_clipped = np.clip(X, 0, Lx - 1).astype(int)
+    # Y_clipped = np.clip(Y, 0, Ly - 1).astype(int)
 
-    # Create polar image
-    polar_img = img[Y_clipped, X_clipped]
-    polar_img=np.flipud(polar_img)
+    # # Create polar image
+    # polar_img = img[Y_clipped, X_clipped]
+    # polar_img=np.flipud(polar_img)
 
-    return polar_img
+    return black #polar_img
 
-def surface_tracking(img,r_bottom,video,polar_range):#界面高さトラッキング
+def surface_tracking(img,r_bottom,video,polar_range,r0):#界面高さトラッキング
     Lx=video.Lx
     Ly=video.Ly
     scale=video.scale
@@ -175,12 +188,12 @@ def surface_tracking(img,r_bottom,video,polar_range):#界面高さトラッキ�
     for i,theta in enumerate(Theta):
         R_rev=np.flip(R)
         top=np.nonzero(img[...,i])[0][0]
-        hight=R_rev[top]
+        hight=R_rev[top]-r0
         h_t.append(hight*scale)
-    if r_bottom==0.0:
-        r_bottom=min(h_t)
-    #相関関数の計算
-    h_t=np.array(h_t)-r_bottom
+    # if r_bottom==0.0:
+    #     r_bottom=min(h_t)
+    # #相関関数の計算
+    # h_t=np.array(h_t)-r_bottom
     cor_func=correlation_func(h_t)
     diff_cor_func=np.diff(cor_func)
     local_max=np.where((diff_cor_func[:-1]>0)&(diff_cor_func[1:]<0))[0]+1
@@ -191,7 +204,7 @@ def surface_analisis(file_path,video):#動画の解析&データ出力
     cor_func_data=pd.DataFrame()
     local_max_data=pd.DataFrame()
     cap=cv2.VideoCapture(file_path)
-    # pbar = tqdm(total=video.total_frames, desc="Analyzing video")
+    pbar = tqdm(total=video.total_frames, desc="Analyzing video")
     r_bottom=0.0
 
     while True:
@@ -207,18 +220,18 @@ def surface_analisis(file_path,video):#動画の解析&データ出力
     
         binary_img=dust_removed(img)
         polor_binary_img=decart_img2polar_img(binary_img,video,cx,cy,polar_range)
-        Theta,h_t,cor_func,local_max,r_bottom=surface_tracking(polor_binary_img,r_bottom,video,polar_range)
+        Theta,h_t,cor_func,local_max,r_bottom=surface_tracking(polor_binary_img,r_bottom,video,polar_range,r0)
         delta_theta=Theta-min(Theta)#相関関数用の角度の差
         if n_frame==1:#DateFrameの1行目に角度の行を追加
             cor_func_data=pd.concat([cor_func_data,pd.DataFrame({"delta_theta":list(delta_theta[:len(delta_theta)//2])})],axis=1)
             surface_hight_data=pd.concat([surface_hight_data,pd.DataFrame({"Theta":list(Theta)})],axis=1)
-            # local_max_data=pd.concat([local_max_data,pd.DataFrame({"local_max":list(Theta)})],axis=1)#うまく取れていないので無し
+            cv2.imwrite(file_path.replace(".avi", "_polar_tmp.png"), polor_binary_img)
         cor_func_data=pd.concat([cor_func_data,pd.DataFrame({str(n_frame/video.fps):list(cor_func)})],axis=1)
         surface_hight_data=pd.concat([surface_hight_data,pd.DataFrame({str(n_frame/video.fps):list(h_t)})],axis=1)
         local_max_data=pd.concat([local_max_data,pd.DataFrame({str(n_frame/video.fps):list(local_max[:3])})],axis=1)
-        # pbar.update()
+        pbar.update()
 
-    # pbar.close()
+    pbar.close()
 
     return surface_hight_data,cor_func_data,local_max_data
 
@@ -235,24 +248,49 @@ def worker(file_path):
 
 # メイン処理
 if __name__ == "__main__":
-    file_pluronic="D:/master_thesis_data/experiment_data/movie_data/movie_data/data_for_surface_groth/Pluronic-F127/"
-    con_list=os.listdir(file_pluronic)
+    # file_pluronic="D:/master_thesis_data/experiment_data/movie_data/movie_data/data_for_surface_groth/Pluronic-F127/"
+    file_tween="E:/master_thesis_data/experment_data/movie_data/movie_data/data_for_test/surface_growth/20241105/"
+    file_base=os.path.dirname(file_tween)
+    con_list=os.listdir(file_base)
+    con_list = [con for con in con_list if not con.endswith('.avi')]
     
-    for con in con_list:
+    threads = []
+    for i in range(len(con_list)):# Create 2 threads,mulitple thread processing
         start=time.time()
-        file_list=os.listdir(file_pluronic+con)
-        threads = []
-        for i in range(len(file_list)):# Create 3 threads,mulitple thread processing
-            file_path=file_pluronic+con+"/"+file_list[i]+"/"+file_list[i]+".avi"
-            video = Video(file_path)
-            video.show_info()
-            print("Start surface groth analisis\n")
-            t = threading.Thread(target=worker, args=(file_path,))
-            threads.append(t)
-            t.start()
+        file_path=file_base+"/"+con_list[i]+"/"+ con_list[i] +".avi"
+        print(file_path)
+        # if os.path.exists(file_path):
+        #     print("OK")
+        # sys.exit()
+        # file_path=file_base+"/"+con_list[i]
+        video = Video(file_path)
+        video.show_info()
+        print("Start surface groth analisis\n")
+        t = threading.Thread(target=worker, args=(file_path,))
+        threads.append(t)
+        t.start()
 
-        for t in threads:
-            t.join()
+    for t in threads:
+        t.join()
+    print(f"analyses are done. Time:{time.time()-start:.2f} s\n")
+
+    # for con in con_list:
+    #     start=time.time()
+    #     file_list=os.listdir(file_base+"/"+con)
+    #     print(file_list)
+    #     sys.exit()
+    #     threads = []
+    #     for i in range(len(file_list)):# Create 3 threads,mulitple thread processing
+    #         file_path=file_pluronic+con+"/"+file_list[i]+"/"+file_list[i]+".avi"
+    #         video = Video(file_path)
+    #         video.show_info()
+    #         print("Start surface groth analisis\n")
+    #         t = threading.Thread(target=worker, args=(file_path,))
+    #         threads.append(t)
+    #         t.start()
+
+    #     for t in threads:
+    #         t.join()
             
         # for file in file_list:
         #     file_path=file_pluronic+con+"/"+file+"/"+file+".avi"
@@ -264,4 +302,4 @@ if __name__ == "__main__":
         #     surface_hight_data.to_csv(file_path.replace(".avi", "_surface_hight_data.csv"),float_format='%.5f')
         #     cor_func_data.to_csv(file_path.replace(".avi", "_cor_func_data.csv"),float_format='%.5f')
         #     local_max_data.to_csv(file_path.replace(".avi", "_local_max_data.csv"),float_format='%.5f')
-        print(f"{con} analyses are done. Time:{time.time()-start:.2f} s\n")
+        # print(f"{con} analyses are done. Time:{time.time()-start:.2f} s\n")

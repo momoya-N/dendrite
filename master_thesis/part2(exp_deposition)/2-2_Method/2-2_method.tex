@@ -83,10 +83,10 @@
 \end{figure}
 
 \subsubsection{枝の長さ・分岐角度の計測}
-全体形状の特徴はフラクタル次元で定量化できる。しかし全体形状以下の構造の特徴は隠れてしまう。そこで，より細かい金属樹の構造を解析するために，最終フレームの画像について枝の長さや分岐角度を解析し，界面活性剤濃度による形態変化を定量化した。解析手順は以下の通りである。
+全体形状の特徴はフラクタル次元で定量化できる。しかし全体形状以下の構造の特徴は隠れてしまう。そこで，より細かい金属樹の構造を解析するために，最終フレームの画像について枝の長さや分岐角度を計測し，界面活性剤濃度によるパターン変化を定量化した。画像処理手順は以下の通りである。
 \begin{enumerate}
   \item 陰極線の位置を極座標の原点とし，適当な半径$r$に対して角度方向に走査した。二値化画像のピクセルの値が$0\rightarrow1\rightarrow0$となった時の1の部分を一本の枝とし，値が1のピクセルの重心の極座標半径$r$と角度$\theta$を計測した。一本の枝が終わったら，角度方向に走査を繰り返し，これを$r=\SI{2}{px}$から，データ内のピクセルで原点から最も遠い位置にあるピクセルの半径$r_{\mathrm{max}}$まで走査を行った。
-  \item $r$が大きい側から最近接の重心位置を結び，複数の点と最近接となる点を分岐した点とみなした。図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される角度$\theta_{\mathrm{in}}$,$\theta_{\mathrm{out}}$と，分岐点と分岐点や分岐点と端点をつなぐ枝（ピンク色の枝）の長さ，$\theta_{\mathrm{out}}\geq 0.9\pi$となる枝どうしをつないだ枝（緑色の枝）の長さを計測し，分岐角度を求めた。
+  \item $r$が大きい側から最近接の重心位置を結び，複数の点と最近接となる点を分岐した点とみなした。図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される角度$\theta_{\mathrm{in}}$,$\theta_{\mathrm{out}}$と，ピンク色の枝の長さ，緑色の枝の長さを計測し，分岐角度を求めた。
 \end{enumerate}
 
 \begin{figure}
@@ -111,15 +111,18 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/den_analisys.png}
     \label{fig:den_analisys}
   \end{minipage}
-  \caption{枝の長さと角度の解析方法。\subref{fig:branch_def}枝の長さと角度の定義。\subref{fig:den_input}入力画像。\subref{fig:den_analisys}解析画像。オレンジ色の点が枝の分岐点，青色の点が端点になっている。}
+  \caption{枝の長さと角度の解析方法。\subref{fig:branch_def}枝の長さと角度の定義。\subref{fig:den_input}入力画像。\subref{fig:den_analisys}処理画像。オレンジ色の点が枝の分岐点，青色の点が端点になっている。}
   \label{fig:branch_def_input}
 \end{figure}
 
-入力画像\ref{fig:branch_def_input}\subref{fig:den_input}に対して，処理結果は図\ref{fig:branch_def_input}\subref{fig:den_analisys}のように得られる。
+入力画像\ref{fig:branch_def_input}\subref{fig:den_input}に対して，処理結果は図\ref{fig:branch_def_input}\subref{fig:den_analisys}のように得られる。青色の点は枝の端を表し，オレンジ色の点は枝の分岐点を表している。
+
+図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義されるピンク色の枝は図\ref{fig:branch_def_input}\subref{fig:den_analisys}の処理画像中の枝の端点と分岐点，あるいは分岐点と分岐点を結ぶ線分で表される。これを以降\textbf{普通の枝}と呼ぶ。また，図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される緑色の枝は，普通の枝と，その隣り合ういくつかの普通の枝の内，$\theta_{\mathrm{out}}\geq 0.9\pi$となる枝のペアを一つの長い枝とみなしたものである。これを以降\textbf{幹}と呼ぶ。
 
 $\theta_{\mathrm{out}}$の定義は，分岐点から生えた枝のうち，前の枝と成す角度が最大となるものとした。$\theta_{\mathrm{out}}$が$0.9\pi$以上になっている枝どうしを一本の枝とみなす定義は，一本の幹のような枝から複数の細かい枝が生える場合の特徴づけ，計測を目的としている。
+
 \subsubsection{フィッティングによる分布の計測}
-取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定して\textbf{相補累積分布関数}を用いて図\ref{fig:fitting_exp}のようにフィッティングを行った。
+取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定し，\textbf{相補累積分布関数}を用いて図\ref{fig:fitting_exp}のようにフィッティングを行った。
 
 確率密度関数$f(x)$が存在するとき，確率変数$X$がある値$x$以上になる確率を表す関数$\bar{F}(x)$を\textbf{相補累積分布関数}と呼び，
 \begin{equation}
@@ -144,7 +147,7 @@ $\theta_{\mathrm{out}}$の定義は，分岐点から生えた枝のうち，前
 \end{figure}
 
 
-枝の太さの結果\ref{fig:branch}\subref{fig:branch_number}より，枝の太さは太くても，おおむね$\SI{10}{px}\approx\SI{1.6}{mm}$であることがわかる。そのため，枝の長さが$\SI{1.6}{mm}$に満たないものはノイズ（例えるならば，幹に生えたコブ）によるものとして除外した。
+枝の太さの結果\ref{fig:branch}\subref{fig:branch_thickness}より，枝の太さは太くても，おおむね$\SI{10}{px}\approx\SI{1.6}{mm}$であることがわかる。そのため，枝の長さが$\SI{1.6}{mm}$に満たないものはノイズ（例えるならば，幹に生えたコブ）によるものとして除外した。
 % （＊説明として適切か？先の結果を手順の段階で参照してもいいのか？）
 残った枝について冪分布の指数$b$を測定し，界面活性剤濃度による分布の変化を調べた。今回の解析では，冪分布の変化を見たいという点と，指数$a$の値はブレが大きいと考えられる点より，指数$b$のみを用いて解析を行った。
 
