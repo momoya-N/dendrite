@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
@@ -12,7 +12,7 @@
   \label{fig:RW_2dim}
 \end{figure}
 
-金属樹のパターン形成における界面の影響や電場の影響を評価し，実験結果を再現するため，数値計算を行った。数値計算は二次元DLA（$d=2$）をベースに，電場によるドリフトと界面活性剤による界面への固着の影響を取り込んだモデルを作成した。\ref{sec:RW}節と\ref{sec:Langevin}節の内容をもとに，RWとLangevin方程式の対応を考える。\ref{sec:RW}節より，外力（電場）について，
+金属樹のパターン形成における界面の影響や電場の影響を評価し，実験結果を再現するため，数値計算を行った。数値計算は二次元DLA（空間次元$d=2$）をベースに，電場によるドリフトと界面活性剤による界面への固着の影響を取り込んだモデルを作成した。\ref{sec:RW}節と\ref{sec:Langevin}節の内容をもとに，RWとLangevin方程式の対応を考える。\ref{sec:RW}節より，外力（電場）について，
 \begin{equation}
   \bar{F}_i=\mu q E_i=(p_i-q_i)\frac{a}{\Delta t}
   \label{eq:force}
@@ -23,19 +23,30 @@
     \label{eq:discretization}
   \end{split}
 \end{equation}
-1ステップの時間発展を考えると，式\eqref{eq:discretization}で$n=1,X_i=\pm1$とすればよい。$\langle\cdot\rangle$を確率分布に関する平均とすれば，$\langle X_i\rangle=(+1)p_i+(-1)q_i=\mu q E_i\Delta t/a$，$\langle X_i^2\rangle=(+1)^2p_i+(-1)^2q_i=1/d$より以下が成り立つ。ただし，電場の平均操作については，1ステップの時間・空間スケールではほぼ一定であるとして，動く前での電場を用いている。
+1ステップの時間発展を考えると，式\eqref{eq:discretization}で$n=1,X_i=\pm1$とすればよい。$\langle\cdot\rangle$を確率分布に関する平均とすれば，$\langle X_i\rangle=(+1)p_i+(-1)q_i=\mu q E_i\Delta t/a$，$\langle X_i^2\rangle=(+1)^2p_i+(-1)^2q_i=1/d$より以下が成り立つ。ただし，電場の平均操作については，1ステップの時間・空間スケールではほぼ一定であるとして，動く前での電場を用いている。平均は
+\begin{equation}
+  \begin{split}
+    \langle\bm{x}\rangle & =a\langle\bm{X}\rangle                     \\
+                         & =a\sum_{i=1}^{d}\bm{e}_i(p_i-q_i)          \\
+                         & =\mu q \Delta t\sum_{i=1}^{d} \bm{e}_i E_i \\
+                         & =\mu q \Delta t\bm{E}
+  \end{split}
+  \label{eq:discrete_average}
+\end{equation}
+となる。次に，分散について考える。分散は
 \begin{equation}
   \begin{aligned}
-    \langle\bm{x}\rangle & =a\langle\bm{X}\rangle                     & \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\langle(\bm{X}-\langle\bm{X}\rangle)^2\rangle                        \\
-                         & =a\sum_{i=1}^{d}\bm{e}_i(p_i-q_i)          &                                                     & =a^2\{\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2\}                    \\
-                         & =\mu q \Delta t\sum_{i=1}^{d} \bm{e}_i E_i &                                                     & =a^2\sum_{i=1}^{d}\ab\{\frac{1}{d}-\frac{(\mu q \Delta t)^2}{a^2}E_i^2\} \\
-                         & =\mu q \Delta t\bm{E}                      &                                                     & =a^2\ab\{1-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\}                      \\
+    \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle
+     & =a^2\langle(\bm{X}-\langle\bm{X}\rangle)^2\rangle                        \\
+     & =a^2\{\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2\}                    \\
+     & =a^2\sum_{i=1}^{d}\ab\{\frac{1}{d}-\frac{(\mu q \Delta t)^2}{a^2}E_i^2\} \\
+     & =a^2\ab\{1-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\}                      \\
   \end{aligned}
-  \label{eq:discrete_average_variance}
+  \label{eq:discrete_variance_3_2}
 \end{equation}
-式\ref{eq:discrete_average_variance}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散の方は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しないという結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なるという物理的に不可解な状況になってしまう。
+式\ref{eq:discrete_average}と式\eqref{eq:discrete_variance_3_2}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散の方は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しないという結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なるという物理的に不可解な状況になってしまう。
 
-そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均・分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
+そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均・分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり，電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
 \begin{equation}
   \begin{split}
     \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\ab\{(1-r)-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\} \\
@@ -47,11 +58,11 @@
 \end{equation}
 式\ref{eq:discrete_variance}より，$C=D\Delta t/a^2$，$r=1-2dC-4\alpha^2\bm{E}^2$となる。
 
-ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$とならなければならない点である。$a^2=2dD\Delta t$のままであれば，$C=1/(2d)$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで$r>0$を確保することができる。
+ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$とならなければならない点である。$a^2=2dD\Delta t$のままであれば，$C=1/(2d)$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで，$a^2\neq2dD\Delta t$になり，$C\neq1/(2d)$なので$r>0$を確保することができる。
 
 以上の議論をまとめると，RWにおいて電場の影響を打ち消す確率$r$を導入することで，Langevin方程式の分散が外力に依存しないという結果を再現することができる。しかし，$r>0$を担保するため，時間間隔$\Delta t$を変化させなければならない。これはパラメータである$\alpha=\mu q\Delta t/(2a),C=D\Delta t/a^2$を変えることに他ならない。今回の数値計算では分散$C$を固定して，$\alpha$を変化させて形状変化を調べた。
 
-$C$の値は以下のように決めた。まず，各$i$成分の確率は
+$C$の値は以下のように定めた。まず，各$i$成分の確率は
 
 \begin{equation}
   \left\{
@@ -97,7 +108,7 @@ $p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$�
 \end{equation}
 となる。これより，上下端の中央の値である$C=3/16$を数値計算に用いる値とした。
 \subsection{固着確率$P$の定義}
-実験における，界面でのlevelerによるイオンの析出阻害を再現するため，Brown運動してきた粒子を\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がすでにある隣のクラスターに来た場合，そのまま新たなクラスターとして取り込むが，今回の数値計算では確率$P$でクラスターとして取り込んだ。取り込まれなかった場合は再びRWを行う。
+実験における，界面での界面活性剤によるイオンの析出阻害を再現するため，Brown運動してきた粒子を，パターンを構成する\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がクラスターの隣に来た場合，そのまま新たなクラスターとして取り込むが，今回の数値計算では確率$P$でクラスターとして取り込んだ。取り込まれなかった場合は再びRWを行った。
 \subsection{数値計算方法}
 今回の数値計算では，パターンにより生じる電場と組み合わせてBrown運動する粒子の遷移確率を計算した。まず，計算する系の条件を表\ref{tab:condition}ように設定する。
 \begin{table}[htbp]
@@ -105,14 +116,19 @@ $p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$�
   \caption{数値計算の系の条件　}
   \begin{tabular}{|c||c|}
     \hline
-    系の条件                      & 設定値                                                  \\ \hline\hline
-    系のサイズ $L$                 & $\SI{512}{px}\times\SI{512}{px}$                     \\ \hline
-    粒子数 $N$                   & 15000                                                \\ \hline
-    中心座標 $\bm{x_c}=(x_c,y_c)$ & $(x_c,y_c)=(L/2,L/2)=(256,256)$                      \\ \hline
-    境界条件                      & $||\bm{r}-\bm{x_c}||>L/2$で電位$V=1.0$，パターンが存在する点で$V=0$ \\ \hline
-    SOR法による電場の収束条件            & 前回との誤差$10^{-5}$未満                                    \\ \hline
-    初期条件                      & $\bm{x_c}$に粒子を一つ置く                                   \\ \hline
-    電場の計算タイミング                & 150粒子毎                                               \\ \hline
+    系の条件                      & 設定値                              \\ \hline\hline
+    系のサイズ $L$                 & $\SI{512}{px}\times\SI{512}{px}$ \\ \hline
+    粒子数 $N$                   & 15000                            \\ \hline
+    中心座標 $\bm{x_c}=(x_c,y_c)$ & $(x_c,y_c)=(L/2,L/2)=(256,256)$  \\ \hline
+    境界条件                      &
+    \begin{tabular}{c}
+      位置$\bm{x}=(x,y)$に対して，$||\bm{r}-\bm{x_c}||>L/2$で \\
+      電位$V=1.0$，パターンが存在する点で$V=0$
+    \end{tabular}
+    \\ \hline
+    SOR法による電場の収束条件            & 前回ループとの誤差$10^{-5}$未満             \\ \hline
+    初期条件                      & $\bm{x_c}$に粒子を一つ置く               \\ \hline
+    電場の計算タイミング                & 150粒子毎                           \\ \hline
   \end{tabular}
   \label{tab:condition}
 \end{table}
@@ -159,7 +175,7 @@ $p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$�
 各条件につき21個のデータについて最終形状の回転半径$R_g$とフラクタル次元を計測した。フラクタル次元の計測には密度相関関数法を用いた。まず密度相関関数$C(r)$を計算し，粒子間距離$2\leq r\leq R_g$以内の範囲でフィッティングを行い，\ref{sec:density_correlation}節に従いフラクタル次元を計測した。
 $\alpha=2.6$では計算が収束しなかったため，解析には$\alpha\leq2.4$までのデータを用いた。
 
-原因については不明だが，収束する場合としない場合があったことより，電場の影響が大きくなりすぎ，ランダムな運動よりも電場に従った弾道的な運動になったことで，たまたま中心付近を通るものしかクラスターに取り込まれなくなり，パターンの成長速度が極端に遅くなったためと考えられる。
+原因については，計算が収束する場合としない場合があったことより，電場の影響が大きくなりすぎ，ランダムな運動よりも電場に従った弾道的な運動になったことで，たまたま中心付近を通るものしかクラスターに取り込まれなくなり，パターンの成長速度が極端に遅くなったためと考えられる。
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}

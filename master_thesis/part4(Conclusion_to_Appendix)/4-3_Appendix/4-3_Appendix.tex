@@ -16,7 +16,7 @@
 \end{equation}
 となる。$a$を1に近づけると
 \begin{equation}
-  \lim_{a\to 1}x\frac{\d f(ax)}{\d (ax)}                 =D_f f(x)
+  x\frac{\d f(x)}{\d (x)}                 =D_f f(x)
 \end{equation}
 となる。ただし，
 \begin{equation}
@@ -53,12 +53,12 @@
   \end{split}
   \label{eq:RW_taylor}
 \end{equation}
-以上の結果から，以下の式が成り立つ。
+よって，
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}(p_i-q_i)\frac{a}{\Delta t}\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\pdv[2]{c(\bm{x},t)}{x_i}
   \label{eq:RW_diffusion}
 \end{equation}
-
+が成り立つ。
 \section{過減衰Langenvin方程式の分散の詳細な計算}
 \label{sec:Langevin_cal}
 運動方程式
@@ -98,7 +98,7 @@
   \nabla^2\phi(\bm{x})=-\rho(\bm{x})
   \label{eq:poisson}
 \end{equation}
-を数値的に解くために，離散化した方程式を考える。ここで，$\bm{x}=(x,y)$は二次元空間内の位置ベクトル，$\phi(\bm{x})$はポテンシャル，$\rho(\bm{x})$は適当な関数である。二次元空間を格子点で離散化する。格子点$(i,j)$におけるLaplasianは以下のように導かれる。格子間隔$\Delta x=\Delta y=h$とすると，
+を数値的に解くために，離散化した方程式を考える。ここで，$\bm{x}=(x,y)$は二次元空間内の位置ベクトル，$\phi(\bm{x})$はポテンシャル，$\rho(\bm{x})$は適当な関数である。二次元空間を格子点で離散化する。格子点$(i,j)$におけるLaplacianは以下のように導かれる。格子間隔$\Delta x=\Delta y=h$とすると，
 \begin{equation}
   \left\{
   \begin{aligned}
@@ -108,7 +108,7 @@
   \right.
   \label{eq:discrete_laplasian}
 \end{equation}
-これより，Laplasianは以下のように離散化される。
+これより，Laplacianは以下のように離散化される。
 \begin{equation}
   \begin{split}
     (\nabla^2\phi)_{i,j} & =\left\{\left(\pdv*[2]{}{x}+\pdv*[2]{}{y}\right)\phi\right\}_{i,j}                                            \\
@@ -127,21 +127,21 @@
   \phi_{i,j}^{n+1}=(1-r)\phi_{i,j}^{n}+\frac{r}{4}\left(\phi_{i+1,j}^{n}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^{n}+\phi_{i,j-1}^{n+1}+h^2\rho_{i,j}\right)
   \label{eq:SOR}
 \end{equation}
-式\ref{eq:SOR}の更新方法を\textbf{SOR法}という。SOR法はGauss-Seidel法よりも収束が速いことが知られている。実際，電場の計算にかかった実時間は，Gaiss-Seidel法に対しておおよそ1/10程度になっていた。
+式\ref{eq:SOR}の更新方法を\textbf{SOR法}という。SOR法はGauss-Seidel法よりも収束が速いことが知られている。実際，本研究での電場の計算にかかった実時間は，Gaiss-Seidel法に対しておおよそ1/10程度になっていた。
 
 加速パラメータ$r$の値によって，効率が変化する。
 \begin{itemize}
-  \item $0<r<1$のとき，\textbf{under-relax}と呼ばれ，収束が速くなる。
+  \item $0<r<1$のとき，\textbf{under-relax}と呼ばれ，収束が遅くなる。
   \item $r=1$のとき，Gauss-Seidel法と等価である。
   \item $1<r<2$のとき，\textbf{over-relax}と呼ばれ，収束が早くなる。
   \item $2<r$のとき，収束しない。
 \end{itemize}
-十分大きな系のサイズ$N$に対して，最適な$r=r_{\mathrm{optimaze}}$は,
+十分大きな系のサイズ$N$に対して，最適な$r=r_{\mathrm{optimize}}$は,
 \begin{equation}
-  r_{\mathrm{optimaze}}=\frac{2}{1+\pi/N}
+  r_{\mathrm{optimize}}=\frac{2}{1+\pi/N}
   \label{eq:optimaze_r}
 \end{equation}
-で与えられる。$r=r_{\mathrm{optimaze}}$の時，計算量はGauss-Seidel法が$\mathcal{O}(N^2)$なのに対して, SOR法は（厳密に）$2N$である。Gauss-Seidel法およびSOR法については文献\cite{hinch2020numerical}を参考にした。
+で与えられる。$r=r_{\mathrm{optimize}}$の時，計算量はGauss-Seidel法が$\mathcal{O}(N^2)$なのに対して, SOR法は（厳密に）$2N$である。Gauss-Seidel法およびSOR法については文献\cite{hinch2020numerical}を参考にした。
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}

@@ -188,12 +188,12 @@ def surface_tracking(img,r_bottom,video,polar_range,r0):#界面高さトラッ�
     for i,theta in enumerate(Theta):
         R_rev=np.flip(R)
         top=np.nonzero(img[...,i])[0][0]
-        hight=R_rev[top]-r0
+        hight=R_rev[top]
         h_t.append(hight*scale)
-    # if r_bottom==0.0:
-    #     r_bottom=min(h_t)
-    # #相関関数の計算
-    # h_t=np.array(h_t)-r_bottom
+    if r_bottom==0.0:
+        r_bottom=min(h_t)
+    #相関関数の計算
+    h_t=np.array(h_t)-r_bottom
     cor_func=correlation_func(h_t)
     diff_cor_func=np.diff(cor_func)
     local_max=np.where((diff_cor_func[:-1]>0)&(diff_cor_func[1:]<0))[0]+1
