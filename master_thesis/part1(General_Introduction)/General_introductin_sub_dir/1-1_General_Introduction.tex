@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
@@ -12,7 +12,7 @@
     {0.32\textwidth}
     \subcaption{}
     \centering
-    \includegraphics[width=0.9\textwidth]{../../figure/part1/BZ_reaction.jpg}
+    \includegraphics[width=0.9\textwidth]{../../figure/part1/BZ_reaction.png}
     \label{fig:BZ}
   \end{minipage}
   \begin{minipage}
@@ -29,7 +29,7 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part1/Benard_cell.png}
     \label{fig:Benard_cell}
   \end{minipage}
-  \caption{様々な非平衡系でのパターン形成。\subref{fig:BZ}Belousov-Zhabotinsky反応によるスパイラルパターン。\cite{BZ_reaction}。\subref{fig:reaction_diffusion_angelfish}サザナミヤッコ（キンチャクダイの一種）の体表のTuringパターン。写真は横幅が4から$\SI{5}{cm}$。\cite{kondo1995reaction}。\subref{fig:Benard_cell}熱対流によるB{\'e}nard セル{\cite{koschmieder1993benard}。}}
+  \caption{様々な非平衡系でのパターン形成。\subref{fig:BZ}Belousov-Zhabotinsky反応によるスパイラルパターン\cite{BZ_reaction}。直径おおよそ$\SI{50}{mm}$。\subref{fig:reaction_diffusion_angelfish}サザナミヤッコ（キンチャクダイの一種）の体表のTuringパターン。写真は横幅が$\SI{40}{mm}$から$\SI{50}{mm}$\cite{kondo1995reaction}。\subref{fig:Benard_cell}熱対流によるB{\'e}nard セル。円の直径は$\SI{120}{mm}${\cite{eckert1998square}}。}
   \label{fig:pattern_formation}
 \end{figure}
 
@@ -179,6 +179,5 @@ $\Omega$ は$\bm{r}$のなす立体角，$\Omega_t$ は全立体角，$N$ は粒
   \bibliographystyle{../../Preamble/Physics.bst}
   \bibliography{../../Preamble/reference.bib}
 }{}
-
 
 \end{document}

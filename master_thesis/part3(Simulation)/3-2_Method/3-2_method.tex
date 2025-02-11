@@ -44,7 +44,7 @@
   \end{aligned}
   \label{eq:discrete_variance_3_2}
 \end{equation}
-式\ref{eq:discrete_average}と式\eqref{eq:discrete_variance_3_2}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散の方は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しないという結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なるという物理的に不可解な状況になってしまう。
+式\eqref{eq:discrete_average}と式\eqref{eq:discrete_variance_3_2}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散の方は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しないという結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なるという物理的に不可解な状況になってしまう。
 
 そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，$\bm{X}$空間での平均・分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり，電場に対する応答の大きさを表す量である。式\ref{eq:discrete_average_variance}より，分散は以下のように修正される。
 \begin{equation}
@@ -56,7 +56,7 @@
   \end{split}
   \label{eq:discrete_variance}
 \end{equation}
-式\ref{eq:discrete_variance}より，$C=D\Delta t/a^2$，$r=1-2dC-4\alpha^2\bm{E}^2$となる。
+式\eqref{eq:discrete_variance}より，$C=D\Delta t/a^2$，$r=1-2dC-4\alpha^2\bm{E}^2$となる。
 
 ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$とならなければならない点である。$a^2=2dD\Delta t$のままであれば，$C=1/(2d)$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで，$a^2\neq2dD\Delta t$になり，$C\neq1/(2d)$なので$r>0$を確保することができる。
 
@@ -138,7 +138,7 @@ $p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$�
   \begin{enumerate}
     \item 現在のパターンの内，中心からの距離が最も遠い点を探索する
     \item その点から30 px離れた円上にランダムに粒子を一つ置く
-    \item 式\ref{eq:prob3}に従って粒子の移動方向を決定する。電位が1.0の領域（中心からの距離が$L/2$の円よりも外側）に来たらその粒子を棄却し，新たな粒子を2.に従って置く。
+    \item 式\eqref{eq:prob3}に従って粒子の移動方向を決定する。電位が1.0の領域（中心からの距離が$L/2$の円よりも外側）に来たらその粒子を棄却し，新たな粒子を2.に従って置く。
     \item クラスターの隣の位置に来たら，与えた固着確率$P$でクラスターとして取り込むか判定する
     \item $150$粒子取り込むたびに，SOR法（詳しくは付録\ref{sec:SOR}参照）を用いて電位のLaplace方程式を解き，電場を計算した（図\ref{fig:DLA_ex}）。
     \item 以上を15000粒子分繰り返す
