@@ -7,64 +7,65 @@
 \section{数値計算の理論的な基礎とモデル}
 \subsection{ランダムウォーク（RW）と拡散方程式}
 \label{sec:RW}
-溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk: RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。
+溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk: RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。\Red{ただし，本節の計算は文献\cite{フラクタル科学}\cite{フラクタルの物理Ⅱ}を参考に計算を拡張した。}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.4\textwidth]{../../figure/part3/RW_d_dif.png}
-  \caption{ランダムウォークの模式図}
+  \caption{ランダムウォークの模式図（３次元の例）。}
   \label{fig:random_walk}
 \end{figure}
-図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i$，負方向に確率$q_i$で遷移する粒子の運動を考える。各軸が選ばれる確率は等しいとすると，各軸に対して，$p_i+q_i=1/d$が成り立つ。この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$後の濃度は，以下のようにあらわされる。
+図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i$，負方向に確率$q_i$で遷移する粒子の運動を考える。各軸が選ばれる確率は等しく，各軸に対して，$p_i+q_i=1/d$が成り立つとする。
+
+この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$後の濃度は
 \begin{equation}
   c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
   \label{eq:RW}
 \end{equation}
-これを左辺は一次，右辺は二次までTaylor展開すると以下のようになる（詳細な計算は付録\ref{sec:RW_cal}参照）。
+のように表される。式\eqref{eq:RW}を左辺は一次，右辺は二次までTaylor展開すると
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}(p_i-q_i)\frac{a}{\Delta t}\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\pdv[2]{c(\bm{x},t)}{x_i}
   \label{eq:RW_diffusion}
 \end{equation}
-$d$次元のナブラ演算子を$\nabla=\sum_{i=1}^{d}\bm{e}_i\pdv*{}{x_i}$とする。また，粒子に働く平均的な駆動力$\bar{F}_i=(p_i-q_i)a/\Delta t$，拡散係数$D=a^2/(2d\Delta t)$とすると，以下のように表される。
+のとなる（詳細な計算は付録\ref{sec:RW_cal}参照）。$d$次元のナブラ演算子を$\nabla=\sum_{i=1}^{d}\bm{e}_i\pdv*{}{x_i}$とする。また，粒子に働く平均的な駆動力$\bar{F}_i=(p_i-q_i)a/\Delta t$，拡散係数$D=a^2/(2d\Delta t)$とすると式\eqref{eq:RW_diffusion}は
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\bm{\bar{F}}\cdot\nabla c(\bm{x},t)+D\nabla^2 c(\bm{x},t)
   \label{eq:RW_diffusion_result}
 \end{equation}
-ここで，ベクトル演算の恒等式$\nabla\cdot(\psi\bm{a})=\bm{a}\cdot\nabla\psi+\psi\nabla\cdot\bm{a}$より，駆動力$\bar{F}$が，$\nabla\cdot\bar{F}=0$を満たすならば，式\ref{eq:RW_diffusion_result}は,
+と表される。ここで，ベクトル演算の恒等式$\nabla\cdot(\psi\bm{a})=\bm{a}\cdot\nabla\psi+\psi\nabla\cdot\bm{a}$より，駆動力$\bar{\bm{F}}$が，$\nabla\cdot\bar{\bm{F}}=0$を満たすならば，式\ref{eq:RW_diffusion_result}は,
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\ab\{\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)\}
   \label{eq:RW_diffusion_result_divergence}
 \end{equation}
-と表される。これは流束を$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
+と表される。式\eqref{eq:RW_diffusion_result_divergence}は流束を$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
 
-例として，電解析出における，電解質溶液中を拡散するイオンの運動を考える。外力として電場$\bm{E}$のみがかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，Gaussの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=-\mu q \rho(\bm{x},t)/\varepsilon$が成り立つ。電解析出において初期に急激な電流が流れた後は気体の発生が見られないことより，溶液中では電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{F}=0$を満たす。そのため，電解析出におけるイオンの運動は流束を$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときのイオンの保存則（拡散方程式）に等しくなり，
+例として，電解析出における，電解質溶液中を拡散するイオンの運動を考える。外力として電場$\bm{E}$のみがかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，Gaussの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=\mu q \rho(\bm{x},t)/\varepsilon$が成り立つ。電解析出において初期に急激な電流が流れた後は電気分解による気体の発生が見られないことより，電解析出の初期段階でイオンの再配置がおこり極板表面に対となるイオンが電気二重層を形成していることが示唆される。そのため，極板から離れた（電気二重層の厚さ以上）バルク溶液中では平均的には電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{\bm{F}}=0$を満たす。そのため，電解析出におけるイオンの運動は流束を$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときのイオンの保存則（拡散方程式）に等しくなり，
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\bm{J}
   \label{eq:RW_diffusion_result_divergence_ion}
 \end{equation}
-で表される。以上の内容は文献\cite{フラクタルの物理Ⅱ}\cite{フラクタル科学}を参考にした。
+で表される。
 \subsection{Langevin方程式}
 \label{sec:Langevin}
-Brown運動する粒子は，粘性抵抗などの速度に比例する減衰項，外力項，ランダム力の項を含むLangevin方程式に従い，粒子の位置$\bm{x}=\bm{x}(t)$は以下のように与えられる。
+Brown運動する粒子は，速度に比例する減衰項，外力項，ランダム力の項を含むLangevin方程式に従い，粒子の位置$\bm{x}=\bm{x}(t)$は
 \begin{equation}
   m\odv[2]{\bm{x}}{t}=-\gamma\odv{\bm{x}}{t}+\bm{F}+\bm{\xi}(t)
   \label{eq:Langevin}
 \end{equation}
-$m$は粒子の質量，$\gamma$は粘性抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。空間次元を$d$とすると，ランダム力は以下の関係式を満たす。
+で与えられる。$m$は粒子の質量，$\gamma$は抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。空間次元を$d$とすると，ランダム力は
 \begin{equation}
   \begin{split}
-    \langle\bm{\xi}(t)\rangle                  & =0                          \\
-    \langle\bm{\xi}(t)\cdot\bm{\xi}(t')\rangle & =2d\gamma k_B T\delta(t-t')
+    \langle\bm{\xi}(t)\rangle                & =0                                              \\
+    \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2d\gamma k_B T\delta_{\alpha\beta}\delta(t-t')
   \end{split}
   \label{eq:random_force}
 \end{equation}
-$\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はBoltzmann定数，$T$は絶対温度である。
-% （＊実験パートの説明で既出だが，書いた方がわかりやすいか？）
-過減衰極限として，慣性項を無視し，外力が電場のみである場合を考えると，運動方程式は
+を満たす。$\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はBoltzmann定数，$T$は絶対温度である。
+過減衰極限として，慣性項を無視し，外力が電場によるクーロン力のみである場合を考えると，運動方程式は
 \begin{equation}
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
   \label{eq:Langevin_overdamped}
 \end{equation}
-で与えられる。$\mu=1/\gamma$は易動度，$q$は粒子の電荷，$\bm{E}$は電場である。粒子の拡散の時間スケールに対して，電場の時間変化のスケールが十分遅いと仮定して，$\bm{E}=\bm{E}(\bm{x})$（位置のみに依存）とする。初期位置$\bm{x}(0)=0$とすると，その平均と二乗平均は，
+で与えられる。$\mu=1/\gamma$は易動度，$q$は粒子の電荷，$\bm{E}$は電場である。粒子の拡散の時間スケールに対して，電場の時間変化のスケールが十分遅いと仮定して，$\bm{E}=\bm{E}(\bm{x})$（位置のみに依存）とする。初期位置$\bm{x}(0)=\bm{0}$とすると，その平均と二乗平均は，
 
 \begin{equation}
   \begin{split}
@@ -73,7 +74,7 @@ $\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はBoltz
   \end{split}
   \label{eq:Langevin_overdamped_average}
 \end{equation}
-となる（計算に付いては付録\ref{sec:Langevin_cal}参照）。これより，粒子の位置の分散は以下のように与えられる。
+となる（計算に付いては付録\ref{sec:Langevin_cal}参照）。式\eqref{eq:Langevin_overdamped_average}より，粒子の位置の分散は
 \begin{equation}
   \begin{split}
     \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =2d \frac{k_B T}{\gamma} t \\
@@ -81,11 +82,10 @@ $\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はBoltz
   \end{split}
   \label{eq:Langevin_overdamped_variance}
 \end{equation}
-ただし，$D=k_B T/\gamma$は拡散係数である。これより，分散は外力（電場）によらない一定値になることがわかる。
+で与えられる。ただし，$D=k_B T/\gamma$は拡散係数である。式\eqref{eq:Langevin_overdamped_variance}より，分散は外力（電場）によらない一定値になる。
 
 \subsection{樹枝状パターンを再現する数値計算モデル}
-樹枝状パターンを再現するモデルは様々なものが提案されている。図\ref{fig:dendrite_model}はいくつかのモデルによる樹枝状パターンの例である。計算方法として図\ref{fig:dendrite_model}\subref{fig:phase_field_dendrite}のように，変数が連続的な値を取り，移動境界に関する偏微分方程式を解くモデル，図\ref{fig:dendrite_model}\subref{fig:DBM}\subref{fig:DLA}\subref{fig:NS_model}のように，離散化した場や粒子を用いるものがある。また，離散化したモデルの中にも，図\ref{fig:dendrite_model}\subref{fig:DBM}のように現在のパターンに成長箇所が支配されるモデルと，図\ref{fig:dendrite_model}\subref{fig:DLA}\subref{fig:NS_model}のように外部から飛んでくる粒子のRWがパターン形成を支配するモデルなどがある。
-% \textcolor{red}{(偏微分方程式を解くときも離散化するので，離散化の有無による区分は微妙か？)}
+樹枝状パターンを再現するモデルは様々なものが提案されている。図\ref{fig:dendrite_model}はいくつかのモデルによる樹枝状パターンの例である。計算方法として図\ref{fig:dendrite_model}\subref{fig:phase_field_dendrite}のように，変数が連続的な値を取り，移動境界に関する偏微分方程式を解くものや，図\ref{fig:dendrite_model}\subref{fig:DBM}\subref{fig:DLA}\subref{fig:NS_model}のように，離散化した場や粒子を用いるものがある。また，離散化したモデルの中にも，図\ref{fig:dendrite_model}\subref{fig:DBM}のように現在のパターンに成長箇所が支配されるモデルと，図\ref{fig:dendrite_model}\subref{fig:DLA}\subref{fig:NS_model}のように外部から飛んでくる粒子のRWがパターン形成を支配するモデルがある。
 
 \begin{figure}[htbp]
   \begin{tabular}{cc}
@@ -130,11 +130,10 @@ $\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はBoltz
 
 \begin{enumerate}
   \item 計算領域の中央に粒子を一つ置く
-  \item 十分離れた円周上に粒子を発生させRWさせる。十分遠い円周上で発生したRWする粒子がパターン近傍の円周上のある点に到達する確率はどの点でも等しくなるため，実際の数値計算では現在のパターンの中で中心から最も遠い点$r_\mathrm{max}$よりもわずかに遠い円周上に粒子を発生させるだけで十分である。（図\ref{fig:DLA_explanation}では$r_{\mathrm{max}}+5$から粒子を発生させている。）
+  \item 十分離れた円周上に粒子を発生させRWさせる。十分遠い円周上で発生したRWする粒子がパターン近傍の円周上のある点に到達する確率はどの点でも等しくなるため，実際の数値計算では現在のパターンの中で中心から最も遠い点$r_\mathrm{max}$よりもわずかに遠い円周上のランダムな位置に粒子を発生させるだけで十分である。（図\ref{fig:DLA_explanation}では$r_{\mathrm{max}}+5$から粒子を発生させている。）
   \item パターンに含まれる粒子とRWしてきた粒子が接触したら，RWしてきた粒子をパターンに取り込む。
-  \item 粒子が一定の距離 (kiling circle：図\ref{fig:DLA_explanation}では$3r_{\mathrm{max}}$) 以上離れたら，その粒子を棄却し，新たに粒子を発生させる。
-  \item 2から4を繰り返す。
-  \item パターンの大きさが一定以上になったら計算を終了する。
+  \item 粒子が一定の距離 (killing circle：図\ref{fig:DLA_explanation}では$3r_{\mathrm{max}}$) 以上離れたら，その粒子を棄却し，新たに粒子を発生させる。
+  \item 2から4を適当な回数繰り返す。
 \end{enumerate}
 
 DLAの性質として，\ref{sec:fractal_dimension}節で定義したフラクタル次元がおおよそ$D_f=1.71$であること\cite{太田正之輔2009dla}，主に５本の枝を形成することなどが知られている\cite{ohta2004mode}。また，平均場近似を用いた理論計算より，フラクタル次元が$D_f=(d^2+1)/(d+1)$（$d$は空間次元）で与えられる\cite{muthukumar1983mean}\cite{tokuyama1984fractal}ことが示されている。実際に金属樹の実験\cite{matsushita1984fractal}では，$D_f=1.66\pm0.03$と与えられており，$d=2$の時の理論値とよく一致している。

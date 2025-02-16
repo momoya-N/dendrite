@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt,draft]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 
@@ -6,11 +6,12 @@
 \appendix
 \chapter{スケールフリー性を持つ関数がべき関数になることの証明}
 \label{sec:scale_free}
-スケールフリー関数$f(x)$はスケール$a$のみに依存する関数$g(a)$を用いて以下のように表される。
+スケールフリー関数$f(x)$はスケール$a$のみに依存する関数$g(a)$を用いて
 \begin{equation}
   \frac{f(ax)}{f(x)}=g(a) \quad (a>0)
+  \label{eq:scale_free}
 \end{equation}
-これを両辺$a$で微分し，変形する。連鎖律より，
+と表される。式\eqref{eq:scale_free}を両辺$a$で微分し変形する。連鎖律より，
 \begin{equation}
   \frac{\d (ax)}{\d a}\frac{\d f(ax)}{\d (ax)}          =\frac{\d g(a)}{\d a}f(x)
 \end{equation}
@@ -34,8 +35,17 @@
     \log \frac{f(x)}{f(x_0)}                              & =D_f\log \frac{x}{x_0}                  \\
     f(x)                                                  & =f(x_0)\left(\frac{x}{x_0}\right)^{D_f}
   \end{split}
+  \label{eq:scale_free_proof}
 \end{equation}
-以上よりスケールフリー性を持つ関数は冪関数になることが示された。
+式\eqref{eq:scale_free_proof}よりスケールフリー性を持つ関数は冪関数になることが示された。
+
+% \chapter{Poisson-Boltzmann (PB) 方程式による電気二重層の厚さの導出}
+% 一次元系におけるPB方程式は，
+% \begin{equation}
+%   \frac{d^2\psi}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi}{k_BT})
+%   \label{eq:PB_1D_appendix}
+% \end{equation}
+
 \chapter{Brown運動に関する理論計算}
 \section{ランダムウォーク（RW）からの拡散方程式の導出}
 \label{sec:RW_cal}
@@ -66,7 +76,7 @@
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
   \label{eq:Langevin_overdamped}
 \end{equation}
-より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行い，以下のように表される。ただしランダム力は以下の関係式を満たす。
+より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行うと求められる。ただしランダム力は
 \begin{equation}
   \begin{split}
     \langle\bm{\xi}(t)\rangle                  & =0                                                   \\
@@ -74,12 +84,12 @@
   \end{split}
   \label{eq:random_force}
 \end{equation}
-よって，時刻$t$での位置$\bm{x}(t)$は以下のように表される。
+で与えられる関係式を満たす。時刻$t$での位置$\bm{x}(t)$は
 \begin{equation}
   \bm{x}(t)=\bm{x}(0)+\mu q\bm{E}t+\mu\int_0^t\bm{\xi}(t')\d t'
   \label{eq:Langevin_overdamped_integrated}
 \end{equation}
-式\ref{eq:Langevin_overdamped_integrated}の両辺の二乗を取り，平均を取ると，以下のようになる。ただし，初期位置$\bm{x}(0)=0$とした。
+と表される。式\ref{eq:Langevin_overdamped_integrated}の両辺の二乗を取り，平均を取ると，式\eqref{eq:Langevin_overdamped_variance}のようになる。ただし，初期位置$\bm{x}(0)=0$とした。
 \begin{equation}
   \begin{split}
     \langle\bm{x}(t)^2\rangle & =(\mu q \bm{E} t)^2+2\mu^2 q t\ab\langle\int_{0}^{t}\bm{E}(\bm{x})\cdot\bm{\xi}(t') \d t'\rangle+\mu^2\ab\langle\int_{0}^{t}\int_{0}^{t}\bm{\xi}(t')\cdot
@@ -98,7 +108,7 @@
   \nabla^2\phi(\bm{x})=-\rho(\bm{x})
   \label{eq:poisson}
 \end{equation}
-を数値的に解くために，離散化した方程式を考える。ここで，$\bm{x}=(x,y)$は二次元空間内の位置ベクトル，$\phi(\bm{x})$はポテンシャル，$\rho(\bm{x})$は適当な関数である。二次元空間を格子点で離散化する。格子点$(i,j)$におけるLaplacianは以下のように導かれる。格子間隔$\Delta x=\Delta y=h$とすると，
+を数値的に解くために，離散化した方程式を考える。ここで，$\bm{x}=(x,y)$は二次元空間内の位置ベクトル，$\phi(\bm{x})$はポテンシャル，$\rho(\bm{x})$は適当な関数である。二次元空間を格子点で離散化する。格子点$(i,j)$におけるLaplacianは，格子間隔$\Delta x=\Delta y=h$とすると
 \begin{equation}
   \left\{
   \begin{aligned}
@@ -108,7 +118,7 @@
   \right.
   \label{eq:discrete_laplasian}
 \end{equation}
-これより，Laplacianは以下のように離散化される。
+で与えられる。式\eqref{eq:discrete_laplasian}より，Laplacianは
 \begin{equation}
   \begin{split}
     (\nabla^2\phi)_{i,j} & =\left\{\left(\pdv*[2]{}{x}+\pdv*[2]{}{y}\right)\phi\right\}_{i,j}                                            \\
@@ -117,17 +127,17 @@
   \end{split}
   \label{eq:discrete_poisson}
 \end{equation}
-この式を以下のように更新して，前回ステップとの差が規定値以下になるまで計算していく。ここで$n$は計算ステップである。
+と離散化される。式\eqref{eq:discrete_poisson}を
 \begin{equation}
   \phi_{i,j}^{n+1}=\frac{1}{4}\left(\phi_{i+1,j}^{n}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^{n}+\phi_{i,j-1}^{n+1}+h^2\rho_{i,j}\right)
   \label{eq:Gauss-Seidel}
 \end{equation}
-式\ref{eq:Gauss-Seidel}のようなLaplace方程式の計算方法を\textbf{Gauss-Seidel法}という。ここに加速パラメータ$r$を導入し，以下のように更新式を変更する。
+のように更新して，前回ステップとの差が規定値以下になるまで計算していく。ここで$n$は計算ステップである。式\ref{eq:Gauss-Seidel}のようなLaplace方程式の計算方法は\textbf{Gauss-Seidel法}と呼ばれる。ここに加速パラメータ$r$を導入し
 \begin{equation}
   \phi_{i,j}^{n+1}=(1-r)\phi_{i,j}^{n}+\frac{r}{4}\left(\phi_{i+1,j}^{n}+\phi_{i-1,j}^{n+1}+\phi_{i,j+1}^{n}+\phi_{i,j-1}^{n+1}+h^2\rho_{i,j}\right)
   \label{eq:SOR}
 \end{equation}
-式\ref{eq:SOR}の更新方法を\textbf{SOR法}という。SOR法はGauss-Seidel法よりも収束が速いことが知られている。実際，本研究での電場の計算にかかった実時間は，Gaiss-Seidel法に対しておおよそ1/10程度になっていた。
+のように更新式を変更する。式\ref{eq:SOR}の更新方法は\textbf{SOR法}と呼ばれる。SOR法はGauss-Seidel法よりも収束が速いことが知られている。実際，本研究での電場の計算にかかった実時間は，Gaiss-Seidel法に対しておおよそ1/10程度になっていた。
 
 加速パラメータ$r$の値によって，効率が変化する。
 \begin{itemize}

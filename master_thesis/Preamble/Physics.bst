@@ -215,7 +215,11 @@ FUNCTION {field.or.null}
 }
 
 FUNCTION {emphasize}
-{ skip$ }
+{ duplicate$ empty$
+    { pop$ "" }
+    { "{\em " swap$ * "}" * }
+  if$
+}
 
 FUNCTION {capitalize}
 { "u" change.case$ "t" change.case$ }
@@ -357,47 +361,21 @@ FUNCTION {eng.ord}
     }
   if$
 }
+% 物理系の論文誌の略称
+MACRO {PRL} {"Phys. Rev. Lett."}
+MACRO {PRB} {"Phys. Rev. B"}
+MACRO {PLA} {"Phys. Lett. A"}
+MACRO {JPSJ} {"J. Phys. Soc. Jpn."}
+MACRO {JSAP} {"Jpn. J. Appl. Phys."}
+MACRO {JAP} {"J. Appl. Phys."}
+MACRO {EPL} {"EPL"}
+MACRO {Physica_D} {"physica D"}
+MACRO {JoFM} {"J. Fluid Mech."}
 
-MACRO {acmcs} {"ACM Comput. Surv."}
-
-MACRO {acta} {"Acta Inf."}
-
-MACRO {cacm} {"Commun. ACM"}
-
-MACRO {ibmjrd} {"IBM J. Res. Dev."}
-
-MACRO {ibmsj} {"IBM Syst.~J."}
-
-MACRO {ieeese} {"IEEE Trans. Softw. Eng."}
-
-MACRO {ieeetc} {"IEEE Trans. Comput."}
-
-MACRO {ieeetcad}
-{"IEEE Trans. Comput.-Aided Design Integrated Circuits"}
-
-MACRO {ipl} {"Inf. Process. Lett."}
-
-MACRO {jacm} {"J.~ACM"}
-
-MACRO {jcss} {"J.~Comput. Syst. Sci."}
-
-MACRO {scp} {"Sci. Comput. Programming"}
-
-MACRO {sicomp} {"SIAM J. Comput."}
-
-MACRO {tocs} {"ACM Trans. Comput. Syst."}
-
-MACRO {tods} {"ACM Trans. Database Syst."}
-
-MACRO {tog} {"ACM Trans. Gr."}
-
-MACRO {toms} {"ACM Trans. Math. Softw."}
-
-MACRO {toois} {"ACM Trans. Office Inf. Syst."}
-
-MACRO {toplas} {"ACM Trans. Prog. Lang. Syst."}
-
-MACRO {tcs} {"Theoretical Comput. Sci."}
+% 化学系
+MACRO {JoES} {"J. Electrochem. Soc."}
+MACRO {JoCaIS} {"J. Colloid Interface Sci."}
+MACRO {JoAEchem} {"J. Appl. Electrochem."}
 
 FUNCTION {write.url}
 { url empty$
@@ -410,52 +388,52 @@ INTEGERS { nameptr namesleft numnames }
 
 FUNCTION {format.names}
 { 's :=
- #1 'nameptr :=
- s num.names$ 'numnames :=
- numnames 'namesleft :=
- numnames #3 >
- {
- #2 'namesleft :=
-   { namesleft #0 > }
-   { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
-     nameptr #1 >
-         { namesleft #1 >
-           { ", " * t * }
-           { " {\it et~al}." * }
-         if$
-       }
-       't  
-     if$
-     nameptr #1 + 'nameptr :=
-     namesleft #1 - 'namesleft :=
-   }
- while$
- }
- {
-   { namesleft #0 > }
-   { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
-     nameptr #1 >
-     { namesleft #1 >
-         { ", " * t * }
-         { numnames #1 >
-           { "" * }
-           'skip$
-         if$
-         t "others" =
-           { " et~al." * }
-           { ", " * t * }
-         if$
-         }
-       if$
-       }
-       't  
-     if$
-     nameptr #1 + 'nameptr :=
-     namesleft #1 - 'namesleft :=
-   }
- while$
- }
- if$
+  #1 'nameptr :=
+  s num.names$ 'numnames :=
+  numnames 'namesleft :=
+  numnames #3 >
+  {
+  #2 'namesleft :=
+    { namesleft #0 > }
+    { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
+      nameptr #1 >
+          { namesleft #1 >
+            { ", " * t * }
+            { " {\it et~al}." * }
+          if$
+        }
+        't  
+      if$
+      nameptr #1 + 'nameptr :=
+      namesleft #1 - 'namesleft :=
+    }
+  while$
+  }
+  {
+    { namesleft #0 > }
+    { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
+      nameptr #1 >
+      { namesleft #1 >
+          { ", " * t * }
+          { numnames #1 >
+            { "" * }
+            'skip$
+          if$
+          t "others" =
+            { " et~al." * }
+            { ", " * t * }
+          if$
+          }
+        if$
+        }
+        't  
+      if$
+      nameptr #1 + 'nameptr :=
+      namesleft #1 - 'namesleft :=
+    }
+  while$
+  }
+  if$
 }
 
 FUNCTION {format.names.ed}
@@ -513,7 +491,8 @@ note empty$
 FUNCTION {format.title}
 { title empty$
    { "" }
-   { title "t" change.case$ %タイトルを消す場合、はじめに""をつけて、以降コメントアウト
+   { "" 
+%    title "t" change.case$ %タイトルを消す場合、はじめに""をつけて、以降コメントアウト
    }
  if$
 }
@@ -760,22 +739,22 @@ FUNCTION {format.vol.num.pages}
 { 
 %SP 2001/01/23
 % Add the leading space only if there is a volume
- % volume field.or.null
- " "
- volume empty$
-   { pop$ "" }
-   { volume bold * }
- if$
- number empty$
-   'skip$
-   {
+  % volume field.or.null
+  " "
+  volume empty$
+    { pop$ "" }
+    { volume bold * }
+  if$
+  number empty$
+    'skip$
+    {
 %      "~(" number * ")" * *
-     volume empty$
-       { "there's a number but no volume in " cite$ * warning$ }
-       'skip$
-     if$
-   }
- if$
+      volume empty$
+        { "there's a number but no volume in " cite$ * warning$ }
+        'skip$
+      if$
+    }
+  if$
 }
 
 FUNCTION {format.chapter.pages}
@@ -976,11 +955,11 @@ FUNCTION {format.organization.address}
 }
 
 FUNCTION {article}
-{ output.bibitem
+{output.bibitem
  format.authors "author" output.check
  format.title "title" output.check
  crossref missing$
-   { journal
+   { journal emphasize
      "journal" output.check
 %SP 2001/01/23
 % Add the space in format.vol.num.pages
