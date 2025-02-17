@@ -51,21 +51,24 @@
 \label{sec:RW_cal}
 1ステップ後の粒子の濃度についての式
 \begin{equation}
-  c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
+  c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i(\bm{x}-a\bm{e}_i,t) c(\bm{x}-a\bm{e}_i,t)+q_i(\bm{x}+a\bm{e}_i,t) c(\bm{x}+a\bm{e}_i,t)\right]
   \label{eq:RW}
 \end{equation}
 を左辺は一次，右辺は二次までTaylor展開する。
 \begin{equation}
   \begin{split}
-    \mathrm{（左辺）} & =c(\bm{x},t)+\pdv{c(\bm{x},t)}{t}\Delta t+\mathcal{O}((\Delta t)^2)                                                                                                                 \\
-    \mathrm{（右辺）} & =\sum_{i=1}^{d}\left[\underset{=1/d}{\uwave{(p_i+q_i)}}c(\bm{x},t)-(p_i-q_i)\pdv{c(\bm{x},t)}{x_i}a+\underset{=1/d}{\uwave{(p_i+q_i)}}\pdv[2]{c(\bm{x},t)}{x_i}\frac{a^2}{2}\right] \\
-                  & =c(\bm{x},t)+\sum_{i=1}^{d}\left[-(p_i-q_i)\pdv{c(\bm{x},t)}{x_i}a+\pdv[2]{c(\bm{x},t)}{x_i}\frac{a^2}{2d}\right]+\mathcal{O}(a^3)
+    \mathrm{（左辺）} & =c(\bm{x},t)+\pdv{c(\bm{x},t)}{t}\Delta t+\mathcal{O}((\Delta t)^2)                                                                                                                                                                                    \\
+    \mathrm{（右辺）} & =\sum_{i=1}^{d}\left[\left\{p_i(\bm{x},t)-a\pdv{p_i(\bm{x},t)}{x_i}+\frac{a^2}{2}\pdv[2]{p_i(\bm{x},t)}{x_i}+\mathcal{O}(a^3)\right\}\left\{c(\bm{x},t)-a\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2}\pdv[2]{c(\bm{x},t)}{x_i}+\mathcal{O}(a^3)\right\}\right. \\
+                  & \hspace{30pt}\left.+\left\{q_i(\bm{x},t)+a\pdv{q_i(\bm{x},t)}{x_i}+\frac{a^2}{2}\pdv[2]{q_i(\bm{x},t)}{x_i}+\mathcal{O}(a^3)\right\}\left\{c(\bm{x},t)+a\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2}\pdv[2]{c(\bm{x},t)}{x_i}+\mathcal{O}(a^3)\right\}\right]  \\
+                  & =\sum_{i=1}^{d}\left[\underset{=1/d}{\uwave{\left\{p_i(\bm{x},t)+q_i(\bm{x},t)\right\}}}c(\bm{x},t)-a\pdv*{\left\{p_i(\bm{x},t)-q_i(\bm{x},t)\right\}c(\bm{x},t)}{x_i}\right.                                                                          \\
+                  & \hspace{250pt}\left.+\frac{a^2}{2}\pdv*[2]{\underset{=1/d}{\uwave{\left\{p_i(\bm{x},t)+q_i(\bm{x},t)\right\}}}c(\bm{x},t)}{x_i}\right] +\mathcal{O}(a^3)                                                                                               \\
+                  & =c(\bm{x},t)+\sum_{i=1}^{d}\left[-a\pdv*{\left\{p_i(\bm{x},t)-q_i(\bm{x},t)\right\}c(\bm{x},t)}{x_i}+\frac{a^2}{2d}\pdv[2]{c(\bm{x},t)}{x_i}\right]+\mathcal{O}(a^3)
   \end{split}
   \label{eq:RW_taylor}
 \end{equation}
-よって，
+よって，$\Delta t$の一次，$a$の二次まで取ると
 \begin{equation}
-  \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}(p_i-q_i)\frac{a}{\Delta t}\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\pdv[2]{c(\bm{x},t)}{x_i}
+  \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}\left[\pdv*{\left\{p_i(\bm{x},t)-q_i(\bm{x},t)\right\}\frac{a}{\Delta t}c(\bm{x},t)}{x_i}\right]+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\left[\pdv[2]{c(\bm{x},t)}{x_i}\right]
   \label{eq:RW_diffusion}
 \end{equation}
 が成り立つ。
@@ -76,11 +79,11 @@
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
   \label{eq:Langevin_overdamped}
 \end{equation}
-より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行うと求められる。ただしランダム力は
+より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行うと求められる。ただしランダム力$\bm{\xi}(t)$は\Red{イントロの過減衰Langevinと同じでdが入っているのはオカシイ？}
 \begin{equation}
   \begin{split}
-    \langle\bm{\xi}(t)\rangle                  & =0                                                   \\
-    \langle\bm{\xi}(t)\cdot\bm{\xi}(t')\rangle & =2d\gamma k_B T\delta(t-t') \qquad (d:\mathrm{空間次元})
+    \langle\xi_\alpha(t)\rangle              & =0                                                                       \\
+    \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2d\gamma k_B T\delta_{\alpha\beta}\delta(t-t') \qquad (d:\mathrm{空間次元})
   \end{split}
   \label{eq:random_force}
 \end{equation}
@@ -89,16 +92,16 @@
   \bm{x}(t)=\bm{x}(0)+\mu q\bm{E}t+\mu\int_0^t\bm{\xi}(t')\d t'
   \label{eq:Langevin_overdamped_integrated}
 \end{equation}
-と表される。式\ref{eq:Langevin_overdamped_integrated}の両辺の二乗を取り，平均を取ると，式\eqref{eq:Langevin_overdamped_variance}のようになる。ただし，初期位置$\bm{x}(0)=0$とした。
+と表される。式\ref{eq:Langevin_overdamped_integrated}の両辺の二乗を取り，平均を取ると，式\eqref{eq:Langevin_overdamped_variance_appendix}のようになる。ただし，初期位置$\bm{x}(0)=\bm{0}$とした。
 \begin{equation}
   \begin{split}
     \langle\bm{x}(t)^2\rangle & =(\mu q \bm{E} t)^2+2\mu^2 q t\ab\langle\int_{0}^{t}\bm{E}(\bm{x})\cdot\bm{\xi}(t') \d t'\rangle+\mu^2\ab\langle\int_{0}^{t}\int_{0}^{t}\bm{\xi}(t')\cdot
-    \bm{\xi}(t'') \d t' \d t''\rangle                                                                                                                                                                                                                            \\
-                              & =(\mu q \bm{E} t)^2+2\mu^2 q t\ab\int_{0}^{t}\bm{E}(\bm{x})\cdot\underset{=0}{\uwave{\langle\bm{\xi}(t')\rangle}} \d t'+\mu^2\ab\int_{0}^{t}\int_{0}^{t}\underset{=2d\gamma k_B T\delta(t'-t'')}{\uwave{\langle\bm{\xi}(t')\cdot
-    \bm{\xi}(t'')\rangle}} \d t' \d t''                                                                                                                                                                                                                          \\
-                              & =(\mu q \bm{E} t)^2+2d\mu k_B T t                                                                                                                                                                                                \\
+    \bm{\xi}(t'') \d t' \d t''\rangle                                                                                                                                                                                                                                 \\
+                              & =(\mu q \bm{E} t)^2+2\mu^2 q t\ab\int_{0}^{t}\bm{E}(\bm{x})\cdot\underset{=\bm{0}}{\uwave{\langle\bm{\xi}(t')\rangle}} \d t'+\mu^2\ab\int_{0}^{t}\int_{0}^{t}\underset{=2d\gamma k_B T\delta(t'-t'')}{\uwave{\langle\bm{\xi}(t')\cdot
+    \bm{\xi}(t'')\rangle}} \d t' \d t''                                                                                                                                                                                                                               \\
+                              & =(\mu q \bm{E} t)^2+2d\mu k_B T t                                                                                                                                                                                                     \\
   \end{split}
-  \label{eq:Langevin_overdamped_variance}
+  \label{eq:Langevin_overdamped_variance_appendix}
 \end{equation}
 
 \chapter{逐次加速緩和法(Successive Over Relaxation: SOR)の概要}

@@ -7,38 +7,36 @@
 \section{数値計算の理論的な基礎とモデル}
 \subsection{ランダムウォーク（RW）と拡散方程式}
 \label{sec:RW}
-溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk: RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。\Red{ただし，本節の計算は文献\cite{フラクタル科学}\cite{フラクタルの物理Ⅱ}を参考に計算を拡張した。}
+溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk: RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。ただし，本節の計算は文献\cite{フラクタル科学}\cite{フラクタルの物理Ⅱ}を参考に計算を拡張した。
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.4\textwidth]{../../figure/part3/RW_d_dif.png}
   \caption{ランダムウォークの模式図（３次元の例）。}
   \label{fig:random_walk}
 \end{figure}
-図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i$，負方向に確率$q_i$で遷移する粒子の運動を考える。各軸が選ばれる確率は等しく，各軸に対して，$p_i+q_i=1/d$が成り立つとする。
+図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i=p_i(\bm{x},t)$，負方向に確率$q_i=q_i(\bm{x},t)$で遷移する粒子の運動を考える。各軸が選ばれる確率は等しく，各軸に対して，$p_i+q_i=1/d$が成り立つとする。
 
 この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$後の濃度は
 \begin{equation}
-  c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i c(\bm{x}-a\bm{e}_i,t)+q_i c(\bm{x}+a\bm{e}_i,t)\right]
+  c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i(\bm{x}-a\bm{e}_i,t) c(\bm{x}-a\bm{e}_i,t)+q_i(\bm{x}+a\bm{e}_i,t) c(\bm{x}+a\bm{e}_i,t)\right]
   \label{eq:RW}
 \end{equation}
 のように表される。式\eqref{eq:RW}を左辺は一次，右辺は二次までTaylor展開すると
 \begin{equation}
-  \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}(p_i-q_i)\frac{a}{\Delta t}\pdv{c(\bm{x},t)}{x_i}+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\pdv[2]{c(\bm{x},t)}{x_i}
+  \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}\left[\pdv*{\left\{p_i(\bm{x},t)-q_i(\bm{x},t)\right\}\frac{a}{\Delta t}c(\bm{x},t)}{x_i}\right]+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\left[\pdv[2]{c(\bm{x},t)}{x_i}\right]
   \label{eq:RW_diffusion}
 \end{equation}
-のとなる（詳細な計算は付録\ref{sec:RW_cal}参照）。$d$次元のナブラ演算子を$\nabla=\sum_{i=1}^{d}\bm{e}_i\pdv*{}{x_i}$とする。また，粒子に働く平均的な駆動力$\bar{F}_i=(p_i-q_i)a/\Delta t$，拡散係数$D=a^2/(2d\Delta t)$とすると式\eqref{eq:RW_diffusion}は
+のとなる（詳細な計算は付録\ref{sec:RW_cal}参照）。$d$次元のナブラ演算子を$\nabla=\sum_{i=1}^{d}\bm{e}_i\pdv*{}{x_i}$とする。また，粒子に働く平均的な駆動力$\bar{F}_i=\{p_i(\bm{x},t)-q_i(\bm{x},t)\}a/\Delta t$，拡散係数$D=a^2/(2d\Delta t)$とすると式\eqref{eq:RW_diffusion}は
 \begin{equation}
-  \pdv{c(\bm{x},t)}{t}=-\bm{\bar{F}}\cdot\nabla c(\bm{x},t)+D\nabla^2 c(\bm{x},t)
+  \begin{split}
+    \pdv{c(\bm{x},t)}{t} & =-\nabla\cdot\ab\{ \bm{\bar{F}}c(\bm{x},t)\}+D\nabla^2 c(\bm{x},t) \\
+                         & =-\nabla\cdot\ab\{\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)\}
+  \end{split}
   \label{eq:RW_diffusion_result}
 \end{equation}
-と表される。ここで，ベクトル演算の恒等式$\nabla\cdot(\psi\bm{a})=\bm{a}\cdot\nabla\psi+\psi\nabla\cdot\bm{a}$より，駆動力$\bar{\bm{F}}$が，$\nabla\cdot\bar{\bm{F}}=0$を満たすならば，式\ref{eq:RW_diffusion_result}は,
-\begin{equation}
-  \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\ab\{\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)\}
-  \label{eq:RW_diffusion_result_divergence}
-\end{equation}
-と表される。式\eqref{eq:RW_diffusion_result_divergence}は流束を$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
+と表される。式\eqref{eq:RW_diffusion_result}は流束を$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
 
-例として，電解析出における，電解質溶液中を拡散するイオンの運動を考える。外力として電場$\bm{E}$のみがかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，Gaussの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=\mu q \rho(\bm{x},t)/\varepsilon$が成り立つ。電解析出において初期に急激な電流が流れた後は電気分解による気体の発生が見られないことより，電解析出の初期段階でイオンの再配置がおこり極板表面に対となるイオンが電気二重層を形成していることが示唆される。そのため，極板から離れた（電気二重層の厚さ以上）バルク溶液中では平均的には電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{\bm{F}}=0$を満たす。そのため，電解析出におけるイオンの運動は流束を$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときのイオンの保存則（拡散方程式）に等しくなり，
+例として，電解析出における，電解質溶液中を拡散するイオンの運動を考える。外場として電場$\bm{E}$のみがかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。\Red{この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，Gaussの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=\mu q \rho(\bm{x},t)/\varepsilon$が成り立つ。電解析出において初期に急激な電流が流れた後は電気分解による気体の発生が見られないことより，電解析出の初期段階でイオンの再配置がおこり極板表面に対となるイオンが電気二重層を形成していることが示唆される。そのため，極板から離れた（電気二重層の厚さ以上）バルク溶液中では平均的には電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{\bm{F}}=0$を満たす。（この部分の記述は無くても成り立つ？）}よって，電解析出におけるイオンの運動は流束を$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときのイオンの保存則（拡散方程式）に等しくなり，
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\bm{J}
   \label{eq:RW_diffusion_result_divergence_ion}
@@ -51,10 +49,10 @@ Brown運動する粒子は，速度に比例する減衰項，外力項，ラン
   m\odv[2]{\bm{x}}{t}=-\gamma\odv{\bm{x}}{t}+\bm{F}+\bm{\xi}(t)
   \label{eq:Langevin}
 \end{equation}
-で与えられる。$m$は粒子の質量，$\gamma$は抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。空間次元を$d$とすると，ランダム力は
+で与えられる。$m$は粒子の質量，$\gamma$は抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。空間次元を$d$とすると，ランダム力は\Red{一成分だけなのに分散にdが付いているのはオカシイ？ベクトルとして総和を取れば合っている？}
 \begin{equation}
   \begin{split}
-    \langle\bm{\xi}(t)\rangle                & =0                                              \\
+    \langle\xi_\alpha(t)\rangle              & =0                                              \\
     \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2d\gamma k_B T\delta_{\alpha\beta}\delta(t-t')
   \end{split}
   \label{eq:random_force}
@@ -119,7 +117,7 @@ Brown運動する粒子は，速度に比例する減衰項，外力項，ラン
   \label{fig:dendrite_model}
 \end{figure}
 
-その中でも，図\ref{fig:dendrite_model}\subref{fig:DLA}の\textbf{Diffusion Limited Aggregation (DLA)}モデル\cite{witten1981diffusion}は，粒子の拡散がパターン形成において支配的な場合のモデルとして知られている。DLAの計算は図\ref{fig:DLA_explanation}\cite{松下貢1987dla}のように行う。
+その中でも，図\ref{fig:dendrite_model}\subref{fig:DLA}の\textbf{Diffusion Limited Aggregation (DLA)}モデル\cite{witten1981diffusion}は，粒子の拡散がパターン形成において支配的な場合のモデルとして知られている。DLAの計算は以下のように行う（図\ref{fig:DLA_explanation}\cite{松下貢1987dla}）。
 
 \begin{figure}[htbp]
   \centering

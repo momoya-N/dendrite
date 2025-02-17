@@ -4,7 +4,7 @@
 \begin{document}
 \chapter{序論}
 \section{パターン形成の物理学}
-自然界では絶えずエネルギーの注入や散逸，物質の輸送が起こっている。このような系を平衡系と区別して\textbf{非平衡系}と呼ぶ。その中でも，非平衡過程により生じる様々な秩序構造の形成メカニズムや統計的性質に着目する分野を\textbf{パターン形成の物理学}と呼ぶ。パターンの形成メカニズムは様々なものがあり，図\ref{fig:pattern_formation}\subref{fig:BZ}のように連続した酸化還元反応によるもの，図\ref{fig:pattern_formation}\subref{fig:reaction_diffusion_angelfish}のように生体組織内の物質の拡散によるもの，図\ref{fig:pattern_formation}\subref{fig:Benard_cell}のように熱対流によるものなどが挙げられる。
+自然界では絶えずエネルギーの注入や散逸，物質の輸送が起こっている。このような系を平衡系と区別して\textbf{非平衡系}と呼ぶ。その中でも，非平衡過程により生じる様々な秩序構造の形成メカニズムや統計的性質に着目する分野を\textbf{パターン形成の物理学}と呼ぶ。パターンの形成メカニズムは様々なものがあり，図\ref{fig:pattern_formation}\subref{fig:BZ}のように連続した酸化還元反応と拡散の競合によるもの，図\ref{fig:pattern_formation}\subref{fig:reaction_diffusion_angelfish}のように\Red{生体組織内の細胞運動}によるもの，図\ref{fig:pattern_formation}\subref{fig:Benard_cell}のように熱対流によるものなどが挙げられる。
 
 \begin{figure}[htbp]
   \centering
@@ -77,7 +77,7 @@
   \label{eq:fractal_dimension_def}
 \end{equation}
 
-ここで$N(\varepsilon)$は与えられたパターンを$\varepsilon$のスケールで埋めつくすのに必要な個数(長さ$\varepsilon^{\mathrm{空間次元}}$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元を表す。例えば,ユークリッド空間中（図\ref{fig:fractal_stracture}\subref{fig:相似次元の考え方}）では，スケールは$\varepsilon=1/l$で与えられる。$\varepsilon=1/1,1/2,1/3$と減少していくとパターンの数$N(\varepsilon)$は増加する。式\eqref{eq:fractal_dimension_def}を用いて計算すると，空間次元$D=1,2,3$に一致する。図\ref{fig:fractal_stracture}\subref{fig:シェルピンスキーのギャスケット}はSierpinskiのギャスケットと呼ばれるパターンである。このパターンは三角形のスケール（三角形の一辺の長さ）を半分にして，中央の三角形を取り去ることで構成される。スケール$\varepsilon$が$\varepsilon=1/2$になると，一辺の長さ$\varepsilon$の三角形の個数$N(\varepsilon)$が3つになる。よって式\eqref{eq:fractal_dimension_def}より$D_f=\log 3/\log 2=1.5849\cdots$となる。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ構造（パターン配置）を持つ。このような\textbf{スケール不変性}を持つ系では，あるスケールで計測できる量（パターンの数，密度等）にスケールの長さに対する冪関数則が成り立つことが知られている。
+ここで$N(\varepsilon)$は与えられたパターンを$\varepsilon$のスケールで埋めつくすのに必要な個数(長さ$\varepsilon^{\mathrm{空間次元}}$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元に対応する。例えば,ユークリッド空間中（図\ref{fig:fractal_stracture}\subref{fig:相似次元の考え方}）では，スケールは$\varepsilon=1/l$で与えられる。$\varepsilon=1/1,1/2,1/3$と減少していくとパターンの数$N(\varepsilon)$は増加する。式\eqref{eq:fractal_dimension_def}を用いて計算すると，空間次元$D=1,2,3$に一致する。図\ref{fig:fractal_stracture}\subref{fig:シェルピンスキーのギャスケット}はSierpinskiのギャスケットと呼ばれるパターンである。このパターンは三角形のスケール（三角形の一辺の長さ）を半分にして，中央の三角形を取り去ることで構成される。スケール$\varepsilon$が$\varepsilon=1/2$になると，一辺の長さ$\varepsilon$の三角形の個数$N(\varepsilon)$が3つになる。よって式\eqref{eq:fractal_dimension_def}より$D_f=\log 3/\log 2=1.5849\cdots$となる。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ構造（パターン配置）を持つ。このような\textbf{スケール不変性}を持つ系では，あるスケールで計測できる量（パターンの数，密度等）にスケールの長さに対する冪則が成り立つことが知られている。
 
 \begin{figure}[htbp]
   \begin{minipage}{0.45\textwidth}
@@ -124,7 +124,7 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.4\textwidth]{../../figure/part3/DLA_with_R_g.png}
-  \caption{樹枝状パターンの回転半径。おおよそ$R_g=\SI{108}{px}$。$R_g$がおおよそのパターンの大きさを与える。}
+  \caption{樹枝状パターンの回転半径。おおよそ$R_g=\SI{108}{px}$。回転半径$R_g$がおおよそのパターンの大きさを与える。}
   \label{fig:DLA_with_R_g}
 \end{figure}
 
@@ -167,14 +167,14 @@
   \end{aligned}
   \label{eq:omega}
 \end{equation}
-で与えられる。興味があるのは$N$の$r$に対するスケーリング則のため，定数分は除いて考える。$C(r)$はスケールフリー性を持つので，$C(r)\propto r^{-a}$と表せる（スケールフリー性と冪関数については付録\ref{sec:scale_free}参照）。$C(r)$はある粒子から距離$r$離れた際に粒子が存在する確率を表しているので，微小範囲の粒子数は$\d N=C(r)\d \bm{r}\propto C(r)r^{d-1}\d r\propto r^{d-a-1} \d r $とスケーリングできる。全範囲にわたって積分すればそのパターンの大きさ，したがって粒子数$N$が導出できる。回転半径程度がパターンのおおよその大きさで，回転半径以上では$C(r)$はほぼ0とみなせるため，粒子数$N$は，
+で与えられる。興味があるのは$N$の$r$に対するスケーリング則のため，定数分は除いて考える。$C(r)$はスケールフリー性を持つので，$C(r)\propto r^{-a}$と表せる（スケールフリー性と冪関数については付録\ref{sec:scale_free}参照）。$C(r)$はある粒子から距離$r$離れた点に粒子が存在する確率を表しているので，微小範囲の粒子数は$\d N=C(r)\d \bm{r}\propto C(r)r^{d-1}\d r\propto r^{d-a-1} \d r $とスケーリングできる。全範囲にわたって積分すればそのパターンの大きさ，したがって粒子数$N$が導出できる。回転半径程度がパターンのおおよその大きさで，回転半径以上では$C(r)$はほぼ0とみなせるため，粒子数$N$は，
 \begin{equation}
   N\propto \int_{0}^{R_g} r^{d-a-1} \d r\propto r^{d-a}
   \label{eq:density_correlation_fractal}
 \end{equation}
 と表される。
 
-本節の議論より，密度相関関数法の両対数プロットより$a$の値を求められれば，パターンのフラクタル次元$D_f$を求めることができる。式\ref{eq:gyration_radius_fractal}と式\ref{eq:density_correlation_fractal}より，$D_f=d-a$となる。
+本節の議論より，密度相関関数法の両対数プロットより$a$の値を求められれば，パターンのフラクタル次元$D_f$を求めることができる。式\eqref{eq:gyration_radius_fractal}と式\eqref{eq:density_correlation_fractal}より，$D_f=d-a$となる。
 
 % \section{研究目的}
 % 枝分かれパターンの形成メカニズムは現象によって異なる。\textcolor{red}{しかし，枝の分岐(Tip Splitting)は成長過程での界面の粗さが影響を与える\cite{}ことが知られており，}界面の粗さの不安定性が最終的な枝分かれ形状に影響を与えると思われる。しかし，成長界面の粗さの不安定性と最終的な枝分かれ形状の関係は十分に理解されていない。本研究では，成長界面の粗さの不安定性と枝分かれ形状の関係を明らかにすることを目的とする。モデル系として，亜鉛イオン水溶液の電界析出で生じる亜鉛の金属樹を用いる。亜鉛の金属樹はフラクタル性を示すことが知られており\cite{matsushita1984fractal}，様々なパラメータでの形態変化が調べられている\cite{suda2003temperature}。本研究では電解質溶液に界面活性剤を加え，最終的に生じる樹枝状パターンがどのように変化するかを議論するとともに，パターン変化の原因であると思われる，電界析出する金属結晶の界面の粗さを平滑化させるleveling現象を検証した。また，枝分かれパターンのフラクタル性を再現するモデルである拡散律速凝集(Diffusion Limited Aggregation: DLA)モデル\cite{witten1981diffusion}をベースに，実験を再現するモデルの構築を行った。

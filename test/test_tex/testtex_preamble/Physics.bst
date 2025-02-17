@@ -362,6 +362,23 @@ FUNCTION {eng.ord}
   if$
 }
 
+% 物理系の論文誌の略称
+MACRO {PRL} {"Phys. Rev. Lett."}
+MACRO {PRB} {"Phys. Rev. B"}
+MACRO {PLA} {"Phys. Lett. A"}
+MACRO {JPSJ} {"J. Phys. Soc. Jpn."}
+MACRO {JSAP} {"Jpn. J. Appl. Phys."}
+MACRO {JAP} {"J. Appl. Phys."}
+MACRO {EPL} {"EPL"}
+MACRO {Physica_D} {"physica D"}
+MACRO {JoFM} {"J. Fluid Mech."}
+
+% 化学系
+MACRO {JoES} {"J. Electrochem. Soc."}
+MACRO {JoCaIS} {"J. Colloid Interface Sci."}
+MACRO {JoAEchem} {"J. Appl. Electrochem."}
+
+
 MACRO {acmcs} {"ACM Comput. Surv."}
 
 MACRO {acta} {"Acta Inf."}
@@ -404,8 +421,6 @@ MACRO {toplas} {"ACM Trans. Prog. Lang. Syst."}
 MACRO {tcs} {"Theoretical Comput. Sci."}
 
 MACRO {jcp} {"J. Comput. Phys."}
-
-MACRO {Physical_Review_Letters} {"Phys. Rev. Lett."}
 
 FUNCTION {write.url}
 { url empty$

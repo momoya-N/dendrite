@@ -29,7 +29,7 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
   n_i(\bm{x}) = n_{i\infty}\exp\ab(-\frac{ez_i\psi(x)}{k_BT})
   \label{eq:boltzmann}
 \end{equation}
-に従うと仮定する。ただし，$k_B$はボルツマン定数，$T$は絶対温度，$e$は電気素量，$z_i$はイオンの価数（正負を含む），$\psi(\bm{x})$は静電ポテンシャル，$n_{i\infty}$はイオンのバルクの個数密度である。個数密度は$k_B T\gg ez_i\psi(x)$ならばいたるところで一様な分布になる。次に電位によるエネルギーが十分大きい場合の正に帯電した極板に対する陽イオン，陰イオンの個数密度分布を考える。正負どちらのイオンも極板から離れて電位が低い点では一様分布に近くなる。しかし，陽イオンの個数密度は，電位の高い極板付近では指数が負で大きくなるため急激に減少する。逆に陰イオンの場合は，指数が正で大きくなるため，極板に近い点では個数密度は急激に増加する。
+に従うと仮定する。ただし，$k_B$はBoltzmann定数，$T$は絶対温度，$e$は電気素量，$z_i$はイオンの価数（正負を含む），$\psi(\bm{x})$は静電ポテンシャル，$n_{i\infty}$はイオンのバルクの個数密度である。個数密度は$k_B T\gg ez_i\psi(x)$ならばいたるところで一様な分布になる。次に電位によるエネルギーが十分大きい場合の，正に帯電した極板（$\psi(\bm{x})|_{\bm{x}=\mathrm{表面}}>0$）に対する陽イオン，陰イオンの個数密度分布を考える。$\lim_{|\bm{x}|\to\infty}\psi(\bm{x})=0$（極板から十分遠い所で電位は0）を仮定すれば，正負どちらのイオンも極板から遠い点では一様分布に近づく。極板に近い部分における陽イオンの個数密度は，$z_i>0$かつ$\psi(\bm{x})|_{\bm{x}=\mathrm{表面}}>0$より$-ez_i\psi(\bm{x})/(k_BT)<0$なので，電位の高い極板付近では指数関数の指数部分が負になるため，極板に近づくにつれて個数密度は急激に減少する。逆に陰イオンの場合は，$z_i<0$より$-ez_i\psi(\bm{x})/(k_BT)>0$となるので，指数関数が極板近傍に近づくにつれて個数密度は急激に増加する。
 
 溶液中の電荷密度$\rho(\bm{x})$は，各イオンの個数密度分布を用いて，$\rho(\bm{x})=\sum_{i}ez_in_i(\bm{x})$と表される。Poisson方程式$\nabla^2\psi(\bm{x})=-\rho(\bm{x})/\varepsilon$に代入すると，\textbf{Poisson-Boltzmann方程式}
 \begin{equation}
@@ -45,7 +45,7 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 \begin{equation}
   \lambda_D = \sqrt{\frac{\varepsilon_r\varepsilon_0 k_BT}{e^2\sum_{i}n_{i\infty}z_i^2}}\label{eq:debye_length}
 \end{equation}
-で与えられる。（後の計算のため$\varepsilon$を比誘電率$\varepsilon_r$と真空の誘電率$\varepsilon_0$の積で表した。詳しい導出は付録\Red{??}参照。）
+で与えられる。（後の計算のため$\varepsilon$を比誘電率$\varepsilon_r$と真空の誘電率$\varepsilon_0$の積で表した。%詳しい導出は付録\Red{??}参照。）%
 
 例として，$\ce{ZnSO_4}$ ($\SI{2}{M}$)の場合の電気二重層の厚さを求めると，
 \begin{itemize}
@@ -66,7 +66,7 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/el_dep_mol.png}
-  \caption{電解析出の様々なパラメータによるおおよその形態変化。様々な要因が複合的に作用する\cite{suda2003temperature}。}
+  \caption{金属樹の様々なパラメータによるおおよその形態変化。様々な要因が複合的に作用する\cite{suda2003temperature}。}
   \label{fig:el_dep_mol}
 \end{figure}
 
@@ -112,7 +112,7 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 が成り立つ。境界条件として無限遠方のバルク濃度$c_{\infty}$と界面上での平衡濃度$c_s$を
 \begin{equation}
   c(r\rightarrow \infty)  = c_{\infty}, \qquad c(r=R)= c_s
-  \label{eq:boundary}
+  \label{eq:boundary_MS}
 \end{equation}
 とする。ここで，3次元のLaplace方程式の解は，$r\to\infty$で発散しないことより，球面調和関数$Y_{lm}(\theta,\phi)$を用いて式\eqref{eq:spherical}のように表される。($l=0$の時の定数項は$c_\infty$となるので分離した。)
 \begin{equation}
@@ -123,7 +123,8 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 流束$\bm{J}_c(\bm{r})$が，Fickの法則$\bm{J}_c(\bm{r})=-D\nabla c(\bm{r})$に従うとすると，界面の成長における，流束の球面に対する法線方向成分（流れ込んだ量）と，微小時間に取り込まれた分子数$\lim_{\Delta t\to 0} (c_0-c_s)\Delta R(t)/\Delta t$（$c_0$は固体内の分子の濃度）は等しい。よって，半径$R=R(t)$の時間発展は，
 \begin{equation}
   \begin{split}
-    \eval{D\pdv{c(\bm{r})}{r}}_{r=R} & = -\bm{e}_r\cdot\bm{J}_c = (c_0-c_s)\odv{R(t)}{t} \\
+    \eval{D\pdv{c(\bm{r})}{r}}_{r=R} & = -\bm{e}_r\cdot\bm{J}_c \\
+                                     & = (c_0-c_s)\odv{R(t)}{t} \\
                                      & \simeq c_0\odv{R(t)}{t}
   \end{split}
   \label{eq:R}
@@ -137,9 +138,9 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 \begin{equation}
   \Gamma_c = \frac{\gamma \omega_0}{k_BT}
 \end{equation}
-で与えられる。$\gamma$は界面エネルギー密度，$\omega_0$は一分子当たりの体積である。大雑把には界面エネルギーと分子運動によるエネルギーの比を表し，長さの次元を持つ。\Red{$k_BT$の定義はいる？}
+で与えられる。$\gamma$は界面エネルギー密度，$\omega_0$は一分子当たりの体積，$k_B$はBoltzmann定数，$T$は絶対温度である。大雑把には界面エネルギーと分子運動によるエネルギーの比を表し，長さの次元を持つ。
 
-まず，$l=m=0$のモードである，半径$R=R(t)$の球形の固相の時間発展について考える。式\eqref{eq:spherical}と境界条件\eqref{eq:boundary}を用いると解は
+まず，$l=m=0$のモードである，半径$R=R(t)$の球形の固相の時間発展について考える。式\eqref{eq:spherical}と境界条件\eqref{eq:boundary_MS}を用いると解は
 
 \begin{equation}
   c(r) = c_{\infty} + \frac{c_s-c_{\infty}}{r}R
@@ -197,7 +198,7 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 \end{equation}
 ただし，$\alpha=D(c_\infty-c_e)/(c_0R^2),\beta=D c_e\Gamma_c/(c_0 R^3)$である。
 
-図\ref{fig:MS_instability_ex}は，式\eqref{eq:delta_t_simple}の値を，$\beta=0.01$に固定し，$l$を横軸にしてプロットしたものである。$\alpha,\beta$の比を変えると，最大値を取る$l$の値が変化する。$\alpha$（過飽和度）の増加れに伴って最も増幅される$l$の値も増加し，より細かい波長が最初に不安定化する。
+図\ref{fig:MS_instability_ex}は，式\eqref{eq:delta_t_simple}の値を，$\beta=0.01$に固定し，$l$を横軸にしてプロットしたものである。$\alpha,\beta$の比を変えると，最大値を取る$l$の値が変化する。$\alpha$（過飽和度）の増加に伴って最も増幅される$l$の値も増加し，より細かい波長が最初に不安定化する。
 
 \begin{figure}[htbp]
   \centering

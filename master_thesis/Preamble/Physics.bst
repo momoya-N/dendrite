@@ -361,6 +361,7 @@ FUNCTION {eng.ord}
     }
   if$
 }
+
 % 物理系の論文誌の略称
 MACRO {PRL} {"Phys. Rev. Lett."}
 MACRO {PRB} {"Phys. Rev. B"}
@@ -376,6 +377,50 @@ MACRO {JoFM} {"J. Fluid Mech."}
 MACRO {JoES} {"J. Electrochem. Soc."}
 MACRO {JoCaIS} {"J. Colloid Interface Sci."}
 MACRO {JoAEchem} {"J. Appl. Electrochem."}
+
+
+MACRO {acmcs} {"ACM Comput. Surv."}
+
+MACRO {acta} {"Acta Inf."}
+
+MACRO {cacm} {"Commun. ACM"}
+
+MACRO {ibmjrd} {"IBM J. Res. Dev."}
+
+MACRO {ibmsj} {"IBM Syst.~J."}
+
+MACRO {ieeese} {"IEEE Trans. Softw. Eng."}
+
+MACRO {ieeetc} {"IEEE Trans. Comput."}
+
+MACRO {ieeetcad}
+{"IEEE Trans. Comput.-Aided Design Integrated Circuits"}
+
+MACRO {ipl} {"Inf. Process. Lett."}
+
+MACRO {jacm} {"J.~ACM"}
+
+MACRO {jcss} {"J.~Comput. Syst. Sci."}
+
+MACRO {scp} {"Sci. Comput. Programming"}
+
+MACRO {sicomp} {"SIAM J. Comput."}
+
+MACRO {tocs} {"ACM Trans. Comput. Syst."}
+
+MACRO {tods} {"ACM Trans. Database Syst."}
+
+MACRO {tog} {"ACM Trans. Gr."}
+
+MACRO {toms} {"ACM Trans. Math. Softw."}
+
+MACRO {toois} {"ACM Trans. Office Inf. Syst."}
+
+MACRO {toplas} {"ACM Trans. Prog. Lang. Syst."}
+
+MACRO {tcs} {"Theoretical Comput. Sci."}
+
+MACRO {jcp} {"J. Comput. Phys."}
 
 FUNCTION {write.url}
 { url empty$
@@ -565,7 +610,7 @@ FUNCTION {format.date}
 FUNCTION{format.year}
 { year duplicate$ empty$
    { "empty year in " cite$ * warning$ pop$ "" }
-   { "(" swap$ * ")" * }
+   { "(" swap$ * ")," * }
  if$
 }
 
@@ -733,6 +778,12 @@ FUNCTION {format.journal.pages}
  if$
 }
 
+% %日本語ジャーナルの判定
+% FUNCTION {is.japanese}
+% { 
+%   journal ".*[一-龥ぁ-んァ-ヴー]." matches$
+% }
+
 %SP 2001/01/23
 % Only used in articles
 FUNCTION {format.vol.num.pages}
@@ -743,7 +794,7 @@ FUNCTION {format.vol.num.pages}
   " "
   volume empty$
     { pop$ "" }
-    { volume bold * }
+    { volume bold * ", " * }
   if$
   number empty$
     'skip$
@@ -959,13 +1010,14 @@ FUNCTION {article}
  format.authors "author" output.check
  format.title "title" output.check
  crossref missing$
-   { journal emphasize
+   { 
+    journal emphasize
      "journal" output.check
 %SP 2001/01/23
 % Add the space in format.vol.num.pages
-     % add.blank
+     % add.camma
      before.all 'output.state :=
-     format.vol.num.pages output
+     ", " * format.vol.num.pages output
    }
    { format.article.crossref output.nonnull
      format.pages output
