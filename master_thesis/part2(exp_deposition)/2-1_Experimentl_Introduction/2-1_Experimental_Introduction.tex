@@ -38,14 +38,14 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 \end{equation}
 が得られる。$\varepsilon$は溶媒の誘電率である。式\eqref{eq:PB}は，一次元系では，
 \begin{equation}
-  \frac{d^2\psi}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi}{k_BT})
+  \frac{d^2\psi(x)}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi(x)}{k_BT})
   \label{eq:PB_1D}
 \end{equation}
 となる。式\eqref{eq:PB_1D}を解くと，電気二重層の厚さ$\lambda_D$は
 \begin{equation}
   \lambda_D = \sqrt{\frac{\varepsilon_r\varepsilon_0 k_BT}{e^2\sum_{i}n_{i\infty}z_i^2}}\label{eq:debye_length}
 \end{equation}
-で与えられる。（後の計算のため$\varepsilon$を比誘電率$\varepsilon_r$と真空の誘電率$\varepsilon_0$の積で表した。%詳しい導出は付録\Red{??}参照。）%
+で与えられる。（詳しい導出は付録\ref{sec:PB}参照。後の計算のため$\varepsilon$を比誘電率$\varepsilon_r$と真空の誘電率$\varepsilon_0$の積で表した。
 
 例として，$\ce{ZnSO_4}$ ($\SI{2}{M}$)の場合の電気二重層の厚さを求めると，
 \begin{itemize}

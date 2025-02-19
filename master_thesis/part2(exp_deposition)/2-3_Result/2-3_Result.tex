@@ -123,46 +123,22 @@
 \subsection{枝の長さ}
 
 \begin{figure}[htbp]
-  \begin{minipage}
-    {0.45\textwidth}
-    \subcaption{}
-    \centering
-    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_hist_abs.png}
-    \label{fig:branch_length_absolute}
-  \end{minipage}
-  \begin{minipage}
-    {0.45\textwidth}
-    \subcaption{}
-    \centering
-    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_hist_relativ.png}
-    \label{fig:branch_length_relativ}
-  \end{minipage}
-  \caption{普通の枝の長さ分布。\subref{fig:branch_length_absolute}絶対度数表示。\subref{fig:branch_length_relativ}相対度数表示。}
+  \centering
+  \includegraphics[width=0.6\textwidth]{../../figure/part2(exp_deposition)/branch_hist_relativ.png}
+  \caption{普通の枝の長さ分布（相対度数表示）。}
   \label{fig:branch_length}
 \end{figure}
 
-図\ref{fig:branch_length}は普通の枝の長さ分布を，カメラの解像度（$\SI{1}{px}\approx \SI{0.16}{mm}$）未満を除いて示している。図\ref{fig:branch_length}\subref{fig:branch_length_absolute}は絶対度数で表しており，図\ref{fig:branch_length}\subref{fig:branch_length_relativ}は相対度数で表している。\ref{fig:branch_length}\subref{fig:branch_length_relativ}で示したように，界面活性剤濃度が高くなるほど長い枝の割合が増加していた（図中赤丸）。また，極端に長い枝が低濃度($\SI{0}{\mathrm{vol}\%}$と$\SI{0.005}{\mathrm{vol}\%}$)でわずかな割合見られた（図中青丸）。\Red{この極端に長い枝は，図\ref{fig:branch_length}\subref{fig:branch_length_absolute}における，1,2本だけ存在する長い枝が相対度数を取ったために，割合として強調されたためである。}
+図\ref{fig:branch_length}は普通の枝の長さ分布をカメラの解像度（$\SI{1}{px}\approx \SI{0.16}{mm}$）未満を除いて相対度数で示しており，界面活性剤濃度が高くなるほど長い枝の割合が増加していた（図中赤丸）。また，極端に長い枝が低濃度($\SI{0}{\mathrm{vol}\%}$と$\SI{0.005}{\mathrm{vol}\%}$)でわずかな割合見られた（図中青丸）。この極端に長い枝は，低濃度のパターン内に数本だけ存在する長い枝が，相対度数を取ったために，割合として強調されたためである。
 
 \begin{figure}[htbp]
-  \begin{minipage}
-    {0.45\textwidth}
-    \subcaption{}
-    \centering
-    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_edited_hist_abs.png}
-    \label{fig:branch_length_absolute_edited}
-  \end{minipage}
-  \begin{minipage}
-    {0.45\textwidth}
-    \subcaption{}
-    \centering
-    \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/branch_edited_hist_relativ.png}
-    \label{fig:branch_length_relativ_edited}
-  \end{minipage}
-  \caption{幹と，幹に含まれない普通の枝の長さ分布。\subref{fig:branch_length_absolute_edited}絶対度数表示。\subref{fig:branch_length_relativ_edited}相対度数表示。}
+  \centering
+  \includegraphics[width=0.6\textwidth]{../../figure/part2(exp_deposition)/branch_edited_hist_relativ.png}
+  \caption{幹と，幹に含まれない普通の枝の長さ分布（相対度数表示）。}
   \label{fig:branch_length_edited}
 \end{figure}
 
-図\ref{fig:branch_length_edited}は幹と，幹に含まれない普通の枝の長さの分布を解像度（$\SI{1}{px}\approx \SI{0.16}{mm}$）未満を除いて示している。図\ref{fig:branch_length_edited}\subref{fig:branch_length_absolute_edited}は絶対度数で表しており，図\ref{fig:branch_length_edited}\subref{fig:branch_length_relativ_edited}は相対度数で表している。図\ref{fig:branch_length}に比べて，高濃度における長い枝の割合が増加していた。また，極端に長いものも同様に低濃度側で見られた。この極端に長い枝も図\ref{fig:branch_length}と同様に，1,2本だけ存在する長い枝が相対度数で強調されたためである。
+図\ref{fig:branch_length_edited}は幹と，幹に含まれない普通の枝の長さの分布を解像度（$\SI{1}{px}\approx \SI{0.16}{mm}$）未満を除いて相対度数で示している。図\ref{fig:branch_length}に比べて，高濃度における長い枝の割合が増加していた。また，極端に長いものも同様に低濃度側で見られた。この極端に長い枝も図\ref{fig:branch_length}と同様に，1,2本だけ存在する長い枝が相対度数で強調されたためである。
 
 \begin{figure}[htbp]
   \begin{minipage}
@@ -186,7 +162,7 @@
 \begin{table}[htbp]
   \begin{minipage}{0.45\textwidth}
     \centering
-    \caption{界面活性剤濃度による普通の枝の分布の指数$b$の平均値。}
+    \caption{界面活性剤濃度による，普通の枝の分布の指数$b$の平均値。}
     \begin{tabular}{|c|c|}
       \hline
       濃度 vol\% & 指数$b$の平均値 \\ \hline\hline
@@ -202,7 +178,7 @@
   \hfill
   \begin{minipage}{0.45\textwidth}
     \centering
-    \caption{界面活性剤濃度による幹と，幹に含まれない枝の分布の指数$b$の平均値。}
+    \caption{界面活性剤濃度による，幹と，幹に含まれない枝の分布の指数$b$の平均値。}
     \begin{tabular}{|c|c|}
       \hline
       濃度 vol\% & 指数$b$の平均値 \\ \hline\hline
@@ -217,15 +193,15 @@
   \end{minipage}
 \end{table}
 
-図\ref{fig:branch_length_exp}は界面活性剤ごとの枝の長さ分布の指数$b$を示している。図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_len}は普通の枝の分布の指数$b$であり，図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_edited_len}は幹と，幹に含まれない普通の枝の分布の指数$b$である。表\ref{tab:brnch_len_exp}は普通の枝の分布の指数$b$の平均値であり，表\ref{tab:branch_len_exp_edited}は幹と，そこに含まれない普通の枝の分布の指数$b$の平均値である。
-図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_len}より，普通の枝の指数$b$の値は，
+図\ref{fig:branch_length_exp}は界面活性剤濃度ごとの枝の長さ分布の指数$b$を示している。図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_len}は普通の枝の分布の指数$b$であり，図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_edited_len}は幹と，幹に含まれない普通の枝を合わせた分布の指数$b$である。表\ref{tab:brnch_len_exp}は普通の枝の分布の指数$b$の平均値であり，表\ref{tab:branch_len_exp_edited}は幹と，幹に含まれない普通の枝を合わせた分布の指数$b$の平均値である。
+図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_len}より，普通の枝の指数$b$の値は界面活性剤濃度に対して，
 \begin{itemize}
   \item $\SI{0}{\mathrm{vol}\%}$, $\SI{0.01}{\mathrm{vol}\%}$では相対的に大きな値($b>4.00$)
   \item $\SI{0.03}{\mathrm{vol}\%}$以上では相対的に小さな値($b<4.00$)
   \item $\SI{0.005}{\mathrm{vol}\%}$は傾向から外れている
 \end{itemize}
 となっていた。
-図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_edited_len}より，幹と，幹に含まれない普通の枝の分布は，
+図\ref{fig:branch_length_exp}\subref{fig:exp_b_branch_edited_len}より，幹と，幹に含まれない普通の枝を合わせた分布の指数$b$の値は界面活性剤濃度に対して，
 \begin{itemize}
   \item $\SI{0.03}{\mathrm{vol}\%}$以下では相対的に大きな値($b>3.20$)
   \item $\SI{0.05}{\mathrm{vol}\%}$では相対的に小さな値($b<3.20$)

@@ -39,13 +39,47 @@
 \end{equation}
 式\eqref{eq:scale_free_proof}よりスケールフリー性を持つ関数は冪関数になることが示された。
 
-% \chapter{Poisson-Boltzmann (PB) 方程式による電気二重層の厚さの導出}
-% 一次元系におけるPB方程式は，
-% \begin{equation}
-%   \frac{d^2\psi}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi}{k_BT})
-%   \label{eq:PB_1D_appendix}
-% \end{equation}
-
+\chapter{Poisson-Boltzmann (PB) 方程式による電気二重層の厚さの導出}
+\label{sec:PB}
+一次元系におけるPB方程式は，
+\begin{equation}
+  \frac{d^2\psi(x)}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi(x)}{k_BT})
+  \label{eq:PB_1D_appendix}
+\end{equation}
+で表される。一般の場合の解析解を導くことは可能ではあるが煩雑で分かりにくい。今回は電気二重層の厚さを求めるだけなので，$ ez_i\psi(x)\ll k_B T$の場合を考える。このとき，指数関数をTaylor展開すると，
+\begin{equation}
+  \exp\ab(-\frac{ez_i\psi(x)}{k_BT})\simeq 1-\frac{ez_i\psi(x)}{k_BT}
+\end{equation}
+となる。式\eqref{eq:PB_1D_appendix}に代入すると，
+\begin{equation}
+  \frac{d^2\psi(x)}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\left(1-\frac{ez_i\psi(x)}{k_BT}\right)
+\end{equation}
+となる。整理すると，
+\begin{equation}
+  \frac{d^2\psi(x)}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i+\frac{e^2}{\varepsilon k_BT}\sum_{i}n_{i\infty}z_i^2\psi(x)
+  \label{eq:taylor_PB}
+\end{equation}
+となる。式\eqref{eq:taylor_PB}の一項目は電気的中性条件
+\begin{equation}
+  \sum_{i}n_{i\infty}z_i=0
+\end{equation}
+より消える。ここで，$\lambda_D$を
+\begin{equation}
+  \frac{1}{\lambda_D}=\sqrt{\frac{e^2\sum_{i}n_{i\infty}z_i^2}{\varepsilon k_BT}}
+\end{equation}
+と定義すると，式\eqref{eq:taylor_PB}は
+\begin{equation}
+  \frac{d^2\psi(x)}{dx^2} = \frac{1}{\lambda_D^2}\psi(x)
+\end{equation}
+となる。この微分方程式の解は
+\begin{equation}
+  \psi(x)=A\exp\ab(-\frac{x}{\lambda_D})+B\exp\ab(\frac{x}{\lambda_D})
+\end{equation}
+である。境界条件$\psi(\infty)=0$より，$B=0$となる。また，$\psi(0)=\psi_0$とすれば，$A=\psi_0$となる。よって，$\phi(x)$は
+\begin{equation}
+  \psi(x)=\psi_0\exp\ab(-\frac{x}{\lambda_D})
+\end{equation}
+となる。この結果より，電気二重層の厚さは$\psi(x)$が電極表面$\psi_0$の$\exp(-1)$倍になる距離，つまり$\lambda_D$であることが示された。
 \chapter{Brown運動に関する理論計算}
 \section{ランダムウォーク（RW）からの拡散方程式の導出}
 \label{sec:RW_cal}
@@ -155,6 +189,41 @@
   \label{eq:optimaze_r}
 \end{equation}
 で与えられる。$r=r_{\mathrm{optimize}}$の時，計算量はGauss-Seidel法が$\mathcal{O}(N^2)$なのに対して, SOR法は（厳密に）$2N$である。Gauss-Seidel法およびSOR法については文献\cite{hinch2020numerical}を参考にした。
+
+\chapter{補足・予備データ}
+\section{金属樹の析出実験の補足データ}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../../figure/part4(appendix)/I_time.png}
+  \caption{金属樹の析出時における電流の時間変化。}
+  \label{fig:I_time}
+\end{figure}
+図\ref{fig:I_time}は金属樹の析出時における電流の時間変化を示している。今回の実験系のサイズにおいて，析出金属が外側の陽極に接する直前の電流はおおよそ$\SI{0.2}{A}$であった。界面活性剤濃度が高い（$\SI{0.03}{vol\%}, \SI{0.05}{vol\%}$）場合の電流の増加割合は，より低い濃度（$\SI{0.03}{vol\%}$未満）の場合に比べて緩やかで，電流には平らに見える領域が存在した。また，高濃度の場合，平らな領域（安定に成長している時間帯）の電流はおおよそ$\SI{0.05}{A}$前後で，低濃度の電流が$\SI{0.2}{A}$まで増加することと比べて，低い電流を取っていた。この結果は，界面活性剤の濃度が高い場合，析出金属の成長が抑制され，単位時間当たりに流れる電荷$dq/dt=I$（$I$は電流）が少なくなることを示唆している。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../../figure/part4(appendix)/r_max_time.png}
+  \caption{界面活性剤濃度ごとの金属樹の最大半径$r_{\mathrm{max}}$の時間変化。}
+  \label{fig:r_max_time}
+\end{figure}
+図\ref{fig:r_max_time}は界面活性剤濃度ごとの金属樹の最大半径$r_{\mathrm{max}}$の時間変化を示している。高濃度の場合，電流のふるまいと同様に，平らに見える領域が存在した。また，同じ平らな領域を持つ場合でも，$\SI{35}{mm}$付近まで伸びる時間は$\SI{0.05}{\%}$は最長でも$\SI{1000}{s}$に対し，$\SI{0.03}{\%}$は最短でも$\SI{2000}{s}$を超えていた。この差の原因は明らかではないが，$\SI{0.05}{\%}$では急激に成長が進む傾向がみられることから，界面活性剤とイオンの配置が電場によって急激に変わり，``絶縁破壊''の様な現象が起こった可能性がある。
+\section{数値計算の補足データ}
+本研究の数値計算はRWに電場によるドリフトを加え，界面での固着確率$P$を導入したものであった。結果として，固着確率$P$の影響は電場の影響に比べて優勢であることが示唆された。そこで，電場を含まないRWを行ったとき，固着確率$P$によってパターンのフラクタル次元がどのように変化するかを調べた。
+
+系の形状，粒子数，棄却領域，粒子の発生のさせ方等は本文中の数値計算と同様にした。ただし，電場を含まないため，粒子の遷移確率は$p_i=q_i=1/4$とした。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../../figure/part4(appendix)/sim_D_f_P.png}
+  \caption{固着確率ごとの密度相関関数。各色の実線はフィッティング直線であり，その傾きからフラクタル次元を求めた。}
+  \label{fig:sim_D_f_P}
+\end{figure}
+図\ref{fig:sim_D_f_P}は固着確率$P$ごとの密度相関関数を示す。各色の実線はフィッティング直線であり，その傾きからフラクタル次元を求めた。固着確率$P$が大きいほどフラクタル次元が2に近づくことがわかった。図\ref{fig:sim_D_f_P}をもとに，固着確率に対するフラクタル次元の変化を図\ref{fig:D_f_P}に示す。
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{../../figure/part4(appendix)/sim_P.png}
+  \caption{固着確率$P$に対するフラクタル次元の変化。}
+  \label{fig:D_f_P}
+\end{figure}
+図\ref{fig:D_f_P}より，固着確率$P$の増加に対するフラクタル次元$D_f$の増加傾向は線形ではなく，$P=0.6$程度までは$D_f\simeq1.65$程度であったが，$P<0.6$の範囲では，$P$の減少に伴って$D_f$は急激に増加していた。この結果は電場を導入した際の図\ref{fig:R_g_result}，\ref{fig:fractal_dim_result}における$P=0.10$と$P>0.10$との間の急激な変化と一致している。このような結果から，\Red{固着確率$P$がパターン形成に与える影響は大きいことが示唆された。}
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
