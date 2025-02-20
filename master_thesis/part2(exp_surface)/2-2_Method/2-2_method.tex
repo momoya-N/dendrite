@@ -62,7 +62,7 @@
 
 実験において，界面はほぼ円の動径方向に成長していた。そのため，デカルト座標のままでは極板形状による歪みが生じてしまう。歪みの除去のため，まず動画の１フレーム目の画像の円形極板を円の一部と仮定して，図\ref{fig:surface_hight_def_polor_changed}\subref{fig:surface_hight_def}のような実験画像から，黒色領域と白色領域の境界をPythonのOpenCVを用いて抽出した。円の方程式$y=-\sqrt{|r_0^2-(x-x_c)^2|}+y_c$でフィッティングを行い，極板の中心座標$(x_c,y_c)$，および極板半径$r_0$を取得した。中心座標$(x_c,y_c)$を原点とし，極板の中心（原点）からの距離$r=r(\theta,t)$を求めた。変換後は図\ref{fig:surface_hight_def_polor_changed}\subref{fig:polor_changed}のようになる。解析のしやすさのため，ビット反転して黒と白を入れ替えている。
 
-初期フレームにおける$r(\theta,0)$の最小値$r_{0\mathrm{min}}$を初期界面と定義した（図\ref{fig:surface_hight_def_polor_changed}\subref{fig:surface_hight_def}の赤色破線）。成長高さ$h=h(\theta,t)$を初期界面からの高さ$h(\theta,t)=r(\theta,t)-r_{0\mathrm{min}}$と定義し解析を行った。時間の基準$t=0$は初期フレームとした。$t_0$を初期フレームとした理由は，実験において，電解析出開始時刻と撮影開始時刻にほぼ差がなく（高々数秒程度），全体の実験時間（1000秒以上）や反応の時間スケールに対して十分小さいためである。また，基準半径を$r_0$ではなく，$r_{0\mathrm{min}}$とした理由として，$r_0$はフィッティング結果のため，$h(\theta,0)<0$となる場合があったことと，$r_0$と$r_{0\mathrm{min}}$に大きな差がなかったことが挙げられる。
+初期フレームにおける$r(\theta,0)$の最小値$r_{0\mathrm{min}}$を初期界面と定義した（図\ref{fig:surface_hight_def_polor_changed}\subref{fig:surface_hight_def}の赤色破線）。成長高さ$h=h(\theta,t)$を初期界面からの高さ$h(\theta,t)=r(\theta,t)-r_{0\mathrm{min}}$と定義し解析を行った。時間の基準$t=0$は初期フレームとした。$t_0$を初期フレームとした理由は，実験において，電解析出開始時刻と撮影開始時刻にほぼ差がなく（高々数$\si{s}$程度），全体の実験時間（$\SI{1000}{s}$以上）や反応の時間スケールに対して十分小さいためである。また，基準半径を$r_0$ではなく，$r_{0\mathrm{min}}$とした理由として，$r_0$はフィッティング結果のため，$h(\theta,0)<0$となる場合があったことと，$r_0$と$r_{0\mathrm{min}}$に大きな差がなかったことが挙げられる。
 
 取得した各時刻の成長高さのデータ$h(\theta,t)$に対して，二乗平均粗さ$W(t)$と成長高さの自己相関関数$C(\delta\theta,t)$を計算した。成長高さ$h(\theta,t)$に対する二乗平均粗さ$W(t)$は，$\langle\cdot\rangle$を$\cdot$に対する$\theta$による平均として，
 \begin{equation}

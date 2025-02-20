@@ -46,7 +46,7 @@
 \end{equation}
 式\eqref{eq:discrete_average}と式\eqref{eq:discrete_variance_3_2}は素朴にRWとLangevin方程式を対応させたものである。しかし，分散は電場の強さに依存しており，\ref{sec:Langevin}節で求めた，分散が外力に依存しない結果と異なる。このままだと，場所によって分散が異なる，つまり場所によって温度が異なる，物理的に不可解な状況になってしまう。
 
-そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，\Red{単位長さで離散化された空間$\bm{X}$}での平均・分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり，電場に対する応答の大きさを表す量である。式\eqref{eq:discrete_variance_3_2}より，分散は
+そこで，RWにおいて図\ref{fig:RW_2dim}のように\textbf{その場にとどまる確率 $r$}を導入し，電場の影響を打ち消すように調整した。物理的には電場と運動が拮抗し，動けない場合を想定している。まず，確率の保存則より，$r+\sum_{i=1}^{d}(p_i+q_i) =1$が成り立つ。そのため，第$i$成分に対して$p_i+q_i=(1-r)/d$となる。以降，単位長さで離散化された空間$\bm{X}$での平均・分散を，$\langle X_i\rangle=2\alpha E_i$，$\langle\bm{X}^2\rangle-\langle\bm{X}\rangle^2=2dC$と置く。ここで，$\alpha=\mu q\Delta t/(2a)$であり，電場に対する応答の大きさを表す量である。式\eqref{eq:discrete_variance_3_2}より，分散は
 \begin{equation}
   \begin{split}
     \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =a^2\ab\{(1-r)-\frac{(\mu q \Delta t)^2}{a^2}\bm{E}^2\} \\
@@ -58,7 +58,7 @@
 \end{equation}
 と修正される。式\eqref{eq:discrete_variance}より，$C=D\Delta t/a^2$，$r=1-2dC-4\alpha^2\bm{E}^2$となる。
 
-ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$でなければならない点である。$a^2=2dD\Delta t$のままならば，$C=1/(2d)$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで，$a^2\neq2dD\Delta t$になり，$C\neq1/(2d)$より$r>0$を確保できる。
+ここで注意しなければならないのは，ここまでの議論が成り立つためには，少なくとも$r>0$でなければならない点である。$a^2=2dD\Delta t$のままならば，$C=1/(2d)$より，$r=-4\alpha^2\bm{E}^2<0$となってしまう。そのため，格子間隔$a$を固定すれば，時間間隔$\Delta t$を変化させることで，$a^2\neq2dD\Delta t$になり，$C\neq1/(2d)$より$r>0$を担保できる。
 
 ここまでの議論より，RWにおいて電場の影響を打ち消す確率$r$を導入することで，Langevin方程式の分散を外力に依存しない形に変形できる。しかし，$r>0$を担保するため，時間間隔$\Delta t$を変化させなければならない。$\Delta t$を変えることは，パラメータである$\alpha=\mu q\Delta t/(2a),C=D\Delta t/a^2$を変えることに他ならない。今回の数値計算では分散$C$を固定して，$\alpha$を変化させて形状変化を調べた。
 
@@ -94,20 +94,20 @@ $C$を定めるために，まず各$i$成分の確率を求めた。各$i$成�
 \end{equation}
 で与えられる。
 
-$p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$で最小値$C-1/8$を取る。また，$r$は$\alpha E_i=0$で最大値$1-2dC$を取る。$p_i,q_i$が0と1の間に入る条件は$d=2$の時，
+$p_i,q_i$を$\alpha E_i$について平方完成すると，$\alpha E_i=\mp1/4$で最小値$C-1/8$を取る。また，$r$は$\alpha E_i=0$で最大値$1-2dC$を取る。$p_i,q_i$が0と1の間に入る条件は$d=2$の時
 \begin{align}
   0<C-\frac{1}{8}<1 & \Leftrightarrow  \frac{1}{8}<C<\frac{9}{8} \label{eq:condition_0} \\
   0<1-4C<1          & \Leftrightarrow  0<C<\frac{1}{4}
   \label{eq:condition}
 \end{align}
-式\eqref{eq:condition_0}，\eqref{eq:condition}より，$C$の許される範囲は
+となる。式\eqref{eq:condition_0}，\eqref{eq:condition}より，$C$の許される範囲は
 \begin{equation}
   \frac{1}{8}<C<\frac{1}{4}
   \label{eq:condition2}
 \end{equation}
 となる。式\eqref{eq:condition2}より，上下端の中央の値である$C=3/16$を数値計算に用いる値とした。
 \subsection{固着確率$P$の定義}
-実験における，界面での界面活性剤によるイオンの析出阻害を再現するため，Brown運動してきた粒子を，パターンを構成する\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がクラスターの隣に来た場合，そのまま新たなクラスターとして取り込むが，今回の数値計算では確率$P$でクラスターとして取り込んだ。取り込まれなかった場合は再びRWを行った。
+実験における，界面での界面活性剤によるイオンの析出阻害を再現するため，Brown運動してきた粒子を，パターンを構成する\textbf{クラスターに取り込む確率$P$}を導入した。本来のDLAでは，粒子がクラスターの隣に来た場合，確率1でそのまま新たなクラスターとして取り込む。しかし今回の数値計算では，次のステップで粒子が既にあるパターン上に移動した際に限り，確率$P$でひとつ前のステップの位置をクラスターとして取り込んだ。取り込まれなかった場合はひとつ前のステップの位置から再びRWを行った。
 \subsection{数値計算方法}
 今回の数値計算では，パターンにより生じる電場と組み合わせてBrown運動する粒子の遷移確率を計算した。計算する系は，サイズ$L=\SI{512}{px}$四方の正方形である。系の中心座標 $\bm{x_c}=(x_c,y_c)=(L/2,L/2)=(256,256)$に粒子を一つ置き，粒子数 $N=15000$個として計算を行った。位置$\bm{x}$に対して電位の境界条件を
 \begin{equation}

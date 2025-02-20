@@ -4,7 +4,7 @@
 \begin{document}
 \chapter{序論}
 \section{パターン形成の物理学}
-自然界では絶えずエネルギーの注入や散逸，物質の輸送が起こっている。このような系を平衡系と区別して\textbf{非平衡系}と呼ぶ。その中でも，非平衡過程により生じる様々な秩序構造の形成メカニズムや統計的性質に着目する分野を\textbf{パターン形成の物理学}と呼ぶ。パターンの形成メカニズムは様々なものがあり，図\ref{fig:pattern_formation}\subref{fig:BZ}のように連続した酸化還元反応と拡散の競合によるもの，図\ref{fig:pattern_formation}\subref{fig:reaction_diffusion_angelfish}のように\Red{生体組織内の細胞運動}によるもの，図\ref{fig:pattern_formation}\subref{fig:Benard_cell}のように熱対流によるものなどが挙げられる。
+自然界では絶えずエネルギーの注入や散逸，物質の輸送が起こっている。このような系を平衡系と区別して\textbf{非平衡系}と呼ぶ。その中でも，非平衡過程により生じる様々な秩序構造の形成メカニズムや統計的性質に着目する分野を\textbf{パターン形成の物理学}と呼ぶ。パターンの形成メカニズムは様々なものがあり，図\ref{fig:pattern_formation}\subref{fig:BZ}のように連続した酸化還元反応と拡散の競合によるもの，図\ref{fig:pattern_formation}\subref{fig:reaction_diffusion_angelfish}のように生体組織内の細胞運動によるもの，図\ref{fig:pattern_formation}\subref{fig:Benard_cell}のように熱対流によるものなどが挙げられる。
 
 \begin{figure}[htbp]
   \centering
@@ -34,7 +34,7 @@
 \end{figure}
 
 \section{枝分かれと樹枝状パターン}
-非平衡系のパターンの中でも枝分かれをくりかえして形成される\textbf{樹枝状パターン}は生物組織（図\ref{fig:pattern_formation_dendrite}\subref{fig:blood_vessel_nerve}）や電解析出（図\ref{fig:pattern_formation_dendrite}\subref{fig:electro_deposition}），落雷のような絶縁破壊（図\ref{fig:pattern_formation_dendrite}\subref{fig:thunder}）,フィヨルド（図\ref{fig:pattern_formation_dendrite}\subref{fig:fjord}）のように自然界で広くみられるパターンである。$\SI{e-4}{m}$から$\SI{e5}{m}$ほどの幅広いスケールで見られ，スケールも形成メカニズムも異なるが，普遍的に見られるパターンである。このようなパターンは\textbf{フラクタル（自己相似）構造}をもち，パターンの一部を相似拡大・縮小したものの統計的な性質が元のパターンと一致する性質を持っている。
+非平衡系のパターンの中でも枝分かれをくりかえして形成される\textbf{樹枝状パターン}は生物組織（図\ref{fig:pattern_formation_dendrite}\subref{fig:blood_vessel_nerve}）や電解析出（図\ref{fig:pattern_formation_dendrite}\subref{fig:electro_deposition}），落雷のような絶縁破壊（図\ref{fig:pattern_formation_dendrite}\subref{fig:thunder}）,フィヨルド（図\ref{fig:pattern_formation_dendrite}\subref{fig:fjord}）のように自然界で広くみられるパターンである。$\SI{e-4}{m}$から$\SI{e5}{m}$ほどの幅広いスケールで見られ，スケールも形成メカニズムも異なるが，普遍的に見られるパターンである。このようなパターンは\textbf{フラクタル（自己相似）構造}をもち，パターンの一部を相似拡大・縮小しても統計的な性質が元のパターンと一致する性質を持っている。
 
 \begin{figure}[htbp]
   \begin{tabular}{cc}
@@ -64,7 +64,7 @@
       \label{fig:fjord}
     \end{minipage}
   \end{tabular}
-  \caption{自然界に見られる様々な樹枝状パターン。\subref{fig:blood_vessel_nerve}血管（左）と神経（右）。スケールバー：$\SI{100}{\mu m}=\SI{e-4}{m}$ \cite{mukouyama2002sensory}。\subref{fig:electro_deposition}電解析出による亜鉛の金属樹。中村撮影。パターンの直径はおおよそ$\SI{e-2}{m}$。\subref{fig:thunder}落雷(Wikipedia)。長さスケールはおおよそ$\SI{e3}{m}$。\subref{fig:fjord}フィヨルド(Wikipedia)。河口からの距離はおおよそ$\SI{e5}{m}$。}
+  \caption{自然界に見られる様々な樹枝状パターン。\subref{fig:blood_vessel_nerve}血管（左）と神経（右）。スケールバー：$\SI{100}{\mu m}=\SI{e-4}{m}$ \cite{mukouyama2002sensory}。\subref{fig:electro_deposition}電解析出による亜鉛の金属樹。中村撮影。パターンの直径はおおよそ$\SI{e-1}{m}$。\subref{fig:thunder}落雷(Wikipedia)。長さスケールはおおよそ$\SI{e3}{m}$。\subref{fig:fjord}フィヨルド(Wikipedia)。河口からの距離はおおよそ$\SI{e5}{m}$。}
   \label{fig:pattern_formation_dendrite}
 \end{figure}
 
@@ -77,7 +77,7 @@
   \label{eq:fractal_dimension_def}
 \end{equation}
 
-ここで$N(\varepsilon)$は与えられたパターンを$\varepsilon$のスケールで埋めつくすのに必要な個数(長さ$\varepsilon^{\mathrm{空間次元}}$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元に対応する。例えば,ユークリッド空間中（図\ref{fig:fractal_stracture}\subref{fig:相似次元の考え方}）では，スケールは$\varepsilon=1/l$で与えられる。$\varepsilon=1/1,1/2,1/3$と減少していくとパターンの数$N(\varepsilon)$は増加する。式\eqref{eq:fractal_dimension_def}を用いて計算すると，空間次元$D=1,2,3$に一致する。図\ref{fig:fractal_stracture}\subref{fig:シェルピンスキーのギャスケット}はSierpinskiのギャスケットと呼ばれるパターンである。このパターンは三角形のスケール（三角形の一辺の長さ）を半分にして，中央の三角形を取り去ることで構成される。スケール$\varepsilon$が$\varepsilon=1/2$になると，一辺の長さ$\varepsilon$の三角形の個数$N(\varepsilon)$が3つになる。よって式\eqref{eq:fractal_dimension_def}より$D_f=\log 3/\log 2=1.5849\cdots$となる。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ構造（パターン配置）を持つ。このような\textbf{スケール不変性}を持つ系では，あるスケールで計測できる量（パターンの数，密度等）にスケールの長さに対する冪則が成り立つことが知られている。
+ここで$N(\varepsilon)$は与えられたパターンを$\varepsilon$のスケールで埋めつくすのに必要な個数(長さ$\varepsilon^{\mathrm{空間次元}}$の物差しで何個になるか)である。フラクタル次元は，図形の複雑さを表す指標であり，整数である場合はユークリッド空間における次元に対応する。例えば,ユークリッド空間中（図\ref{fig:fractal_stracture}\subref{fig:相似次元の考え方}）では，スケールは一方向あたりの分割数$l$を用いて$\varepsilon=1/l$で与えられる。$\varepsilon=1/1,1/2,1/3$と減少させるとパターンの数$N(\varepsilon)$は増加する。式\eqref{eq:fractal_dimension_def}を用いて計算すると，空間次元$D=1,2,3$に一致する。図\ref{fig:fractal_stracture}\subref{fig:シェルピンスキーのギャスケット}はSierpinskiのギャスケットと呼ばれるパターンである。このパターンは三角形のスケール（三角形の一辺の長さ）を半分にして，中央の三角形を取り去ることで構成される。スケール$\varepsilon$が$\varepsilon=1/2$になると，一辺の長さ$\varepsilon$の三角形の個数$N(\varepsilon)$が3つになる。よって式\eqref{eq:fractal_dimension_def}より$D_f=\log 3/\log 2=1.5849\cdots$となる。フラクタル構造を持つ系はスケールフリー性を持ち，系の大きさ（スケール）によらず同じ構造（パターン配置）を持つ。このような\textbf{スケール不変性}を持つ系では，あるスケールで計測できる量（パターンの数，密度等）にスケールの長さに対する冪則が成り立つことが知られている。
 
 \begin{figure}[htbp]
   \begin{minipage}{0.45\textwidth}
@@ -106,11 +106,11 @@
   \label{fig:box_counting}
 \end{figure}
 
-ボックスカウンティング法とは，例えば図\ref{fig:box_counting}のように2次元空間内で与えられたパターンのフラクタル次元を求める場合，パターンを様々なスケール（大きさ）の正方形（２次元の場合）で覆い，その正方形の中にパターンが含まれるか否かを数えることでフラクタル次元を求める方法である。
+ボックスカウンティング法とは，例えば図\ref{fig:box_counting}のように2次元空間内で与えられたパターンのフラクタル次元を求める場合，パターンを様々なスケール（大きさ）の正方形（２次元の場合，（一辺の長さ）=（スケールの長さ））で覆い，その正方形の中にパターンが含まれるか否かを数えることでフラクタル次元を求める方法である。
 
-スケールを$\varepsilon$，パターンが少しでも含まれるボックスの個数を$N(\varepsilon)$とすると，フラクタル次元$D_f$とボックスの数の関係はおおよそ$N(\varepsilon)\propto\varepsilon^{D_f}$となる。ボックスの大きさ$\varepsilon$を変え，$N(\varepsilon)$を求め，両対数プロットすることでその傾きからフラクタル次元を求められる。ボックスの大きさを変えて個数を計測するだけのため，コンピュータによる実装が簡単な反面，他の計測法に比べて精度が低い。
+スケールを$\varepsilon$，パターンが少しでも含まれるボックスの個数を$N(\varepsilon)$とすると，フラクタル次元$D_f$とボックスの数の関係はおおよそ$N(\varepsilon)\propto\varepsilon^{D_f}$となる。スケールの大きさ$\varepsilon$を変え，$N(\varepsilon)$を求め，両対数プロットすることでその傾きからフラクタル次元を求められる。スケールの大きさを変えて個数を計測するだけのため，コンピュータによる実装が簡単な反面，他の計測法に比べて精度が低い。
 \subsubsection{回転半径法}
-図\ref{fig:DLA_with_R_g}のようにランダムな要素を含むフラクタルパターンの大きさの目安を与えるのが\textbf{回転半径}である。回転半径$R_g$は
+図\ref{fig:DLA_with_R_g}のようにフラクタルパターンの大きさの目安を与えるのが\textbf{回転半径}である。回転半径$R_g$は
 \begin{align}
   R_g & =\sqrt{\frac{1}{N}\sum_{i=1}^{N}(\bm{r}_i-\bm{r}_{\mathrm{c}})^2}
   \label{eq:gyration_radius}
@@ -124,7 +124,7 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.4\textwidth]{../../figure/part3/DLA_with_R_g.png}
-  \caption{樹枝状パターンの回転半径。おおよそ$R_g=\SI{108}{px}$。回転半径$R_g$がおおよそのパターンの大きさを与える。}
+  \caption{樹枝状パターンの回転半径の例。回転半径$R_g$がおおよそのパターンの大きさを与える。赤色の円はこのパターンにおける$R_g=\SI{108}{px}$の円である。}
   \label{fig:DLA_with_R_g}
 \end{figure}
 

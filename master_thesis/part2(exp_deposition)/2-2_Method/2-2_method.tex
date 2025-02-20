@@ -112,15 +112,15 @@
     \includegraphics[width=0.9\textwidth]{../../figure/part2(exp_deposition)/den_analisys.png}
     \label{fig:den_analisys}
   \end{minipage}
-  \caption{枝の長さと角度の解析方法。\subref{fig:branch_def}枝の長さと角度の定義。\subref{fig:den_input}入力画像。\subref{fig:den_analisys}処理画像。オレンジ色の点が枝の分岐点，青色の点が端点になっている。}
+  \caption{枝の長さと角度の解析方法。\subref{fig:branch_def}枝の長さと角度の定義。\subref{fig:den_input}入力画像。\subref{fig:den_analisys}処理画像。赤色の点が枝の分岐点，青色の点が端点になっている。}
   \label{fig:branch_def_input}
 \end{figure}
 
 入力画像\ref{fig:branch_def_input}\subref{fig:den_input}に対して，処理結果は図\ref{fig:branch_def_input}\subref{fig:den_analisys}のように得られる。青色の点は枝の端を表し，オレンジ色の点は枝の分岐点を表している。
 
-図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義されるピンク色の枝は図\ref{fig:branch_def_input}\subref{fig:den_analisys}の処理画像中の枝の端点と分岐点，あるいは分岐点と分岐点を結ぶ線分で表される。以降この線分を\textbf{普通の枝}と呼ぶ。また，図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される緑色の枝は，普通の枝と，その隣り合ういくつかの普通の枝の内，$\theta_{\mathrm{out}}\geq 0.9\pi$となる枝のペアを一つの長い枝とみなしたものである。以降この長い枝を\textbf{幹}と呼ぶ。
+図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義されるピンク色の枝は図\ref{fig:branch_def_input}\subref{fig:den_analisys}の処理画像中の枝の端点と分岐点，あるいは分岐点と分岐点を結ぶ線分で表される。以降この線分を\textbf{普通の枝}と呼ぶ。また，図\ref{fig:branch_def_input}\subref{fig:branch_def}で定義される緑色の枝は，普通の枝と，その隣り合ういくつかの普通の枝のうち，$\theta_{\mathrm{out}}\geq 0.9\pi$となる枝のペアを一つの長い枝とみなしたものである。以降この長い枝を\textbf{幹}と呼ぶ。
 
-$\theta_{\mathrm{out}}$の定義は，\Red{ある分岐点に対して内側の普通の枝（中心により近い普通の枝）と外側の枝（内側の普通の枝が分かれて形成された複数の普通の枝枝）が成す角度のうち，成す角度が最大となるものとした。ただし，$0\leq\theta_{\mathrm{out}}\leq\pi$とした。$\theta_{\mathrm{out}}$が$0.9\pi$以上になっている普通の枝どうしを一本の枝とみなす定義は，一本の幹のような枝から複数の細かい枝が生える場合の特徴づけ，計測を目的としている。}
+$\theta_{\mathrm{out}}$の定義は，ある分岐点に対して内側の普通の枝（中心により近い普通の枝）と外側の枝（内側の普通の枝が分かれて形成された複数の普通の枝枝）が成す角度のうち，成す角度が最大となるものとした。ただし，$0\leq\theta_{\mathrm{out}}\leq\pi$とした。$\theta_{\mathrm{out}}$が$0.9\pi$以上になっている普通の枝どうしを一本の枝とみなす定義は，一本の幹のような枝から複数の細かい枝が生える場合の特徴づけ，計測を目的としている。
 
 \subsubsection{フィッティングによる分布の計測}
 取得した枝の長さのデータから，その分布を計測した。枝の長さについて，金属樹がフラクタル構造を持つことより，冪分布$f(x)=ax^{-b}$になっていると仮定し，\textbf{相補累積分布関数}を用いて図\ref{fig:fitting_exp}のようにフィッティングを行った。
@@ -143,7 +143,7 @@ $\theta_{\mathrm{out}}$の定義は，\Red{ある分岐点に対して内側の�
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{../../figure/part2(exp_deposition)/fitting_exp.png}
-  \caption{冪分布のフィッティングの例。界面活性剤濃度$\SI{0.05}{\mathrm{vol}\%}$の時の，幹と，幹に含まれない普通の枝の分布を表している。矢印で表した範囲($\SI{10}{px}\approx\SI{1.6}{mm}$以上)でフィッティングを行った。}
+  \caption{冪分布のフィッティングの例。界面活性剤濃度$\SI{0.05}{\mathrm{vol}\%}$の時の，幹及び幹に含まれない普通の枝を合わせた分布を表している。矢印で表した範囲($\SI{10}{px}\approx\SI{1.6}{mm}$以上)でフィッティングを行った。}
   \label{fig:fitting_exp}
 \end{figure}
 

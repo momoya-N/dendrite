@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
@@ -13,7 +13,7 @@
     \label{eq:electro_deposition}
   \end{split}
 \end{equation}
-Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオンの価数を表す。陽極側で金属が電子を放出し，イオンとなって溶液中に溶け出す。一方陰極側では溶液中の金属イオンが電子を受け取り，金属として析出する。このようにして金属イオンが陰極で析出することを\textbf{電解析出}と呼ぶ。
+Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z \ (z>0)$はイオンの価数を表す。陽極側で金属が電子を放出し，イオンとなって溶液中に溶け出す。一方陰極側では溶液中の金属イオンが電子を受け取り，金属として析出する。このようにして金属イオンが陰極で析出することを\textbf{電解析出}と呼ぶ。
 
 電解析出では，電極表面において反対符号のイオンの再配置が起こり，図\ref{fig:debye_layer}のように，電極表面の極薄い層と近傍の反対符号のイオン濃度が高い層が形成される。このような構造は\textbf{電気二重層}と呼ばれる。反対符号のイオンが電極表面の電場を遮蔽するため，溶液のバルクでは電場が減少し，結果的に大部分の溶液中では電場が存在しないとみなせる状態が生じる。
 
@@ -26,12 +26,12 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 
 電気二重層の厚さは，電解質の濃度や温度，溶媒の誘電率に依存する。その厚さは次のように計算できる\cite{足立泰久2013電気二重層とコロイド分散系の凝集}。溶液中のイオン種$i$の個数密度分布$n_i(\bm{x})$がBoltzmann分布
 \begin{equation}
-  n_i(\bm{x}) = n_{i\infty}\exp\ab(-\frac{ez_i\psi(x)}{k_BT})
+  n_i(\bm{x}) = n_{i\infty}\exp\ab(-\frac{ez_i\psi(\bm{x})}{k_BT})
   \label{eq:boltzmann}
 \end{equation}
-に従うと仮定する。ただし，$k_B$はBoltzmann定数，$T$は絶対温度，$e$は電気素量，$z_i$はイオンの価数（正負を含む），$\psi(\bm{x})$は静電ポテンシャル，$n_{i\infty}$はイオンのバルクの個数密度である。個数密度は$k_B T\gg ez_i\psi(x)$ならばいたるところで一様な分布になる。次に電位によるエネルギーが十分大きい場合の，正に帯電した極板（$\psi(\bm{x})|_{\bm{x}=\mathrm{表面}}>0$）に対する陽イオン，陰イオンの個数密度分布を考える。$\lim_{|\bm{x}|\to\infty}\psi(\bm{x})=0$（極板から十分遠い所で電位は0）を仮定すれば，正負どちらのイオンも極板から遠い点では一様分布に近づく。極板に近い部分における陽イオンの個数密度は，$z_i>0$かつ$\psi(\bm{x})|_{\bm{x}=\mathrm{表面}}>0$より$-ez_i\psi(\bm{x})/(k_BT)<0$なので，電位の高い極板付近では指数関数の指数部分が負になるため，極板に近づくにつれて個数密度は急激に減少する。逆に陰イオンの場合は，$z_i<0$より$-ez_i\psi(\bm{x})/(k_BT)>0$となるので，指数関数が極板近傍に近づくにつれて個数密度は急激に増加する。
+に従うと仮定する。ただし，$k_B$はBoltzmann定数，$T$は絶対温度，$e$は電気素量，$z_i$はイオン種$i$のイオンの価数（符号を含む），$\psi(\bm{x})$は静電ポテンシャル，$n_{i\infty}$はイオン種$i$のバルクの個数密度である。個数密度は$k_B T\gg ez_i\psi(x)$ならばいたるところで一様な分布になる。次に電位によるエネルギーが十分大きい場合の，正に帯電した極板（$\psi(\bm{x})|_{\bm{x}=\mathrm{表面}}>0$）に対する陽イオン，陰イオンの個数密度分布を考える。$\lim_{|\bm{x}|\to\infty}\psi(\bm{x})=0$（極板から十分遠い所で電位は0）を仮定すれば，正負どちらのイオンも極板から遠い点では一様分布に近づく。極板に近い部分における陽イオンの個数密度は，$z_i>0$かつ$\psi(\bm{x})|_{\bm{x}=\mathrm{表面}}>0$より$-ez_i\psi(\bm{x})/(k_BT)<0$なので，電位の高い極板付近では指数関数の指数部分が負になるため，極板に近づくにつれて個数密度は急激に減少する。逆に陰イオンの場合は，$z_i<0$より$-ez_i\psi(\bm{x})/(k_BT)>0$となるので，指数関数が極板近傍に近づくにつれて個数密度は急激に増加する。
 
-溶液中の電荷密度$\rho(\bm{x})$は，各イオンの個数密度分布を用いて，$\rho(\bm{x})=\sum_{i}ez_in_i(\bm{x})$と表される。Poisson方程式$\nabla^2\psi(\bm{x})=-\rho(\bm{x})/\varepsilon$に代入すると，\textbf{Poisson-Boltzmann方程式}
+溶液中の電荷密度$\rho(\bm{x})$は，各イオン種$i$についての個数密度分布を用いて，$\rho(\bm{x})=\sum_{i}ez_in_i(\bm{x})$と表される。Poisson方程式$\nabla^2\psi(\bm{x})=-\rho(\bm{x})/\varepsilon$に代入すると，\textbf{Poisson-Boltzmann方程式}
 \begin{equation}
   \nabla^2\psi(\bm{x}) = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi(\bm{x})}{k_BT})
   \label{eq:PB}
@@ -41,26 +41,26 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
   \frac{d^2\psi(x)}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi(x)}{k_BT})
   \label{eq:PB_1D}
 \end{equation}
-となる。式\eqref{eq:PB_1D}を解くと，電気二重層の厚さ$\lambda_D$は
+となる。式\eqref{eq:PB_1D}を静電ポテンシャル$\psi(x)$について解くと，電気二重層の厚さ$\lambda_D$は
 \begin{equation}
   \lambda_D = \sqrt{\frac{\varepsilon_r\varepsilon_0 k_BT}{e^2\sum_{i}n_{i\infty}z_i^2}}\label{eq:debye_length}
 \end{equation}
-で与えられる。（詳しい導出は付録\ref{sec:PB}参照。後の計算のため$\varepsilon$を比誘電率$\varepsilon_r$と真空の誘電率$\varepsilon_0$の積で表した。
+で与えられる（詳しい導出は付録\ref{sec:PB}参照）。後の計算のため$\varepsilon$を比誘電率$\varepsilon_r$と真空の誘電率$\varepsilon_0$の積で表した。
 
-例として，$\ce{ZnSO_4}$ ($\SI{2}{M}$)の場合の電気二重層の厚さを求めると，
+例として，$\ce{ZnSO_4}$ ($\SI{2}{M}$)水溶液の室温における電気二重層の厚さを求めると，
 \begin{itemize}
   \item $\varepsilon_r$ : 比誘電率，$80.4$ (\ce{H_2O})
   \item $T$ : 絶対温度，$\SI{298}{K}$
   \item $n_{i\infty}$ : イオン（$\ce{Zn^{2+},SO_4^{2-}}$）の平均個数密度，$\SI{1.20e27}{m^{-3}}$ （$\SI{2}{M}$相当）
-  \item $z$ : イオンの価数，$2$
+  \item $z_i$ : イオンの価数，$\pm2$
 \end{itemize}
 より，
 \begin{equation}
   \lambda_D\approx \SI{1.09e-1}{nm}
 \end{equation}
-となり，電気二重層の厚さは約$\SI{0.1}{nm}$である。電気二重層の厚さ$\lambda_D$は溶液の拡散層における電位が$e^{-1}$になる距離であり，$\lambda_D$以上の距離では一様なイオン分布とみなすことができる。バルク水溶液中では平均して電気的に中性なために電場がほとんど遮蔽されているとみなせる。そのためイオンの移動は拡散が支配的となる。
+となり，電気二重層の厚さは約$\SI{0.1}{nm}$である。電気二重層の厚さ$\lambda_D$は溶液の拡散層における電位が$\exp(-1)$になる距離であり，$\lambda_D$以上の距離では一様なイオン分布とみなすことができる。バルク水溶液中では平均して電気的に中性なために電場がほとんど遮蔽されているとみなせる。そのためイオンの移動は拡散が支配的となる。
 \subsection{金属樹}
-式\eqref{eq:electro_deposition}の電解析出で生じる金属結晶は図\ref{fig:el_dep_mol}のように，印可する電圧や溶液の温度によってその形態が変化する\cite{suda2003temperature}。その中でも，生じる金属結晶が成長に伴って枝分かれをしていくものを\textbf{金属樹}（図\ref{fig:fractal_dimension}\subref{fig:el_dep_fractal}）と呼ぶ。
+式\eqref{eq:electro_deposition}の電解析出で生じる金属結晶は図\ref{fig:el_dep_mol}のように印可する電圧や溶液の温度によってその形態が変化する\cite{suda2003temperature}。その中でも，生じる金属結晶が成長に伴って枝分かれをしていくものを\textbf{金属樹}（図\ref{fig:fractal_dimension}\subref{fig:el_dep_fractal}）と呼ぶ。
 
 金属樹は，電極間の距離や電圧，溶液の濃度などの条件によって枝分かれの形態や大きさが変化する。金属樹は，その形態がフラクタル構造を持つことが知られており，印加する電圧を増加させたり\cite{matsushita1984fractal},溶液の温度を上昇させると\cite{suda2003temperature}，転移的にフラクタル次元が上昇していくことが知られている(図\ref{fig:fractal_dimension}\subref{fig:Df_volt},\subref{fig:Df_temp})。
 \begin{figure}[htbp]
@@ -95,9 +95,9 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
   \label{fig:fractal_dimension}
 \end{figure}
 
-\subsection{先端分岐（Tip-splitting）とMullins-Sekerka(MS)不安定性}
+\subsection{先端分岐（Tip-splitting）とMullins-Sekerka（MS）不安定性}
 \label{sec:tip_splitting}
-樹枝状パターンの成長過程で，成長界面が何らかの摂動を受けて枝分かれすることを\textbf{先端分岐（Tip-splitting）}といい，金属樹の枝分かれ構造の形成要因となっている。金属樹に限らず，結晶界面が成長していく際，成長界面が平らであっても摂動が加わることで界面が不安定化し，突出部が自然に形成・成長していく。このような不安定性を発見者の名前から\textbf{Mullins-Sekerka(MS)不安定性}と呼ぶ。
+樹枝状パターンの成長過程で，成長界面が何らかの摂動を受けて枝分かれすることを\textbf{先端分岐（Tip-splitting）}といい，金属樹の枝分かれ構造の形成要因となっている。金属樹に限らず，結晶界面が成長していく際，成長界面が平らであっても摂動が加わることで界面が不安定化し，突出部が自然に形成・成長していく。このような不安定性を発見者の名前から\textbf{Mullins-Sekerka（MS）不安定性}と呼ぶ。
 
 ここからはMS不安定性の理論的な概要を述べる。簡単のため，結晶の異方性を無視して，外力や流れが存在しない，物質拡散のみの無限に広い溶液中における球形(半径$R$)の固体の表面が不安定化するメカニズムを考える\cite{フラクタル科学}\cite{mullins1963morphological}。3次元空間の溶液中での分子運動は，粒子の濃度場を$c(\bm{r},t)$,拡散係数を$D$とすると，拡散方程式
 \begin{equation}
@@ -114,13 +114,13 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
   c(r\rightarrow \infty)  = c_{\infty}, \qquad c(r=R)= c_s
   \label{eq:boundary_MS}
 \end{equation}
-とする。ここで，3次元のLaplace方程式の解は，$r\to\infty$で発散しないことより，球面調和関数$Y_{lm}(\theta,\phi)$を用いて式\eqref{eq:spherical}のように表される。($l=0$の時の定数項は$c_\infty$となるので分離した。)
+とする。ここで，3次元のLaplace方程式の解は，$r\to\infty$で発散しないことより，球面調和関数$Y_{lm}(\theta,\phi)$を用いて式\eqref{eq:spherical}のように表される。($r^l$に比例する項の$l=0$の時の定数は$c_\infty$となるので分離した。)
 \begin{equation}
   c(\bm{r}) = c_{\infty} + \sum_{l=0}^{\infty}\sum_{m=-l}^{l}A_{lm}r^{-(l+1)}Y_{l}^{m}(\theta,\phi)
   \label{eq:spherical}
 \end{equation}
 
-流束$\bm{J}_c(\bm{r})$が，Fickの法則$\bm{J}_c(\bm{r})=-D\nabla c(\bm{r})$に従うとすると，界面の成長における，流束の球面に対する法線方向成分（流れ込んだ量）と，微小時間に取り込まれた分子数$\lim_{\Delta t\to 0} (c_0-c_s)\Delta R(t)/\Delta t$（$c_0$は固体内の分子の濃度）は等しい。よって，半径$R=R(t)$の時間発展は，
+粒子の流束$\bm{J}_c(\bm{r})$が，Fickの法則$\bm{J}_c(\bm{r})=-D\nabla c(\bm{r})$に従うとすると，界面の成長における，流束の球面に対する法線方向成分（流れ込んだ量）と，微小時間に取り込まれた分子数$\lim_{\Delta t\to 0} (c_0-c_s)\Delta R(t)/\Delta t$（$c_0$は固体内の分子の濃度）は等しい。よって，半径$R=R(t)$の時間発展は，
 \begin{equation}
   \begin{split}
     \eval{D\pdv{c(\bm{r})}{r}}_{r=R} & = -\bm{e}_r\cdot\bm{J}_c \\
@@ -138,7 +138,7 @@ Mは金属原子，M$^{z+}$は金属イオン，\ce{e^-}は電子，$z$はイオ
 \begin{equation}
   \Gamma_c = \frac{\gamma \omega_0}{k_BT}
 \end{equation}
-で与えられる。$\gamma$は界面エネルギー密度，$\omega_0$は一分子当たりの体積，$k_B$はBoltzmann定数，$T$は絶対温度である。大雑把には界面エネルギーと分子運動によるエネルギーの比を表し，長さの次元を持つ。
+で与えられる。$\gamma$は界面エネルギー密度，$\omega_0$は一分子当たりの体積である。大雑把には界面エネルギーと分子運動によるエネルギーの比を表し，長さの次元を持つ。
 
 まず，$l=m=0$のモードである，半径$R=R(t)$の球形の固相の時間発展について考える。式\eqref{eq:spherical}と境界条件\eqref{eq:boundary_MS}を用いると解は
 

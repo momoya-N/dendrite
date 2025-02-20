@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 \begin{document}
@@ -7,7 +7,7 @@
 \section{数値計算の理論的な基礎とモデル}
 \subsection{ランダムウォーク（RW）と拡散方程式}
 \label{sec:RW}
-溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk: RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。ただし，本節の計算は文献\cite{フラクタル科学}\cite{フラクタルの物理Ⅱ}を参考に計算を拡張した。
+溶液中で粒子が拡散する際，その運動は\textbf{ランダムウォーク(Random Walk：RW)}でモデル化される。RWは粒子がある確率に従ってランダムに移動する運動である。そこで，$d$次元空間内でRWする場合を考える。ただし，本節の計算は文献\cite{フラクタル科学}\cite{フラクタルの物理Ⅱ}を参考に計算を拡張した。
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.4\textwidth]{../../figure/part3/RW_d_dif.png}
@@ -16,7 +16,7 @@
 \end{figure}
 図\ref{fig:random_walk}のように，１ステップ$\Delta t$毎に格子間隔$a$で正方向に確率$p_i=p_i(\bm{x},t)$，負方向に確率$q_i=q_i(\bm{x},t)$で遷移する粒子の運動を考える。各軸が選ばれる確率は等しく，各軸に対して，$p_i+q_i=1/d$が成り立つとする。
 
-この条件のもと，ある時刻$t$，位置$\bm{x}=\{x_1,x_2,\cdots,x_d\}$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$後の濃度は
+この条件のもと，ある時刻$t$，位置$\bm{x}=(x_1,x_2,\cdots,x_d)$での粒子の濃度$c(\bm{x},t)$の時間発展を考える。$\Delta t$後の濃度は
 \begin{equation}
   c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i(\bm{x}-a\bm{e}_i,t) c(\bm{x}-a\bm{e}_i,t)+q_i(\bm{x}+a\bm{e}_i,t) c(\bm{x}+a\bm{e}_i,t)\right]
   \label{eq:RW}
@@ -36,7 +36,7 @@
 \end{equation}
 と表される。式\eqref{eq:RW_diffusion_result}は流束を$\bm{J}=\bm{\bar{F}}c(\bm{x},t)-D\nabla c(\bm{x},t)$としたときの粒子の保存則に他ならない。
 
-例として，電解析出における，電解質溶液中を拡散するイオンの運動を考える。外場として電場$\bm{E}$のみがかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。\Red{この時，電荷密度$\rho(\bm{x},t)$，誘電率$\varepsilon$とすれば，Gaussの法則より，$\nabla\cdot\bm{\bar{F}}=-\mu q \nabla^2\phi=\mu q \rho(\bm{x},t)/\varepsilon$が成り立つ。電解析出において初期に急激な電流が流れた後は電気分解による気体の発生が見られないことより，電解析出の初期段階でイオンの再配置がおこり極板表面に対となるイオンが電気二重層を形成していることが示唆される。そのため，極板から離れた（電気二重層の厚さ以上）バルク溶液中では平均的には電気的中性が満たされているとみなせる。よって$\rho(\bm{x,t})=0$となり，$\nabla\cdot\bar{\bm{F}}=0$を満たす。（この部分の記述は無くても成り立つ？）}よって，電解析出におけるイオンの運動は流束を$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときのイオンの保存則（拡散方程式）に等しくなり，
+例として，電解析出における，電解質溶液中を拡散するイオンの運動を考える。外場として電場$\bm{E}$のみがかかっている場合，電位$\phi$，イオンの電荷$q$，易動度$\mu$とすると，$\bm{\bar{F}}=\mu q\bm{E}=-\mu q \nabla\phi$となる。よって，電解析出におけるイオンの運動は流束を$\bm{J}=-\mu qc(\bm{x},t) \nabla\phi-D\nabla c(\bm{x},t)$としたときのイオンの保存則（拡散方程式）に等しくなり，
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\nabla\cdot\bm{J}
   \label{eq:RW_diffusion_result_divergence_ion}
@@ -49,15 +49,15 @@ Brown運動する粒子は，速度に比例する減衰項，外力項，ラン
   m\odv[2]{\bm{x}}{t}=-\gamma\odv{\bm{x}}{t}+\bm{F}+\bm{\xi}(t)
   \label{eq:Langevin}
 \end{equation}
-で与えられる。$m$は粒子の質量，$\gamma$は抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。空間次元を$d$とすると，ランダム力は\Red{一成分だけなのに分散にdが付いているのはオカシイ？ベクトルとして総和を取れば合っている？}
+で与えられる。$m$は粒子の質量，$\gamma$は抵抗係数，$\bm{F}$は外力，$\bm{\xi}(t)$はランダム力である。ランダム力は
 \begin{equation}
   \begin{split}
-    \langle\xi_\alpha(t)\rangle              & =0                                              \\
-    \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2d\gamma k_B T\delta_{\alpha\beta}\delta(t-t')
+    \langle\xi_\alpha(t)\rangle              & =0                                             \\
+    \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2\gamma k_B T\delta_{\alpha\beta}\delta(t-t')
   \end{split}
   \label{eq:random_force}
 \end{equation}
-を満たす。$\langle\cdots\rangle$は確率分布に関する平均を表し，$k_B$はBoltzmann定数，$T$は絶対温度である。
+を満たす。$\langle\cdots\rangle$は確率分布に関する平均を表す。
 過減衰極限として，慣性項を無視し，外力が電場によるクーロン力のみである場合を考えると，運動方程式は
 \begin{equation}
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
@@ -72,7 +72,7 @@ Brown運動する粒子は，速度に比例する減衰項，外力項，ラン
   \end{split}
   \label{eq:Langevin_overdamped_average}
 \end{equation}
-となる（計算に付いては付録\ref{sec:Langevin_cal}参照）。式\eqref{eq:Langevin_overdamped_average}より，粒子の位置の分散は
+となる（計算に付いては付録\ref{sec:Langevin_cal}参照）。ここで$d$は空間次元である。式\eqref{eq:Langevin_overdamped_average}より，粒子の位置の分散は
 \begin{equation}
   \begin{split}
     \langle(\bm{x}(t)-\langle\bm{x}(t)\rangle)^2\rangle & =2d \frac{k_B T}{\gamma} t \\

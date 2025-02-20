@@ -1,4 +1,4 @@
-\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany,11pt]{bxjsbook}
+\documentclass[autodetect-engine,dvi=dvipdfmx,a4paper,ja=standard,oneside,openany]{bxjsbook}
 \usepackage{../../Preamble/mypackage}
 
 
@@ -46,7 +46,7 @@
   \frac{d^2\psi(x)}{dx^2} = -\frac{e}{\varepsilon}\sum_{i}n_{i\infty}z_i\exp\ab(-\frac{ez_i\psi(x)}{k_BT})
   \label{eq:PB_1D_appendix}
 \end{equation}
-で表される。一般の場合の解析解を導くことは可能ではあるが煩雑で分かりにくい。今回は電気二重層の厚さを求めるだけなので，$ ez_i\psi(x)\ll k_B T$の場合を考える。このとき，指数関数をTaylor展開すると，
+で表される。一般の場合の解析解を導くことは可能ではあるが煩雑で分かりにくい。今回は電気二重層の厚さを求めるだけなので，$ ez_i\psi(x)\ll k_B T$の場合を考える。この近似を\textbf{Debye-Huckel 近似}という。指数関数をTaylor展開すると，
 \begin{equation}
   \exp\ab(-\frac{ez_i\psi(x)}{k_BT})\simeq 1-\frac{ez_i\psi(x)}{k_BT}
 \end{equation}
@@ -79,14 +79,14 @@
 \begin{equation}
   \psi(x)=\psi_0\exp\ab(-\frac{x}{\lambda_D})
 \end{equation}
-となる。この結果より，電気二重層の厚さは$\psi(x)$が電極表面$\psi_0$の$\exp(-1)$倍になる距離，つまり$\lambda_D$であることが示された。
+となる。この結果より，電気二重層の厚さは$\psi(x)$が電極表面$\psi_0$の$\exp(-1)$倍になる距離，つまり$\lambda_D$である。
 \chapter{Brown運動に関する理論計算}
 \section{ランダムウォーク（RW）からの拡散方程式の導出}
 \label{sec:RW_cal}
 1ステップ後の粒子の濃度についての式
 \begin{equation}
   c(\bm{x},t+\Delta t)=\sum_{i=1}^{d}\left[p_i(\bm{x}-a\bm{e}_i,t) c(\bm{x}-a\bm{e}_i,t)+q_i(\bm{x}+a\bm{e}_i,t) c(\bm{x}+a\bm{e}_i,t)\right]
-  \label{eq:RW}
+  \label{eq:RW_appendix}
 \end{equation}
 を左辺は一次，右辺は二次までTaylor展開する。
 \begin{equation}
@@ -100,7 +100,7 @@
   \end{split}
   \label{eq:RW_taylor}
 \end{equation}
-よって，$\Delta t$の一次，$a$の二次まで取ると
+よって，$\Delta t$の一次，$a$の二次までの項を残すと
 \begin{equation}
   \pdv{c(\bm{x},t)}{t}=-\sum_{i=1}^{d}\left[\pdv*{\left\{p_i(\bm{x},t)-q_i(\bm{x},t)\right\}\frac{a}{\Delta t}c(\bm{x},t)}{x_i}\right]+\frac{a^2}{2d\Delta t}\sum_{i=1}^{d}\left[\pdv[2]{c(\bm{x},t)}{x_i}\right]
   \label{eq:RW_diffusion}
@@ -113,11 +113,11 @@
   \odv{\bm{x}}{t}=\mu q\bm{E}+\mu\bm{\xi}(t)
   \label{eq:Langevin_overdamped}
 \end{equation}
-より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行うと求められる。ただしランダム力$\bm{\xi}(t)$は\Red{イントロの過減衰Langevinと同じでdが入っているのはオカシイ？}
+より，時刻$t$での位置$\bm{x}(t)$は0から$t$までの積分を行うと求められる。ただしランダム力$\bm{\xi}(t)$は
 \begin{equation}
   \begin{split}
-    \langle\xi_\alpha(t)\rangle              & =0                                                                       \\
-    \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2d\gamma k_B T\delta_{\alpha\beta}\delta(t-t') \qquad (d:\mathrm{空間次元})
+    \langle\xi_\alpha(t)\rangle              & =0                                             \\
+    \langle\xi_\alpha(t)\xi_\beta(t')\rangle & =2\gamma k_B T\delta_{\alpha\beta}\delta(t-t')
   \end{split}
   \label{eq:random_force}
 \end{equation}
@@ -190,7 +190,7 @@
 \end{equation}
 で与えられる。$r=r_{\mathrm{optimize}}$の時，計算量はGauss-Seidel法が$\mathcal{O}(N^2)$なのに対して, SOR法は（厳密に）$2N$である。Gauss-Seidel法およびSOR法については文献\cite{hinch2020numerical}を参考にした。
 
-\chapter{補足・予備データ}
+\chapter{補足データ}
 \section{金属樹の析出実験の補足データ}
 \begin{figure}[htbp]
   \centering
@@ -205,7 +205,7 @@
   \caption{界面活性剤濃度ごとの金属樹の最大半径$r_{\mathrm{max}}$の時間変化。}
   \label{fig:r_max_time}
 \end{figure}
-図\ref{fig:r_max_time}は界面活性剤濃度ごとの金属樹の最大半径$r_{\mathrm{max}}$の時間変化を示している。高濃度の場合，電流のふるまいと同様に，平らに見える領域が存在した。また，同じ平らな領域を持つ場合でも，$\SI{35}{mm}$付近まで伸びる時間は$\SI{0.05}{\%}$は最長でも$\SI{1000}{s}$に対し，$\SI{0.03}{\%}$は最短でも$\SI{2000}{s}$を超えていた。この差の原因は明らかではないが，$\SI{0.05}{\%}$では急激に成長が進む傾向がみられることから，界面活性剤とイオンの配置が電場によって急激に変わり，``絶縁破壊''の様な現象が起こった可能性がある。
+図\ref{fig:r_max_time}は界面活性剤濃度ごとの金属樹の最大半径$r_{\mathrm{max}}$の時間変化を示している。高濃度の場合，電流のふるまいと同様に，平らに見える領域が存在した。また，同じ平らな領域を持つ場合でも，$\SI{35}{mm}$付近まで伸びる時間は$\SI{0.05}{\%}$は最長でも$\SI{1000}{s}$程度に対し，$\SI{0.03}{\%}$は最短でも$\SI{2000}{s}$を超えていた。この差の原因は明らかではないが，$\SI{0.05}{\%}$では急激に成長が進む傾向がみられることから，より高濃度な条件では界面活性剤とイオンの配置が電場によって急激に変わり，``絶縁破壊''の様な現象が起こった可能性がある。
 \section{数値計算の補足データ}
 本研究の数値計算はRWに電場によるドリフトを加え，界面での固着確率$P$を導入したものであった。結果として，固着確率$P$の影響は電場の影響に比べて優勢であることが示唆された。そこで，電場を含まないRWを行ったとき，固着確率$P$によってパターンのフラクタル次元がどのように変化するかを調べた。
 
@@ -223,7 +223,7 @@
   \caption{固着確率$P$に対するフラクタル次元の変化。}
   \label{fig:D_f_P}
 \end{figure}
-図\ref{fig:D_f_P}より，固着確率$P$の増加に対するフラクタル次元$D_f$の増加傾向は線形ではなく，$P=0.6$程度までは$D_f\simeq1.65$程度であったが，$P<0.6$の範囲では，$P$の減少に伴って$D_f$は急激に増加していた。この結果は電場を導入した際の図\ref{fig:R_g_result}，\ref{fig:fractal_dim_result}における$P=0.10$と$P>0.10$との間の急激な変化と一致している。このような結果から，\Red{固着確率$P$がパターン形成に与える影響は大きいことが示唆された。}
+図\ref{fig:D_f_P}より，固着確率$P$の増加に対するフラクタル次元$D_f$の増加傾向は線形ではなく，$P=0.6$程度までは$D_f\simeq1.65$程度であったが，$P<0.6$の範囲では，$P$の減少に伴って$D_f$は急激に増加していた。この結果は電場を導入した際の図\ref{fig:R_g_result}，\ref{fig:fractal_dim_result}における$P=0.10$と$P>0.10$との間の急激な変化と一致している。このような結果から，固着確率$P$がパターン形成に与える影響は大きいことが示唆された。
 
 \ifdraft{
   \bibliographystyle{../../Preamble/Physics.bst}
